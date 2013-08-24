@@ -16,10 +16,10 @@ game.model = function() {
 
     var playerArrows = initialise2d(PLAYERS);
 
-    var addArrow = function(player, cell, direction) {
+    var addArrow = function(player, arrow) {
         var active = playerArrows[player];
         for (var i = 0; i < active.length; ++i) {
-            if (active[i].x === cell.x && active[i].y === cell.y) {
+            if (active[i].x === arrow.x && active[i].y === arrow.y) {
                 return;
             }
         }
@@ -28,11 +28,7 @@ game.model = function() {
             active.shift();
         }
 
-        active.push({
-            x: cell.x,
-            y: cell.y,
-            d: direction
-        });
+        active.push(arrow);
     };
 
     return {

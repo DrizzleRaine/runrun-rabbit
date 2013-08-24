@@ -60,9 +60,14 @@ game.view = function(parent, model) {
 
     stage.addChild(grid);
 
+    var isRunning = true;
     requestAnimFrame(animate);
 
     function animate() {
+        if (!isRunning) {
+            return;
+        }
+
         while (grid.children.length) {
             grid.removeChild(grid.getChildAt(0));
         }
@@ -78,6 +83,7 @@ game.view = function(parent, model) {
     }
 
     var $arena = $(renderer.view);
+    var clickCallback;
 
     $arena.mousedown(function(event) {
         if (!clickCallback) {
@@ -93,8 +99,14 @@ game.view = function(parent, model) {
         clickCallback(cell);
     });
 
+    function close() {
+        isRunning = false;
+        parent.removeChild(renderer.view);
+    }
+
     return {
-        click: function(callback) { clickCallback = callback }
+        click: function(callback) { clickCallback = callback },
+        close: close
     }
 };
 

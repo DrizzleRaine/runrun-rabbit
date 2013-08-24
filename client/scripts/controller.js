@@ -10,15 +10,34 @@ game.controller = (function() {
         40: 2,
         65: 3,
         37: 3
+    };
+
+    var activeKey = null;
+
+    var model;
+    var view;
+    var socket;
+
+    function startGame() {
+        model = game.model();
+        view = game.view(document.body, model);
+
+        view.click(function(cell) {
+            if (activeKey !== null) {
+                var newArrow = {
+                    x: cell.x,
+                    y: cell.y,
+                    d: keyMap[activeKey]
+                };
+
+                model.addArrow(0, newArrow);
+                socket.emit('placeArrow', newArrow);
+            }
+        });
     }
 
     var init = function() {
         window.oncontextmenu = function() { return false };
-
-        var model = game.model();
-        var view = game.view(document.body, model);
-
-        var activeKey = null;
 
         $(document).keydown(function (event) {
             if (keyMap.hasOwnProperty(event.keyCode.toString())) {
@@ -32,11 +51,23 @@ game.controller = (function() {
             }
         });
 
-        view.click(function(cell) {
-            if (activeKey !== null) {
-                model.addArrow(0, cell, keyMap[activeKey]);
+        socket = io.connect('/');
+        socket.on('start', startGame);
+
+        socket.on('placeArrow', function (data) {
+            if (model) {
+                model.addArrow(1, data);
             }
         });
+
+        socket.on('disconnect', disconnect);
+        socket.on('opponentDisconnect', disconnect);
+
+        function disconnect() {
+            view.close();
+            model = null;
+            view = null;
+        }
     };
 
     return {
