@@ -1,6 +1,6 @@
 var game = game || {};
 
-game.view = function(model) {
+game.view = function(parent, model) {
 
     var CELL_SIZE = 48;
 
@@ -11,7 +11,7 @@ game.view = function(model) {
     var stage = new PIXI.Stage(0x000000);
 
     var renderer = PIXI.autoDetectRenderer(model.width * CELL_SIZE, model.height * CELL_SIZE);
-    document.body.appendChild(renderer.view);
+    parent.appendChild(renderer.view);
 
     var grid = new PIXI.Graphics();
 
