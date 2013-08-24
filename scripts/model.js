@@ -3,34 +3,41 @@ var game = game || {};
 game.model = function() {
     var WIDTH = 12;
     var HEIGHT = 10;
+    var PLAYERS = 2;
+    var MAX_ARROWS = 3;
 
-    var cells = [];
-    for (var i = 0; i < WIDTH; ++i) {
-        cells[i] = [];
+    function initialise2d(size) {
+        var arr = [];
+        for (var i = 0; i < size; ++i) {
+            arr[i] = [];
+        }
+        return arr;
     }
 
-    var activeCells = [];
+    var playerArrows = initialise2d(PLAYERS);
 
-    var activate = function(cell) {
-        if (isActive(cell.x, cell.y)) {
-            return;
+    var addArrow = function(player, cell, direction) {
+        var active = playerArrows[player];
+        for (var i = 0; i < active.length; ++i) {
+            if (active[i].x === cell.x && active[i].y === cell.y) {
+                return;
+            }
         }
 
-        if (activeCells.length === 3) {
-            var deactivate = activeCells.shift();
-            cells[deactivate.x][deactivate.y] = false;
+        if (active.length === MAX_ARROWS) {
+            active.shift();
         }
-        activeCells.push(cell);
-        cells[cell.x][cell.y] = true;
-    };
 
-    var isActive = function(i, j) {
-        return cells[i][j];
+        active.push({
+            x: cell.x,
+            y: cell.y,
+            d: direction
+        });
     };
 
     return {
-        activate: activate,
-        isActive: isActive,
+        addArrow: addArrow,
+        playerArrows: playerArrows,
         width: WIDTH,
         height: HEIGHT
     }
