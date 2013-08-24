@@ -1,4 +1,4 @@
-var server = require('./server/server.js');
+var server = require('./build/server/server.js');
 server.start(function() {
     console.info("Server started...");
 });

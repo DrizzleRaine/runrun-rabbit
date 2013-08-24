@@ -1,6 +1,4 @@
-var game = game || {};
-
-game.model = function() {
+exports.build = function build() {
     var WIDTH = 12;
     var HEIGHT = 10;
     var PLAYERS = 2;

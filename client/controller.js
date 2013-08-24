@@ -1,6 +1,4 @@
-var game = game || {};
-
-game.controller = (function() {
+module.exports = (function() {
     var keyMap = {
         87: 0,
         38: 0,
@@ -14,13 +12,16 @@ game.controller = (function() {
 
     var activeKey = null;
 
+    var modelFactory = require('../shared/model.js');
+    var viewFactory = require('./view.js');
+
     var model;
     var view;
     var socket;
 
     function startGame() {
-        model = game.model();
-        view = game.view(document.getElementById('game'), model);
+        model = modelFactory.build();
+        view = viewFactory.build(document.getElementById('game'), model);
 
         view.click(function(cell) {
             if (activeKey !== null) {

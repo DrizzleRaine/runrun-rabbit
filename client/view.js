@@ -1,6 +1,4 @@
-var game = game || {};
-
-game.view = function(parent, model) {
+exports.build = function build(parent, model) {
 
     var CELL_SIZE = 48;
 
@@ -109,4 +107,3 @@ game.view = function(parent, model) {
         close: close
     }
 };
-
