@@ -17,18 +17,20 @@ game.model = function() {
     var playerArrows = initialise2d(PLAYERS);
 
     var addArrow = function(player, arrow) {
-        var active = playerArrows[player];
-        for (var i = 0; i < active.length; ++i) {
-            if (active[i].x === arrow.x && active[i].y === arrow.y) {
-                return;
+        for (var p = 0; p < playerArrows.length; ++p) {
+            for (var a = 0; a < playerArrows[p].length; ++a) {
+                if (playerArrows[p][a].x === arrow.x && playerArrows[p][a].y === arrow.y) {
+                    return;
+                }
             }
         }
 
-        if (active.length === MAX_ARROWS) {
-            active.shift();
+        var ownArrows = playerArrows[player];
+        if (ownArrows.length === MAX_ARROWS) {
+            ownArrows.shift();
         }
 
-        active.push(arrow);
+        ownArrows.push(arrow);
     };
 
     return {

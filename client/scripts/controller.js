@@ -20,7 +20,7 @@ game.controller = (function() {
 
     function startGame() {
         model = game.model();
-        view = game.view(document.body, model);
+        view = game.view(document.getElementById('game'), model);
 
         view.click(function(cell) {
             if (activeKey !== null) {

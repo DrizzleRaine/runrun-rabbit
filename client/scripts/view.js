@@ -6,7 +6,7 @@ game.view = function(parent, model) {
 
     var CELL_COLOURS = [0xEEEEEE, 0xCCCCCC];
     var ARROW_COLOUR = 0xFFFFFF;
-    var PLAYER_COLOURS = [0x0066FF, 0x00CC33];
+    var PLAYER_COLOURS = [0x007fff, 0x3fb618];
 
     var stage = new PIXI.Stage(0x000000);
 
