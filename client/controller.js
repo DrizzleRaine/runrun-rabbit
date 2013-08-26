@@ -32,12 +32,14 @@ module.exports = (function() {
                 };
 
                 model.addArrow(0, newArrow);
-                socket.emit('placeArrow', newArrow);
+                if (socket) {
+                    socket.emit('placeArrow', newArrow);
+                }
             }
         });
     }
 
-    var init = function() {
+    var init = function(multiplayer) {
         window.oncontextmenu = function() { return false };
 
         $(document).keydown(function (event) {
@@ -52,22 +54,26 @@ module.exports = (function() {
             }
         });
 
-        socket = io.connect('/');
-        socket.on('start', startGame);
+        if (multiplayer) {
+            socket = io.connect('/');
+            socket.on('start', startGame);
 
-        socket.on('placeArrow', function (data) {
-            if (model) {
-                model.addArrow(1, data);
+            socket.on('placeArrow', function (data) {
+                if (model) {
+                    model.addArrow(1, data);
+                }
+            });
+
+            socket.on('disconnect', disconnect);
+            socket.on('opponentDisconnect', disconnect);
+
+            function disconnect() {
+                view.close();
+                model = null;
+                view = null;
             }
-        });
-
-        socket.on('disconnect', disconnect);
-        socket.on('opponentDisconnect', disconnect);
-
-        function disconnect() {
-            view.close();
-            model = null;
-            view = null;
+        } else {
+            startGame();
         }
     };
 

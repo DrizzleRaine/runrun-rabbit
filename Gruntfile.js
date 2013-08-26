@@ -16,12 +16,17 @@ module.exports = function(grunt) {
                     { src: ['server/**'], dest: 'build/' }
                 ]
             }
+        },
+        watch: {
+            files: ['client/**/*.js', 'shared/**/*.js', 'client/**/*.html', 'client/**/*.css'],
+            tasks: ['browserify', 'copy']
         }
     });
 
     grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-contrib-watch');
 
     grunt.registerTask('default', ['clean', 'browserify', 'copy']);
 };

@@ -4,7 +4,6 @@ var lobby = require('./lobby.js');
 
 var server;
 
-
 exports.TEST_PORT = 5000;
 
 exports.start = function(callback) {
@@ -13,6 +12,7 @@ exports.start = function(callback) {
     app.use(express.static(path.resolve(__dirname + '/../client')));
 
     var port = process.env.PORT || exports.TEST_PORT;
+    console.log('starting server on port ' + port);
     server = app.listen(port, callback);
 
     lobby(server);

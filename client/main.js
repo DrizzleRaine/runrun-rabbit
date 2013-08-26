@@ -1,2 +1,14 @@
 var controller = require('./controller.js');
-controller.init();
+
+$(document).ready(function() {
+    $('#startSinglePlayer').click(function() {
+        $('#menu').hide();
+        controller.init(false);
+    });
+
+    $('#startMultiplayer').click(function() {
+        $('#menu').hide();
+        controller.init(true);
+    });
+});
+

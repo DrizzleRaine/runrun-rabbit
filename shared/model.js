@@ -1,3 +1,5 @@
+var levels = require('./levels.js');
+
 exports.build = function build() {
     var WIDTH = 12;
     var HEIGHT = 10;
@@ -14,12 +16,12 @@ exports.build = function build() {
 
     var playerArrows = initialise2d(PLAYERS);
 
-    var addArrow = function(player, arrow) {
+    var level = levels[1];
+
+    function addArrow(player, arrow) {
         for (var p = 0; p < playerArrows.length; ++p) {
-            for (var a = 0; a < playerArrows[p].length; ++a) {
-                if (playerArrows[p][a].x === arrow.x && playerArrows[p][a].y === arrow.y) {
-                    return;
-                }
+            if (getAtCell(playerArrows[p], arrow.x, arrow.y)) {
+                return;
             }
         }
 
@@ -29,11 +31,32 @@ exports.build = function build() {
         }
 
         ownArrows.push(arrow);
-    };
+    }
+
+    function getSource(x, y) {
+        return getAtCell(level.sources, x, y);
+    }
+
+    function getSink(x, y) {
+        return getAtCell(level.sinks, x, y);
+    }
+
+    function getAtCell(objects, x, y) {
+        for (var i = 0; i < objects.length; ++i) {
+            if (objects[i].x === x && objects[i].y === y) {
+                return objects[i];
+            }
+        }
+        return null;
+    }
 
     return {
         addArrow: addArrow,
         playerArrows: playerArrows,
+        getSource: getSource,
+        getSink: getSink,
+        sinks: level.sinks,
+        sources: level.sources,
         width: WIDTH,
         height: HEIGHT
     }

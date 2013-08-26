@@ -1,65 +1,18 @@
 exports.build = function build(parent, model) {
+    var constants = require('./graphics/constants.js');
 
-    var CELL_SIZE = 48;
+    var stage = new PIXI.Stage(constants.COLOURS.BACKGROUND);
 
-    var CELL_COLOURS = [0xEEEEEE, 0xCCCCCC];
-    var ARROW_COLOUR = 0xFFFFFF;
-    var PLAYER_COLOURS = [0x007fff, 0x3fb618];
-
-    var stage = new PIXI.Stage(0x000000);
-
-    var renderer = PIXI.autoDetectRenderer(model.width * CELL_SIZE, model.height * CELL_SIZE);
+    var renderer = PIXI.autoDetectRenderer(model.width * constants.CELL_SIZE, model.height * constants.CELL_SIZE);
     parent.appendChild(renderer.view);
 
-    var grid = new PIXI.Graphics();
-
-    var cellFill = 0;
-    for (var i = 0; i < model.width; ++i) {
-        for (var j = 0; j < model.height; ++j) {
-            var cellOriginX = i * CELL_SIZE;
-            var cellOriginY = j * CELL_SIZE;
-
-            grid.beginFill(CELL_COLOURS[cellFill], 1);
-            grid.drawRect(cellOriginX, cellOriginY, CELL_SIZE, CELL_SIZE);
-
-            cellFill = 1-cellFill;
-        }
-        cellFill = 1-cellFill;
-    }
-
-    function drawArrow(player, i, j, direction) {
-        var arrow = new PIXI.Graphics();
-
-        arrow.position.x = i * CELL_SIZE + CELL_SIZE / 2;
-        arrow.position.y = j * CELL_SIZE + CELL_SIZE / 2;
-        arrow.pivot.x = CELL_SIZE / 2;
-        arrow.pivot.y = CELL_SIZE / 2;
-
-        arrow.beginFill(PLAYER_COLOURS[player], 0.6);
-        arrow.drawRect(0, 0, CELL_SIZE, CELL_SIZE);
-
-        arrow.beginFill(ARROW_COLOUR, 1);
-        arrow.moveTo(23.5, 7.5);
-        arrow.lineTo(39.5, 23.5);
-        arrow.lineTo(31.5, 23.5);
-        arrow.lineTo(31.5, 39.5);
-        arrow.lineTo(15.5, 40.5);
-        arrow.lineTo(15.5, 23.5);
-        arrow.lineTo(7.5, 23.5);
-        arrow.lineTo(23.5, 7.5);
-        arrow.endFill();
-
-        grid.addChild(arrow);
-
-        arrow.rotation = (direction || 0) * Math.PI / 2;
-
-        return arrow;
-    }
+    var grid = require('./graphics/grid.js')(model);
+    var fixtures = require('./graphics/fixtures.js')(grid);
 
     stage.addChild(grid);
-
     var isRunning = true;
-    requestAnimFrame(animate);
+
+    window.requestAnimationFrame(animate);
 
     function animate() {
         if (!isRunning) {
@@ -72,12 +25,20 @@ exports.build = function build(parent, model) {
 
         $.each(model.playerArrows, function(player, playerArrows) {
             $.each(playerArrows, function(i, arrow) {
-                drawArrow(player, arrow.x, arrow.y, arrow.d);
+                fixtures.drawArrow(player, arrow.x, arrow.y, arrow.d);
             });
         });
 
+        model.sources.forEach(function(source) {
+            fixtures.drawSource(source);
+        });
+
+        model.sinks.forEach(function(sink) {
+            fixtures.drawSink(sink);
+        });
+
         renderer.render(stage);
-        requestAnimFrame(animate);
+        window.requestAnimationFrame(animate);
     }
 
     var $arena = $(renderer.view);
@@ -90,9 +51,9 @@ exports.build = function build(parent, model) {
 
         var offset = $arena.offset();
         var cell = {};
-        cell.x = Math.floor((event.pageX - offset.left) / CELL_SIZE);
 
-        cell.y = Math.floor((event.pageY - offset.top) / CELL_SIZE);
+        cell.x = Math.floor((event.pageX - offset.left) / constants.CELL_SIZE);
+        cell.y = Math.floor((event.pageY - offset.top) / constants.CELL_SIZE);
 
         clickCallback(cell);
     });
