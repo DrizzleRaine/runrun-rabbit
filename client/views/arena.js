@@ -1,14 +1,14 @@
 exports.build = function build(parent, model) {
-    var constants = require('./graphics/constants.js');
+    var constants = require('../graphics/constants.js');
 
     var stage = new PIXI.Stage(constants.COLOURS.BACKGROUND);
 
     var renderer = PIXI.autoDetectRenderer(model.width * constants.CELL_SIZE, model.height * constants.CELL_SIZE);
     parent.appendChild(renderer.view);
 
-    var grid = require('./graphics/grid.js')(model);
-    var fixtures = require('./graphics/fixtures.js')(grid);
-    var sprites = require('./graphics/sprites.js')(grid);
+    var grid = require('../graphics/grid.js')(model);
+    var fixtures = require('../graphics/fixtures.js')(grid);
+    var sprites = require('../graphics/sprites.js')(grid);
 
     stage.addChild(grid);
     var isRunning = true;

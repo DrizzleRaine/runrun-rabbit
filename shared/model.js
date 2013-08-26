@@ -11,6 +11,8 @@ exports.build = function build(level) {
     var MAX_ARROWS = 3;
     var playerArrows = arrayUtils.initialise(PLAYERS, function() { return []; });
     var playerScores = arrayUtils.initialise(PLAYERS, 0);
+    var playerTimes = arrayUtils.initialise(PLAYERS, 9999);
+    var playerHuds = [];
 
     function addArrow(player, arrow) {
         if (getArrow(arrow.x, arrow.y)) {
@@ -42,15 +44,37 @@ exports.build = function build(level) {
         playerScores[player] += score;
     }
 
+    function completePlayerTurn(player) {
+        if (currentPlayer === player) {
+            currentPlayer = (++currentPlayer) % PLAYERS;
+        }
+    }
+
+    function registerHud(hud, player) {
+        hud.done(function() {
+            completePlayerTurn(player);
+        });
+        playerHuds[player] = hud;
+    }
+
     var lastUpdate = new Date().getTime();
     var TICK = 1000;
+    var currentPlayer = 0;
 
     function update() {
         var now = new Date().getTime();
         var delta = now - lastUpdate;
-        /*if (delta > 1000) {
-            throw new Error("Lagged out");
-        }*/
+
+        if (delta > 1000) {
+            throw new Error("lagged out");
+        }
+
+        playerTimes[currentPlayer] -= delta;
+
+        if (playerTimes[currentPlayer] <= 0) {
+            playerTimes[currentPlayer] = 0;
+            completePlayerTurn(currentPlayer);
+        }
 
         var remainingCritters = [];
         while (critters.length) {
@@ -71,6 +95,13 @@ exports.build = function build(level) {
         }
 
         lastUpdate = now;
+
+        playerHuds.forEach(function(hud, player) {
+            hud.update({
+                score: playerScores[player],
+                time: playerTimes[player]
+            })
+        });
     }
 
     model.width = level.width;
@@ -79,6 +110,8 @@ exports.build = function build(level) {
     model.sinks = level.sinks;
     model.critters = critters;
     model.playerArrows = playerArrows;
+    model.playerTimes = playerTimes;
+    model.registerHud = registerHud;
     model.update = update;
     model.addArrow = addArrow;
     model.getArrow = getArrow;

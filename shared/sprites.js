@@ -35,7 +35,7 @@ Critter.prototype.update = function(model, deltaT) {
         var sink = gridUtils.getAtCell(model.sinks, centreX, centreY);
         if (sink !== null) {
             this.inPlay = false;
-            if (sink.player) {
+            if (sink.player !== null) {
                 model.rewardPlayer(sink.player, 1);
             }
         } else {

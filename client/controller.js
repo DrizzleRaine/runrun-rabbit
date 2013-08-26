@@ -14,17 +14,18 @@ module.exports = (function() {
 
     var modelFactory = require('../shared/model.js');
     var levels = require('../shared/levels.js');
-    var viewFactory = require('./view.js');
 
     var model;
-    var view;
+    var playArea;
     var socket;
 
     function startGame() {
         model = modelFactory.build(levels[1]);
-        view = viewFactory.build(document.getElementById('game'), model);
 
-        view.click(function(cell) {
+        var container = document.getElementById('game');
+        playArea = require('./views/arena.js').build(container, model);
+
+        playArea.click(function(cell) {
             if (activeKey !== null) {
                 var newArrow = {
                     x: cell.x,
@@ -37,6 +38,11 @@ module.exports = (function() {
                     socket.emit('placeArrow', newArrow);
                 }
             }
+        });
+
+        var hudFactory = require('./views/hud.js');
+        $.each(model.playerTimes, function(player) {
+            model.registerHud(hudFactory.build(container, player), player);
         });
     }
 
@@ -69,9 +75,9 @@ module.exports = (function() {
             socket.on('opponentDisconnect', disconnect);
 
             function disconnect() {
-                view.close();
+                playArea.close();
                 model = null;
-                view = null;
+                playArea = null;
             }
         } else {
             startGame();

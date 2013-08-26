@@ -1,8 +1,48 @@
+#game {
+    text-align: center;
+}
+
 #game canvas {
-    margin: 0 auto;
     display: block;
+    margin: 0 auto;
+}
+
+#game canvas:first-child {
     border: 3px solid #333333;
     border-radius: 3px;
+}
+
+.hud {
+    padding-top: 2em;
+}
+
+#hud-0 {
+    float: left;
+    margin-left: 10%;
+}
+
+#hud-1 {
+    float: right;
+    margin-right: 10%;
+}
+
+@media screen and (min-width: 1200px) {
+    #game canvas {
+        float: left;
+        margin-left: 25%;
+    }
+
+    #hud-0 {
+        width: 25%;
+        clear: none;
+        margin: 0 0 0 -75%;
+    }
+
+    #hud-1 {
+        width: 25%;
+        clear: none;
+        margin: 0;
+    }
 }
 
 h1 {
@@ -17,4 +57,12 @@ h1 {
 #menu .btn {
     width: 100%;
     margin-top: 1em;
+}
+
+.btn-lg {
+    font-weight: normal;
+}
+
+h3.score {
+    font-size: 3em;
 }
