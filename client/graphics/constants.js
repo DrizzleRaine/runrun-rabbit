@@ -6,7 +6,7 @@ module.exports = {
         PLAYER: [0x007fff, 0x3fb618],
         ARROW: 0xFFFFFF,
         NPC: {
-            FRIENDLY: 0x9954bb,
+            FRIENDLY: [0x9954bb,0xAD76C9],
             ENEMY: 0xff7518
         }
     }

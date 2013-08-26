@@ -45,7 +45,7 @@ module.exports = function(grid) {
     function drawSource(source) {
         common.drawObject(function(graphics) {
             shadeCell3d(graphics, true);
-        }, source.x, source.y, constants.COLOURS.NPC.FRIENDLY, 1, 0);
+        }, source.x, source.y, constants.COLOURS.NPC.FRIENDLY[0], 1, 0);
         common.drawObject(function(graphics) {
             graphics.beginFill(constants.COLOURS.CELL[2], 1);
             graphics.moveTo(constants.CELL_SIZE / 6, 0);
@@ -53,7 +53,7 @@ module.exports = function(grid) {
             graphics.lineTo(constants.CELL_SIZE * 2 / 3, constants.CELL_SIZE / 6);
             graphics.lineTo(constants.CELL_SIZE / 3, constants.CELL_SIZE / 6);
             graphics.lineTo(constants.CELL_SIZE / 6, 0);
-            graphics.beginFill(constants.COLOURS.NPC.FRIENDLY, 1);
+            graphics.beginFill(constants.COLOURS.NPC.FRIENDLY[0], 1);
             graphics.drawRect(constants.CELL_SIZE / 4, constants.CELL_SIZE / 4,
                 constants.CELL_SIZE / 2, constants.CELL_SIZE / 2);
         }, source.x, source.y, null, null, source.direction);

@@ -14,7 +14,7 @@ module.exports = function(grid) {
             graphics.drawRect(0, 0, constants.CELL_SIZE, constants.CELL_SIZE);
         }
 
-        drawDetail(graphics);
+        drawDetail(graphics, constants.CELL_SIZE);
         grid.addChild(graphics);
 
         if (direction) {
