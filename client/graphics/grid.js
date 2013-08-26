@@ -1,6 +1,6 @@
 module.exports = function(model) {
     var constants = require('./constants.js');
-    
+
     var grid = new PIXI.Graphics();
     var cellFill = 0;
     for (var i = 0; i < model.width; ++i) {

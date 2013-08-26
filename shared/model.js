@@ -1,28 +1,20 @@
 var levels = require('./levels.js');
 
-exports.build = function build() {
-    var WIDTH = 12;
-    var HEIGHT = 10;
+exports.build = function build(level) {
+    var model = {};
+
+    var gridUtils = require('./utils/grid.js');
+    var arrayUtils = require('./utils/array.js');
+    var sprites = require('./sprites.js');
+
     var PLAYERS = 2;
     var MAX_ARROWS = 3;
-
-    function initialise2d(size) {
-        var arr = [];
-        for (var i = 0; i < size; ++i) {
-            arr[i] = [];
-        }
-        return arr;
-    }
-
-    var playerArrows = initialise2d(PLAYERS);
-
-    var level = levels[1];
+    var playerArrows = arrayUtils.initialise(PLAYERS, function() { return []; });
+    var playerScores = arrayUtils.initialise(PLAYERS, 0);
 
     function addArrow(player, arrow) {
-        for (var p = 0; p < playerArrows.length; ++p) {
-            if (getAtCell(playerArrows[p], arrow.x, arrow.y)) {
-                return;
-            }
+        if (getArrow(arrow.x, arrow.y)) {
+            return false;
         }
 
         var ownArrows = playerArrows[player];
@@ -31,33 +23,66 @@ exports.build = function build() {
         }
 
         ownArrows.push(arrow);
+        return true;
     }
 
-    function getSource(x, y) {
-        return getAtCell(level.sources, x, y);
-    }
-
-    function getSink(x, y) {
-        return getAtCell(level.sinks, x, y);
-    }
-
-    function getAtCell(objects, x, y) {
-        for (var i = 0; i < objects.length; ++i) {
-            if (objects[i].x === x && objects[i].y === y) {
-                return objects[i];
+    function getArrow(i, j) {
+        for (var p = 0; p < playerArrows.length; ++p) {
+            var arrow = gridUtils.getAtCell(playerArrows[p], i, j);
+            if (arrow) {
+                return arrow;
             }
         }
         return null;
     }
 
-    return {
-        addArrow: addArrow,
-        playerArrows: playerArrows,
-        getSource: getSource,
-        getSink: getSink,
-        sinks: level.sinks,
-        sources: level.sources,
-        width: WIDTH,
-        height: HEIGHT
+    var critters = [];
+
+    function rewardPlayer(player, score) {
+        playerScores[player] += score;
     }
+
+    var lastUpdate = new Date().getTime();
+    var TICK = 1000;
+
+    function update() {
+        var now = new Date().getTime();
+        var delta = now - lastUpdate;
+        /*if (delta > 1000) {
+            throw new Error("Lagged out");
+        }*/
+
+        var remainingCritters = [];
+        while (critters.length) {
+            var critter = critters.pop();
+            critter.update(model, delta);
+            if (critter.inPlay) {
+                remainingCritters.push(critter);
+            }
+        }
+        while (remainingCritters.length) {
+            critters.push(remainingCritters.pop());
+        }
+
+        if (Math.floor(now / TICK) > Math.floor(lastUpdate / TICK)) {
+            level.sources.forEach(function(source) {
+                critters.push(new sprites.Critter(source));
+            });
+        }
+
+        lastUpdate = now;
+    }
+
+    model.width = level.width;
+    model.height = level.height;
+    model.sources = level.sources;
+    model.sinks = level.sinks;
+    model.critters = critters;
+    model.playerArrows = playerArrows;
+    model.update = update;
+    model.addArrow = addArrow;
+    model.getArrow = getArrow;
+    model.rewardPlayer = rewardPlayer;
+
+    return model;
 };

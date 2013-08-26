@@ -8,6 +8,7 @@ exports.build = function build(parent, model) {
 
     var grid = require('./graphics/grid.js')(model);
     var fixtures = require('./graphics/fixtures.js')(grid);
+    var sprites = require('./graphics/sprites.js')(grid);
 
     stage.addChild(grid);
     var isRunning = true;
@@ -23,6 +24,8 @@ exports.build = function build(parent, model) {
             grid.removeChild(grid.getChildAt(0));
         }
 
+        model.update();
+
         $.each(model.playerArrows, function(player, playerArrows) {
             $.each(playerArrows, function(i, arrow) {
                 fixtures.drawArrow(player, arrow.x, arrow.y, arrow.d);
@@ -35,6 +38,10 @@ exports.build = function build(parent, model) {
 
         model.sinks.forEach(function(sink) {
             fixtures.drawSink(sink);
+        });
+
+        model.critters.forEach(function(critter) {
+            sprites.drawCritter(critter);
         });
 
         renderer.render(stage);

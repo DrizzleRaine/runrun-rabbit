@@ -13,6 +13,7 @@ module.exports = (function() {
     var activeKey = null;
 
     var modelFactory = require('../shared/model.js');
+    var levels = require('../shared/levels.js');
     var viewFactory = require('./view.js');
 
     var model;
@@ -20,7 +21,7 @@ module.exports = (function() {
     var socket;
 
     function startGame() {
-        model = modelFactory.build();
+        model = modelFactory.build(levels[1]);
         view = viewFactory.build(document.getElementById('game'), model);
 
         view.click(function(cell) {
