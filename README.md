@@ -5,10 +5,17 @@ My entry for Ludum Dare #27
 
 Competitive puzzle game for two players
 
-Getting started
----------------
+Pre-requisites
+--------------
 
 Install node.js
+Install grunt:
+```
+npm install -g grunt-cli
+```
+
+Getting started
+---------------
 
 Clone the repo
 
