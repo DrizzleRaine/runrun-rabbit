@@ -1,19 +1,9 @@
 module.exports = (function() {
-    var keyMap = {
-        87: 0,
-        38: 0,
-        68: 1,
-        39: 1,
-        83: 2,
-        40: 2,
-        65: 3,
-        37: 3
-    };
-
     var activeKey = null;
 
     var modelFactory = require('../shared/model.js');
     var levels = require('../shared/levels.js');
+    var direction = require('../shared/utils/direction.js');
 
     var model;
     var playArea;
@@ -30,7 +20,7 @@ module.exports = (function() {
                 var newArrow = {
                     x: cell.x,
                     y: cell.y,
-                    d: keyMap[activeKey]
+                    d: direction.fromKey(activeKey)
                 };
 
                 model.addArrow(0, newArrow);
@@ -50,8 +40,9 @@ module.exports = (function() {
         window.oncontextmenu = function() { return false };
 
         $(document).keydown(function (event) {
-            if (keyMap.hasOwnProperty(event.keyCode.toString())) {
+            if (direction.fromKey(event.keyCode) !== null) {
                 activeKey = event.keyCode;
+                event.preventDefault();
             }
         });
 

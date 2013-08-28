@@ -1,3 +1,18 @@
+var keyMap = {
+    87: 0, 38: 0,
+    68: 1, 39: 1,
+    83: 2, 40: 2,
+    65: 3, 37: 3
+};
+
+module.exports.fromKey = function fromKey(keyCode) {
+    if (keyMap.hasOwnProperty(keyCode.toString())) {
+        return keyMap[keyCode];
+    } else {
+        return null;
+    }
+};
+
 module.exports.components = function components(direction) {
     var ret = { x: 0, y: 0 };
 
