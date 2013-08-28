@@ -9,9 +9,10 @@ Getting started
 ---------------
 
 Install node.js
-Clone the repo
-Build:
 
+Clone the repo
+
+Build:
 ```
 npm install
 grunt
