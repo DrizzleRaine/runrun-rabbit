@@ -28,7 +28,7 @@ exports.build = function build(parent, model) {
 
         $.each(model.playerArrows, function(player, playerArrows) {
             $.each(playerArrows, function(i, arrow) {
-                fixtures.drawArrow(player, arrow.x, arrow.y, arrow.d);
+                fixtures.drawArrow(player, arrow);
             });
         });
 

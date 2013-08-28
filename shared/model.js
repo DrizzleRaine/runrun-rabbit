@@ -15,8 +15,14 @@ exports.build = function build(level) {
     var playerHuds = [];
 
     function addArrow(player, arrow) {
-        if (getArrow(arrow.x, arrow.y)) {
-            return false;
+        var existingArrow = getArrow(arrow.x, arrow.y);
+        if (existingArrow) {
+            if (arrow.confirmed && !existingArrow.confirmed) {
+                existingArrow.confirmed = true;
+                return true;
+            } else {
+                return false;
+            }
         }
 
         var ownArrows = playerArrows[player];
@@ -36,6 +42,16 @@ exports.build = function build(level) {
             }
         }
         return null;
+    }
+
+    function cancelArrow(player, arrow) {
+        for (var i = 0; i < playerArrows[player].length; ++i) {
+            if (playerArrows[player][i].x === arrow.x && playerArrows[player][i].y === arrow.y) {
+                playerArrows[player].splice(i, 1);
+                return true;
+            }
+        }
+        return false;
     }
 
     var critters = [];
@@ -114,6 +130,7 @@ exports.build = function build(level) {
     model.registerHud = registerHud;
     model.update = update;
     model.addArrow = addArrow;
+    model.cancelArrow = cancelArrow;
     model.getArrow = getArrow;
     model.rewardPlayer = rewardPlayer;
 

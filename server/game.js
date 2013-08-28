@@ -1,11 +1,31 @@
 var activeGames = [];
 
+var modelFactory = require('../shared/model.js');
+
 function configure(io) {
     function start(room) {
-        io.sockets.in(room).emit('start');
-        io.sockets.clients(room).forEach(function (socket) {
-            socket.on('placeArrow', function(data) {
-                socket.broadcast.to(room).emit('placeArrow', data);
+        var gameData = {
+            levelId: 1
+        };
+        var model = modelFactory.build(gameData);
+
+        io.sockets.clients(room).forEach(function (socket, index) {
+            socket.emit('start', {
+                playerId: index,
+                levelId: gameData.levelId
+            });
+            socket.on('placeArrow', function(arrow) {
+                arrow.confirmed = true;
+                if (model.addArrow(index, arrow)) {
+                    var arrowData = {
+                        playerId: index,
+                        arrow: arrow
+                    };
+
+                    io.sockets.in(room).emit('placeArrow', arrowData);
+                } else {
+                    socket.emit('cancelArrow', arrow);
+                }
             });
             socket.on('disconnect', function() {
                 socket.broadcast.to(room).emit('opponentDisconnect');

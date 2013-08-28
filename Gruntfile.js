@@ -13,7 +13,8 @@ module.exports = function(grunt) {
                 files: [
                     { src: ['client/static/*'], dest: 'build/client/', expand: true, flatten: true },
                     { src: ['client/lib/*'], dest: 'build/client/lib/', expand: true, flatten: true },
-                    { src: ['server/**'], dest: 'build/' }
+                    { src: ['server/**'], dest: 'build/' },
+                    { src: ['shared/**'], dest: 'build/' }
                 ]
             }
         },

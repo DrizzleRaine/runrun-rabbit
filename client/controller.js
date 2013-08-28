@@ -9,8 +9,8 @@ module.exports = (function() {
     var playArea;
     var socket;
 
-    function startGame() {
-        model = modelFactory.build(levels[1]);
+    function startGame(gameData) {
+        model = modelFactory.build(levels[gameData.levelId]);
 
         var container = document.getElementById('game');
         playArea = require('./views/arena.js').build(container, model);
@@ -20,14 +20,23 @@ module.exports = (function() {
                 var newArrow = {
                     x: cell.x,
                     y: cell.y,
-                    d: direction.fromKey(activeKey)
+                    d: direction.fromKey(activeKey),
+                    confirmed: !socket
                 };
 
-                model.addArrow(0, newArrow);
-                if (socket) {
+                if (model.addArrow(gameData.playerId, newArrow) && socket) {
                     socket.emit('placeArrow', newArrow);
                 }
+
             }
+        });
+
+        socket.on('placeArrow', function (arrowData) {
+            model.addArrow(arrowData.playerId, arrowData.arrow);
+        });
+
+        socket.on('cancelArrow', function (data) {
+            model.cancelArrow(data);
         });
 
         var hudFactory = require('./views/hud.js');
@@ -55,13 +64,6 @@ module.exports = (function() {
         if (multiplayer) {
             socket = io.connect('/');
             socket.on('start', startGame);
-
-            socket.on('placeArrow', function (data) {
-                if (model) {
-                    model.addArrow(1, data);
-                }
-            });
-
             socket.on('disconnect', disconnect);
             socket.on('opponentDisconnect', disconnect);
 
@@ -71,7 +73,10 @@ module.exports = (function() {
                 playArea = null;
             }
         } else {
-            startGame();
+            startGame({
+                playerId: 0,
+                levelId: 1
+            });
         }
     };
 

@@ -41,7 +41,7 @@ Critter.prototype.update = function(model, deltaT) {
         } else {
             var arrow = model.getArrow(centreX, centreY);
             var newDirection = this.direction;
-            if (arrow && (arrow.d !== this.direction)) {
+            if (arrow && arrow.confirmed && (arrow.d !== this.direction)) {
                 newDirection = arrow.d;
             }
 

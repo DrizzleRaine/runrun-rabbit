@@ -27,7 +27,7 @@ module.exports = function(grid) {
         graphics.lineStyle();
     }
 
-    function drawArrow(player, i, j, direction) {
+    function drawArrow(player, arrow) {
         return common.drawObject(function(graphics) {
             graphics.beginFill(constants.COLOURS.ARROW);
             graphics.moveTo(23.5, 7.5);
@@ -39,7 +39,7 @@ module.exports = function(grid) {
             graphics.lineTo(7.5, 23.5);
             graphics.lineTo(23.5, 7.5);
             graphics.endFill();
-        }, i, j, constants.COLOURS.PLAYER[player], 0.6, direction);
+        }, arrow.x, arrow.y, constants.COLOURS.PLAYER[player], arrow.confirmed ? 0.6 : 0.2, arrow.d);
     }
 
     function drawSource(source) {
