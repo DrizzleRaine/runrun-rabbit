@@ -1,26 +1,31 @@
-var CRITTER_SPEED = 0.002;
+module.exports.RABBIT = {
+    SPEED: 0.0024
+};
+
+module.exports.FOX = {
+    SPEED: 0.0022
+};
 
 var gridUtils = require('./utils/grid.js');
 var directionUtils = require('./utils/direction.js');
 
-function Critter(source) {
+function Critter(source, type) {
     this.x = source.x;
     this.y = source.y;
     this.direction = source.direction;
     this.inPlay = true;
+    this.type = type;
 
     var offset = directionUtils.components(source.direction);
     this.x += 0.5 * offset.x;
     this.y += 0.5 * offset.y;
 }
 
-Critter.prototype.speed = CRITTER_SPEED;
-
 Critter.prototype.update = function(model, deltaT) {
     var oldDirection = directionUtils.components(this.direction);
 
-    var newX = this.x + (deltaT * this.speed * oldDirection.x);
-    var newY = this.y + (deltaT * this.speed * oldDirection.y);
+    var newX = this.x + (deltaT * this.type.SPEED * oldDirection.x);
+    var newY = this.y + (deltaT * this.type.SPEED * oldDirection.y);
 
     var oldCellX = Math.floor(this.x);
     var oldCellY = Math.floor(this.y);
@@ -51,7 +56,7 @@ Critter.prototype.update = function(model, deltaT) {
 
             if (newDirection != oldDirection) {
                 this.direction = newDirection;
-                var deltaD = (deltaT * this.speed) - Math.abs(this.x - centreX) - Math.abs(this.y - centreY);
+                var deltaD = (deltaT * this.type.SPEED) - Math.abs(this.x - centreX) - Math.abs(this.y - centreY);
                 var newComponents = directionUtils.components(newDirection);
                 newX = centreX + deltaD * newComponents.x;
                 newY = centreY + deltaD * newComponents.y;

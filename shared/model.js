@@ -75,6 +75,7 @@ exports.build = function build(level) {
 
     var lastUpdate = new Date().getTime();
     var TICK = 1000;
+    var FOX_TICK = 2000;
     var currentPlayer = 0;
 
     function update() {
@@ -105,9 +106,15 @@ exports.build = function build(level) {
         }
 
         if (Math.floor(now / TICK) > Math.floor(lastUpdate / TICK)) {
-            level.sources.forEach(function(source) {
-                critters.push(new sprites.Critter(source));
-            });
+            if (Math.floor(now / FOX_TICK) > Math.floor(lastUpdate / FOX_TICK)) {
+                level.sources.forEach(function(source) {
+                    critters.push(new sprites.Critter(source, sprites.FOX));
+                });
+            } else {
+                level.sources.forEach(function(source) {
+                    critters.push(new sprites.Critter(source, sprites.RABBIT));
+                });
+            }
         }
 
         lastUpdate = now;

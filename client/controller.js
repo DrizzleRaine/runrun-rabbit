@@ -31,13 +31,15 @@ module.exports = (function() {
             }
         });
 
-        socket.on('placeArrow', function (arrowData) {
-            model.addArrow(arrowData.playerId, arrowData.arrow);
-        });
+        if (socket) {
+            socket.on('placeArrow', function (arrowData) {
+                model.addArrow(arrowData.playerId, arrowData.arrow);
+            });
 
-        socket.on('cancelArrow', function (data) {
-            model.cancelArrow(data);
-        });
+            socket.on('cancelArrow', function (data) {
+                model.cancelArrow(data);
+            });
+        }
 
         var hudFactory = require('./views/hud.js');
         $.each(model.playerTimes, function(player) {
