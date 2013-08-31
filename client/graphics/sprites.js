@@ -1,7 +1,7 @@
 module.exports = function(grid) {
     var constants = require('./constants.js');
     var common = require('./common.js')(grid);
-    var sprites = require('../../shared/sprites.js')
+    var sprites = require('../../shared/sprites.js');
 
     function drawRabbit(critter) {
         common.drawObject(function(graphics, unit) {
@@ -24,8 +24,7 @@ module.exports = function(grid) {
             graphics.lineTo(unit * 2 / 3, unit / 6);
             graphics.lineTo(unit / 3, unit / 6);
             graphics.lineTo(unit / 2, -unit / 6);
-            graphics.drawElipse(unit / 2, unit / 3, unit * 3 / 24, unit * 5 / 24);
-            graphics.drawElipse(unit / 2, unit * 2 / 3, unit * 3 / 24, unit * 5 / 24);
+            graphics.drawElipse(unit / 2, unit / 2, unit / 6, unit / 4);
             graphics.beginFill(0xFFFFFF);
             graphics.moveTo(unit / 2, unit);
             graphics.lineTo(unit * 5 / 12, unit * 5 / 6);
@@ -41,7 +40,7 @@ module.exports = function(grid) {
                 drawRabbit(critter);
                 break;
             case sprites.FOX:
-                drawFox(critter)
+                drawFox(critter);
                 break;
         }
     }

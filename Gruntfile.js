@@ -20,7 +20,29 @@ module.exports = function(grunt) {
         },
         watch: {
             files: ['client/**/*.js', 'shared/**/*.js', 'client/**/*.html', 'client/**/*.css'],
-            tasks: ['browserify', 'copy']
+            tasks: ['browserify', 'copy'],
+            options: {
+                livereload: true
+            }
+        },
+        nodemon: {
+            dev: {
+                options: {
+                    file: 'start.js',
+                    ignoredFiles: ['README.md', 'node_modules/**'],
+                    watchedExtensions: ['js'],
+                    watchedFolders: ['build'],
+                    delayTime: 1
+                }
+            }
+        },
+        concurrent: {
+            target: {
+                tasks: ['nodemon', 'watch'],
+                options: {
+                    logConcurrentOutput: true
+                }
+            }
         }
     });
 
@@ -28,6 +50,8 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-nodemon');
+    grunt.loadNpmTasks('grunt-concurrent');
 
     grunt.registerTask('default', ['clean', 'browserify', 'copy']);
 };
