@@ -7,7 +7,7 @@ module.exports = {
         ARROW: 0xFFFFFF,
         NPC: {
             FRIENDLY: [0x9954bb,0xAD76C9],
-            ENEMY: 0xff7518
+            ENEMY: [0xff7518, 0xE05804]
         }
     }
 };

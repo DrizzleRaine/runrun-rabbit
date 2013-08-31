@@ -19,17 +19,22 @@ module.exports = function(grid) {
 
     function drawFox(critter) {
         common.drawObject(function(graphics, unit) {
-            graphics.beginFill(constants.COLOURS.NPC.ENEMY);
+            graphics.beginFill(constants.COLOURS.NPC.ENEMY[1]);
+            graphics.drawElipse(unit / 2, unit / 2, unit / 6, unit / 3);
+            graphics.moveTo(unit / 2, unit * 7 / 6);
+            graphics.lineTo(unit * 3 / 8, unit * 2 / 3);
+            graphics.lineTo(unit * 5 / 8, unit * 2 / 3);
+            graphics.lineTo(unit / 2, unit * 7 / 6);
+            graphics.beginFill(constants.COLOURS.NPC.ENEMY[0]);
             graphics.moveTo(unit / 2, -unit / 6);
-            graphics.lineTo(unit * 2 / 3, unit / 6);
-            graphics.lineTo(unit / 3, unit / 6);
+            graphics.lineTo(unit * 17 / 24, unit * 9 / 24);
+            graphics.lineTo(unit * 7 / 24, unit * 9 / 24);
             graphics.lineTo(unit / 2, -unit / 6);
-            graphics.drawElipse(unit / 2, unit / 2, unit / 6, unit / 4);
             graphics.beginFill(0xFFFFFF);
-            graphics.moveTo(unit / 2, unit);
-            graphics.lineTo(unit * 5 / 12, unit * 5 / 6);
-            graphics.lineTo(unit * 7 / 12, unit * 5 / 6);
-            graphics.lineTo(unit / 2, unit);
+            graphics.moveTo(unit / 2, unit * 7 / 6);
+            graphics.lineTo(unit * 7 / 16, unit * 11 / 12);
+            graphics.lineTo(unit * 9 / 16, unit * 11 / 12);
+            graphics.lineTo(unit / 2, unit * 7 / 6);
             graphics.endFill();
         }, critter.x, critter.y, null, null, critter.direction);
     }
