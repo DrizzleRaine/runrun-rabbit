@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = function(grid) {
     var constants = require('./constants.js');
     var common = require('./common.js')(grid);
@@ -82,5 +84,5 @@ module.exports = function(grid) {
         drawArrow: drawArrow,
         drawSource: drawSource,
         drawSink: drawSink
-    }
+    };
 };

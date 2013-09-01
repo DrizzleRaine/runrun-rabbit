@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = (function() {
     var activeKey = null;
 
@@ -48,7 +50,7 @@ module.exports = (function() {
     }
 
     var init = function(multiplayer) {
-        window.oncontextmenu = function() { return false };
+        window.oncontextmenu = function() { return false; };
 
         $(document).keydown(function (event) {
             if (direction.fromKey(event.keyCode) !== null) {
@@ -66,14 +68,14 @@ module.exports = (function() {
         if (multiplayer) {
             socket = io.connect('/');
             socket.on('start', startGame);
-            socket.on('disconnect', disconnect);
-            socket.on('opponentDisconnect', disconnect);
 
-            function disconnect() {
+            var disconnect = function disconnect() {
                 playArea.close();
                 model = null;
                 playArea = null;
-            }
+            };
+            socket.on('disconnect', disconnect);
+            socket.on('opponentDisconnect', disconnect);
         } else {
             startGame({
                 playerId: 0,
@@ -84,6 +86,6 @@ module.exports = (function() {
 
     return {
         init: init
-    }
+    };
 
 }());

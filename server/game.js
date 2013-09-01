@@ -1,4 +1,4 @@
-var activeGames = [];
+'use strict';
 
 var modelFactory = require('../shared/model.js');
 
@@ -29,13 +29,13 @@ function configure(io) {
             });
             socket.on('disconnect', function() {
                 socket.broadcast.to(room).emit('opponentDisconnect');
-            })
+            });
         });
     }
 
     return {
         start: start
-    }
+    };
 }
 
 module.exports = configure;

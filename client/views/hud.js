@@ -1,3 +1,5 @@
+'use strict';
+
 var buttonClass = ['primary', 'success'];
 
 exports.build = function build(parent, player) {
@@ -43,6 +45,5 @@ exports.build = function build(parent, player) {
     return {
         done: function(callback) { doneCallback = callback; },
         update: update
-    }
-
+    };
 };

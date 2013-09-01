@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = function(model) {
     var constants = require('./constants.js');
 

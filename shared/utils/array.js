@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports.initialise = function initialise(size, elem) {
     var arr = [];
     for (var i = 0; i < size; ++i) {

@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports.Timer = function Timer(colour, unit) {
     var background = 0xFFFFFF;
 

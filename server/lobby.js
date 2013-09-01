@@ -1,3 +1,5 @@
+'use strict';
+
 function configure(server) {
     var uuid = require('node-uuid');
     var io = require('socket.io').listen(server);

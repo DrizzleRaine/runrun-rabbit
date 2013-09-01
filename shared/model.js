@@ -1,4 +1,4 @@
-var levels = require('./levels.js');
+'use strict';
 
 exports.build = function build(level) {
     var model = {};
@@ -83,7 +83,7 @@ exports.build = function build(level) {
         var delta = now - lastUpdate;
 
         if (delta > 1000) {
-            throw new Error("lagged out");
+            throw new Error('Lagged out...');
         }
 
         playerTimes[currentPlayer] -= delta;
@@ -123,7 +123,7 @@ exports.build = function build(level) {
             hud.update({
                 score: playerScores[player],
                 time: playerTimes[player]
-            })
+            });
         });
     }
 

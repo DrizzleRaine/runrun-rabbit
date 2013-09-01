@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = function(grid) {
     var constants = require('./constants.js');
     var common = require('./common.js')(grid);
@@ -41,16 +43,16 @@ module.exports = function(grid) {
 
     function drawCritter(critter) {
         switch (critter.type) {
-            case sprites.RABBIT:
-                drawRabbit(critter);
-                break;
-            case sprites.FOX:
-                drawFox(critter);
-                break;
+        case sprites.RABBIT:
+            drawRabbit(critter);
+            break;
+        case sprites.FOX:
+            drawFox(critter);
+            break;
         }
     }
 
     return {
         drawCritter: drawCritter
-    }
+    };
 };

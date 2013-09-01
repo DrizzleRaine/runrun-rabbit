@@ -1,3 +1,5 @@
+'use strict';
+
 var controller = require('./controller.js');
 
 $(document).ready(function() {

@@ -1,3 +1,5 @@
+'use strict';
+
 exports.build = function build(parent, model) {
     var constants = require('../graphics/constants.js');
 
@@ -12,8 +14,6 @@ exports.build = function build(parent, model) {
 
     stage.addChild(grid);
     var isRunning = true;
-
-    window.requestAnimationFrame(animate);
 
     function animate() {
         if (!isRunning) {
@@ -48,6 +48,8 @@ exports.build = function build(parent, model) {
         window.requestAnimationFrame(animate);
     }
 
+    window.requestAnimationFrame(animate);
+
     var $arena = $(renderer.view);
     var clickCallback;
 
@@ -71,7 +73,7 @@ exports.build = function build(parent, model) {
     }
 
     return {
-        click: function(callback) { clickCallback = callback },
+        click: function(callback) { clickCallback = callback; },
         close: close
-    }
+    };
 };

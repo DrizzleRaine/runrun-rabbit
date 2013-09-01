@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports.RABBIT = {
     SPEED: 0.0024
 };
@@ -33,7 +35,7 @@ Critter.prototype.update = function(model, deltaT) {
     var newCellX = Math.floor(newX);
     var newCellY = Math.floor(newY);
 
-    if (newCellX != oldCellX || newCellY != oldCellY) {
+    if (newCellX !== oldCellX || newCellY !== oldCellY) {
         var centreX = Math.max(oldCellX, newCellX);
         var centreY = Math.max(oldCellY, newCellY);
 
@@ -54,7 +56,7 @@ Critter.prototype.update = function(model, deltaT) {
                 newDirection = (newDirection + 1) % 4;
             }
 
-            if (newDirection != oldDirection) {
+            if (newDirection !== oldDirection) {
                 this.direction = newDirection;
                 var deltaD = (deltaT * this.type.SPEED) - Math.abs(this.x - centreX) - Math.abs(this.y - centreY);
                 var newComponents = directionUtils.components(newDirection);

@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = function(grid) {
     var constants = require('./constants.js');
 
@@ -9,7 +11,7 @@ module.exports = function(grid) {
         graphics.pivot.x = constants.CELL_SIZE / 2;
         graphics.pivot.y = constants.CELL_SIZE / 2;
 
-        if (background !== null && typeof(background) != 'undefined') {
+        if (background !== null && typeof(background) !== 'undefined') {
             graphics.beginFill(background, alpha);
             graphics.drawRect(0, 0, constants.CELL_SIZE, constants.CELL_SIZE);
         }
@@ -30,5 +32,5 @@ module.exports = function(grid) {
 
     return {
         drawObject: drawObject
-    }
+    };
 };

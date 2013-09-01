@@ -1,3 +1,5 @@
+'use strict';
+
 var levels = [];
 
 function source(x, y, d) {
@@ -5,7 +7,7 @@ function source(x, y, d) {
         x: x,
         y: y,
         direction: d
-    }
+    };
 }
 
 function sink(p, x, y) {
@@ -13,7 +15,7 @@ function sink(p, x, y) {
         player: p,
         x: x,
         y: y
-    }
+    };
 }
 
 function level(sources, sinks) {

@@ -1,7 +1,46 @@
+'use strict';
+
 module.exports = function(grunt) {
     grunt.initConfig({
-        pkg: grunt.file.readJSON('package.json'),
         clean: [ 'build' ],
+        jshint: {
+            options: {
+                camelcase: true,
+                curly: true,
+                eqeqeq:true,
+                forin: true,
+                immed: true,
+                indent: 4,
+                latedef: true,
+                newcap: true,
+                noarg:true,
+                noempty: true,
+                nonew: true,
+                quotmark: true,
+                undef: true,
+                unused: true,
+                strict: true,
+                trailing: true,
+                node: true
+            },
+            build: ['*.js'],
+            server: ['server/**/*.js'],
+            shared: ['shared/**/*.js'],
+            client: {
+                options: {
+                    ignores: ['client/lib/**/*.js'],
+                    browser: true,
+                    globals: {
+                        PIXI: false,
+                        $: false,
+                        io: false
+                    }
+                },
+                files: {
+                    src: ['client/**/*.js']
+                }
+            }
+        },
         browserify: {
             main: {
                 src: ['client/main.js'],
@@ -29,8 +68,6 @@ module.exports = function(grunt) {
             dev: {
                 options: {
                     file: 'start.js',
-                    ignoredFiles: ['README.md', 'node_modules/**'],
-                    watchedExtensions: ['js'],
                     watchedFolders: ['build'],
                     delayTime: 1
                 }
@@ -52,6 +89,8 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-nodemon');
     grunt.loadNpmTasks('grunt-concurrent');
+    grunt.loadNpmTasks('grunt-contrib-jshint');
 
     grunt.registerTask('default', ['clean', 'browserify', 'copy']);
+    grunt.registerTask('test', ['jshint']);
 };

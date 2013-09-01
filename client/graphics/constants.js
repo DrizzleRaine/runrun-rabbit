@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = {
     CELL_SIZE: 48,
     COLOURS: {
