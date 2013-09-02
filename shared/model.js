@@ -56,8 +56,8 @@ exports.build = function build(level) {
 
     var critters = [];
 
-    function rewardPlayer(player, score) {
-        playerScores[player] += score;
+    function modifyScore(player, modifier) {
+        playerScores[player] = modifier(playerScores[player]);
     }
 
     function completePlayerTurn(player) {
@@ -75,7 +75,7 @@ exports.build = function build(level) {
 
     var lastUpdate = new Date().getTime();
     var TICK = 1000;
-    var FOX_TICK = 2000;
+    var FOX_TICK = 10000;
     var currentPlayer = 0;
 
     function update() {
@@ -139,7 +139,7 @@ exports.build = function build(level) {
     model.addArrow = addArrow;
     model.cancelArrow = cancelArrow;
     model.getArrow = getArrow;
-    model.rewardPlayer = rewardPlayer;
+    model.modifyScore = modifyScore;
 
     return model;
 };

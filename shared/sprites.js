@@ -1,11 +1,17 @@
 'use strict';
 
 module.exports.RABBIT = {
-    SPEED: 0.0024
+    speed: 0.0024,
+    score: function(currentScore) {
+        return currentScore + 1;
+    }
 };
 
 module.exports.FOX = {
-    SPEED: 0.0022
+    speed: 0.0022,
+    score: function(currentScore) {
+        return Math.ceil(currentScore / 2);
+    }
 };
 
 var gridUtils = require('./utils/grid.js');
@@ -26,8 +32,8 @@ function Critter(source, type) {
 Critter.prototype.update = function(model, deltaT) {
     var oldDirection = directionUtils.components(this.direction);
 
-    var newX = this.x + (deltaT * this.type.SPEED * oldDirection.x);
-    var newY = this.y + (deltaT * this.type.SPEED * oldDirection.y);
+    var newX = this.x + (deltaT * this.type.speed * oldDirection.x);
+    var newY = this.y + (deltaT * this.type.speed * oldDirection.y);
 
     var oldCellX = Math.floor(this.x);
     var oldCellY = Math.floor(this.y);
@@ -43,7 +49,7 @@ Critter.prototype.update = function(model, deltaT) {
         if (sink !== null) {
             this.inPlay = false;
             if (sink.player !== null) {
-                model.rewardPlayer(sink.player, 1);
+                model.modifyScore(sink.player, this.type.score);
             }
         } else {
             var arrow = model.getArrow(centreX, centreY);
@@ -58,7 +64,7 @@ Critter.prototype.update = function(model, deltaT) {
 
             if (newDirection !== oldDirection) {
                 this.direction = newDirection;
-                var deltaD = (deltaT * this.type.SPEED) - Math.abs(this.x - centreX) - Math.abs(this.y - centreY);
+                var deltaD = (deltaT * this.type.speed) - Math.abs(this.x - centreX) - Math.abs(this.y - centreY);
                 var newComponents = directionUtils.components(newDirection);
                 newX = centreX + deltaD * newComponents.x;
                 newY = centreY + deltaD * newComponents.y;
