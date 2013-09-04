@@ -39,7 +39,7 @@ module.exports.Timer = function Timer(colour, unit) {
         }
 
         var text = new PIXI.Text(number.toString(), {
-            font: 'normal ' + Math.round(unit / 4) + 'pt "Open Sans", Calibri, Candara, Arial, sans-serif',
+            font: 'normal ' + Math.round(unit / 4) + 'pt ' + window.getComputedStyle(document.getElementsByTagName('body')[0])['font-family'],
             align: 'center'
         });
 

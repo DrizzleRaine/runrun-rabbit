@@ -1,17 +1,17 @@
 'use strict';
 
-exports.build = function build(level) {
+exports.build = function build(gameData) {
     var model = {};
 
     var gridUtils = require('./utils/grid.js');
     var arrayUtils = require('./utils/array.js');
     var sprites = require('./sprites.js');
+    var level = require('./levels.js')[gameData.levelId];
 
-    var PLAYERS = 2;
     var MAX_ARROWS = 3;
-    var playerArrows = arrayUtils.initialise(PLAYERS, function() { return []; });
-    var playerScores = arrayUtils.initialise(PLAYERS, 0);
-    var playerTimes = arrayUtils.initialise(PLAYERS, 9999);
+    var playerArrows = arrayUtils.initialise(gameData.totalPlayers, function() { return []; });
+    var playerScores = arrayUtils.initialise(gameData.totalPlayers, 0);
+    var playerTimes = arrayUtils.initialise(gameData.totalPlayers, 9999);
     var playerHuds = [];
 
     function addArrow(player, arrow) {
@@ -62,7 +62,7 @@ exports.build = function build(level) {
 
     function completePlayerTurn(player) {
         if (currentPlayer === player) {
-            currentPlayer = (++currentPlayer) % PLAYERS;
+            currentPlayer = (++currentPlayer) % gameData.totalPlayers;
         }
     }
 

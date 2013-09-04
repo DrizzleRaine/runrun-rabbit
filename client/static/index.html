@@ -1,20 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title></title>
-    <link href="//netdna.bootstrapcdn.com/bootswatch/3.0.0/cosmo/bootstrap.min.css" rel="stylesheet">
-    <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css" rel="stylesheet">
+    <title>RunRun Rabbit!</title>
     <link href="./site.css" rel="stylesheet">
     <script src="./lib/pixi.dev.js"></script>
-    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
     <div class="container">
         <h1>RunRun Rabbit!</h1>
         <div id="menu">
-            <button id="startSinglePlayer" type="button" class="btn btn-primary">Start Single Player Game</button>
-            <button id="startMultiplayer" type="button" class="btn btn-primary">Start Multiplayer Game</button>
+            <button id="startSinglePlayer" type="button" class="btn player-0">Start Single Player Game</button>
+            <button id="startMultiplayer" type="button" class="btn player-0">Start Multiplayer Game</button>
         </div>
         <div id="game"></div>
         <script src="./bundle.js"></script>

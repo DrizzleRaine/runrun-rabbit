@@ -4,7 +4,6 @@ module.exports = (function() {
     var activeKey = null;
 
     var modelFactory = require('../shared/model.js');
-    var levels = require('../shared/levels.js');
     var direction = require('../shared/utils/direction.js');
 
     var model;
@@ -12,7 +11,7 @@ module.exports = (function() {
     var socket;
 
     function startGame(gameData) {
-        model = modelFactory.build(levels[gameData.levelId]);
+        model = modelFactory.build(gameData);
 
         var container = document.getElementById('game');
         playArea = require('./views/arena.js').build(container, model);
@@ -44,26 +43,26 @@ module.exports = (function() {
         }
 
         var hudFactory = require('./views/hud.js');
-        $.each(model.playerTimes, function(player) {
+        for (var player = 0; player < gameData.totalPlayers; ++player) {
             model.registerHud(hudFactory.build(container, player), player);
-        });
+        }
     }
 
     var init = function(multiplayer) {
         window.oncontextmenu = function() { return false; };
 
-        $(document).keydown(function (event) {
+        document.onkeydown = function (event) {
             if (direction.fromKey(event.keyCode) !== null) {
                 activeKey = event.keyCode;
                 event.preventDefault();
             }
-        });
+        };
 
-        $(document).keyup(function (event) {
+        document.onkeyup = function (event) {
             if (event.keyCode === activeKey) {
                 activeKey = null;
             }
-        });
+        };
 
         if (multiplayer) {
             socket = io.connect('/');
@@ -79,7 +78,8 @@ module.exports = (function() {
         } else {
             startGame({
                 playerId: 0,
-                levelId: 1
+                levelId: 1,
+                totalPlayers: 2
             });
         }
     };

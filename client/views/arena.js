@@ -26,8 +26,8 @@ exports.build = function build(parent, model) {
 
         model.update();
 
-        $.each(model.playerArrows, function(player, playerArrows) {
-            $.each(playerArrows, function(i, arrow) {
+        model.playerArrows.forEach(function(playerArrows, player) {
+            playerArrows.forEach(function(arrow) {
                 fixtures.drawArrow(player, arrow);
             });
         });
@@ -50,22 +50,23 @@ exports.build = function build(parent, model) {
 
     window.requestAnimationFrame(animate);
 
-    var $arena = $(renderer.view);
     var clickCallback;
 
-    $arena.mousedown(function(event) {
+    var offsetX = renderer.view.offsetLeft + (renderer.view.offsetWidth - renderer.view.width) / 2;
+    var offsetY = renderer.view.offsetTop + (renderer.view.offsetHeight - renderer.view.height) / 2;
+
+    renderer.view.onmousedown = function(event) {
         if (!clickCallback) {
             return;
         }
 
-        var offset = $arena.offset();
         var cell = {};
 
-        cell.x = Math.floor((event.pageX - offset.left) / constants.CELL_SIZE);
-        cell.y = Math.floor((event.pageY - offset.top) / constants.CELL_SIZE);
+        cell.x = Math.floor((event.clientX - offsetX) / constants.CELL_SIZE);
+        cell.y = Math.floor((event.clientY - offsetY) / constants.CELL_SIZE);
 
         clickCallback(cell);
-    });
+    };
 
     function close() {
         isRunning = false;

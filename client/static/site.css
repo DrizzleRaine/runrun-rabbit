@@ -13,6 +13,7 @@
 }
 
 .hud {
+    text-align: center;
     padding-top: 2em;
 }
 
@@ -43,10 +44,10 @@
         clear: none;
         margin: 0;
     }
-}
 
-h1 {
-    text-align: center;
+    .container {
+        max-width: 1170px;
+    }
 }
 
 #menu {
@@ -59,10 +60,69 @@ h1 {
     margin-top: 1em;
 }
 
-.btn-lg {
-    font-weight: normal;
+.hidden {
+    display: none;
+}
+
+body, .btn, .btn-lg {
+    font-family: "Century Gothic", CenturyGothic, AppleGothic, sans-serif;
+    font-size: 15px;
+    color: #333;
+}
+
+.container {
+    margin-right: auto;
+    margin-left: auto;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 300;
+    line-height: 1;
+    margin-top: 0.6em;
+    margin-bottom: 0.3em;
+}
+
+h1 {
+    text-align: center;
+    font-size: 3.5em;
+}
+
+.hud h2 {
+    font-size: 2.5em;
 }
 
 h3.score {
     font-size: 3em;
+}
+
+.btn {
+    color: #fff;
+    display: inline-block;
+    padding: 0.6em 1em;
+    margin-bottom: 0;
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+    border: 0;
+}
+
+.btn-lg {
+    font-weight: normal;
+    font-size: 2em;
+}
+
+.player-0 {
+    background-color: #007fff;
+}
+
+.player-0:hover {
+    background-color:#006bd6;
+}
+
+.player-1 {
+    background-color: #3fb618;
+}
+
+.player-1:hover {
+    background-color:#339213;
 }

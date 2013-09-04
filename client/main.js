@@ -2,14 +2,16 @@
 
 var controller = require('./controller.js');
 
-$(document).ready(function() {
-    $('#startSinglePlayer').click(function() {
-        $('#menu').hide();
-        controller.init(false);
-    });
+var hideMenu = function hideMenu() {
+    document.getElementById('menu').classList.add('hidden');
+};
 
-    $('#startMultiplayer').click(function() {
-        $('#menu').hide();
-        controller.init(true);
-    });
-});
+document.getElementById('startSinglePlayer').onclick = function() {
+    hideMenu();
+    controller.init(false);
+};
+
+document.getElementById('startMultiplayer').onclick = function() {
+    hideMenu();
+    controller.init(true);
+};

@@ -5,14 +5,16 @@ var modelFactory = require('../shared/model.js');
 function configure(io) {
     function start(room) {
         var gameData = {
-            levelId: 1
+            levelId: 1,
+            totalPlayers: io.sockets.clients(room).length
         };
         var model = modelFactory.build(gameData);
 
         io.sockets.clients(room).forEach(function (socket, index) {
             socket.emit('start', {
                 playerId: index,
-                levelId: gameData.levelId
+                levelId: gameData.levelId,
+                totalPlayers: gameData.totalPlayers
             });
             socket.on('placeArrow', function(arrow) {
                 arrow.confirmed = true;
