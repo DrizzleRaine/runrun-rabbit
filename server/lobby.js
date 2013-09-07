@@ -1,7 +1,7 @@
 'use strict';
 
 function configure(server) {
-    var uuid = require('node-uuid');
+    var crypto = require('crypto');
     var io = require('socket.io').listen(server);
     var game = require('./game.js')(io);
 
@@ -19,7 +19,9 @@ function configure(server) {
             }
         }
         if (!joinedRoom) {
-            socket.join(uuid.v4());
+            crypto.pseudoRandomBytes(16, function(err, buf) {
+                socket.join(buf.toString());
+            });
         }
     });
 }

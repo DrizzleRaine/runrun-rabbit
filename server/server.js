@@ -9,17 +9,31 @@ var server;
 exports.TEST_PORT = 5000;
 
 exports.start = function(callback) {
-    var app = express();
-
-    app.use(express.static(path.resolve(__dirname + '/../client')));
 
     var port = process.env.PORT || exports.TEST_PORT;
+    var fs = require('fs');
+
+    function handler (req, res) {
+        var url = req.url;
+        if (url === '/') {
+            url = '/index.html';
+        }
+
+        fs.readFile(__dirname + '/../client' + url,
+            function (err, data) {
+                if (err) {
+                    res.writeHead(500);
+                    return res.end('Error loading ' + url);
+                }
+
+                res.writeHead(200);
+                res.end(data);
+            });
+    }
+
+    var server = require('http').createServer(handler);
     console.log('starting server on port ' + port);
-    server = app.listen(port, callback);
-
+    server.listen(port, callback);
     lobby(server);
-};
-
-exports.stop = function(callback) {
-    server.close(callback);
+    callback();
 };
