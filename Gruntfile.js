@@ -46,11 +46,17 @@ module.exports = function(grunt) {
                 dest: 'build/client/bundle.js'
             }
         },
+        uglify: {
+            client: {
+                files: {
+                    'build/client/bundle.js': ['build/client/bundle.js']
+                }
+            }
+        },
         copy: {
             main: {
                 files: [
                     { src: ['client/static/*'], dest: 'build/client/', expand: true, flatten: true },
-                    { src: ['client/lib/*'], dest: 'build/client/lib/', expand: true, flatten: true },
                     { src: ['server/**'], dest: 'build/' },
                     { src: ['shared/**'], dest: 'build/' }
                 ]
@@ -89,7 +95,9 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-nodemon');
     grunt.loadNpmTasks('grunt-concurrent');
     grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks('grunt-contrib-uglify');
 
     grunt.registerTask('default', ['clean', 'browserify', 'copy']);
+    grunt.registerTask('release', ['default', 'uglify']);
     grunt.registerTask('test', ['jshint']);
 };
