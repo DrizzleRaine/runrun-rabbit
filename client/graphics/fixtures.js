@@ -4,80 +4,110 @@ module.exports = function(grid) {
     var constants = require('./constants.js');
     var common = require('./common.js')(grid);
 
-    function shadeCell3d(graphics, convex) {
-        var light = 0xFFFFFF;
-        var shade = 0x000000;
+    var unit = constants.CELL_SIZE;
 
-        graphics.beginFill(convex ? light : shade, 0.2);
-        graphics.moveTo(0, 0);
-        graphics.lineTo(constants.CELL_SIZE, 0);
-        graphics.lineTo(constants.CELL_SIZE, constants.CELL_SIZE);
-        graphics.lineTo(0, 0);
-        graphics.endFill();
-        graphics.beginFill(convex ? shade : light, 0.2);
-        graphics.moveTo(0, 0);
-        graphics.lineTo(0, constants.CELL_SIZE);
-        graphics.lineTo(constants.CELL_SIZE, constants.CELL_SIZE);
-        graphics.lineTo(0, 0);
-        graphics.endFill();
-        graphics.lineStyle(1, convex ? light : shade, 0.2);
-        graphics.moveTo(constants.CELL_SIZE, 0);
-        graphics.lineTo(constants.CELL_SIZE / 2, constants.CELL_SIZE / 2);
-        graphics.lineStyle(1, convex ? shade : light, 0.2);
-        graphics.moveTo(0, constants.CELL_SIZE);
-        graphics.lineTo(constants.CELL_SIZE / 2, constants.CELL_SIZE / 2);
-        graphics.lineStyle();
+    function shadeCell3d(ctx, convex) {
+        var light = '#FFFFFF';
+        var shade = '#000000';
+
+        ctx.globalAlpha = 0.2;
+        ctx.fillStyle = convex ? light : shade;
+        ctx.beginPath();
+        ctx.moveTo(-unit/2, -unit/2);
+        ctx.lineTo(unit/2, -unit/2);
+        ctx.lineTo(unit/2, unit/2);
+        ctx.lineTo(-unit/2, -unit/2);
+        ctx.fill();
+        ctx.fillStyle = convex ? shade : light;
+        ctx.beginPath();
+        ctx.moveTo(-unit/2, -unit/2);
+        ctx.lineTo(-unit/2, unit/2);
+        ctx.lineTo(unit/2, unit/2);
+        ctx.lineTo(-unit/2, -unit/2);
+        ctx.fill();
+        ctx.globalAlpha = 0.2;
+        ctx.strokeStyle = convex ? light : shade;
+        ctx.beginPath();
+        ctx.moveTo(unit/2, -unit/2);
+        ctx.lineTo(0, 0);
+        ctx.stroke();
+        ctx.closePath();
+        ctx.strokeStyle = convex ? shade : light;
+        ctx.beginPath();
+        ctx.moveTo(-unit/2, unit/2);
+        ctx.lineTo(0, 0);
+        ctx.stroke();
+        ctx.closePath();
     }
+
+    var arrowForeground = common.preRender(function (ctx) {
+        ctx.fillStyle = constants.COLOURS.ARROW;
+        ctx.beginPath();
+        ctx.moveTo(0, -unit / 3);
+        ctx.lineTo(unit / 3, 0);
+        ctx.lineTo(unit / 6, 0);
+        ctx.lineTo(unit / 6, unit / 3);
+        ctx.lineTo(-unit / 6, unit / 3);
+        ctx.lineTo(-unit / 6, 0);
+        ctx.lineTo(-unit / 3, 0);
+        ctx.lineTo(0, -unit / 3);
+        ctx.fill();
+    });
 
     function drawArrow(player, arrow) {
-        return common.drawObject(function(graphics) {
-            graphics.beginFill(constants.COLOURS.ARROW);
-            graphics.moveTo(23.5, 7.5);
-            graphics.lineTo(39.5, 23.5);
-            graphics.lineTo(31.5, 23.5);
-            graphics.lineTo(31.5, 39.5);
-            graphics.lineTo(15.5, 40.5);
-            graphics.lineTo(15.5, 23.5);
-            graphics.lineTo(7.5, 23.5);
-            graphics.lineTo(23.5, 7.5);
-            graphics.endFill();
-        }, arrow.x, arrow.y, constants.COLOURS.PLAYER[player], arrow.confirmed ? 0.6 : 0.2, arrow.d);
+        common.render(arrow.x, arrow.y, arrow.d, arrowForeground,
+        function(ctx) {
+            ctx.globalAlpha = arrow.confirmed ? 0.6 : 0.2;
+            ctx.fillStyle = constants.COLOURS.PLAYER[player];
+            ctx.fillRect(-unit / 2, -unit / 2, unit, unit);
+        });
     }
+
+    var sourceBackground = common.preRender(function(ctx) {
+        ctx.fillStyle = constants.COLOURS.NPC.FRIENDLY[0];
+        ctx.fillRect(-unit/2, -unit/2, unit, unit);
+        shadeCell3d(ctx, true);
+    });
+    var sourceForeground = common.preRender(function(ctx) {
+        ctx.fillStyle = constants.COLOURS.CELL[2];
+        ctx.moveTo(-unit/3, -unit/2);
+        ctx.lineTo(unit/3, -unit/2);
+        ctx.lineTo(unit/6, -unit/3);
+        ctx.lineTo(-unit/6, -unit/3);
+        ctx.lineTo(-unit/3, -unit/2);
+        ctx.fill();
+        ctx.fillStyle = constants.COLOURS.NPC.FRIENDLY[0];
+        ctx.fillRect(-unit/4, -unit/4, unit / 2, unit / 2);
+    });
 
     function drawSource(source) {
-        common.drawObject(function(graphics) {
-            shadeCell3d(graphics, true);
-        }, source.x, source.y, constants.COLOURS.NPC.FRIENDLY[0], 1, 0);
-        common.drawObject(function(graphics) {
-            graphics.beginFill(constants.COLOURS.CELL[2], 1);
-            graphics.moveTo(constants.CELL_SIZE / 6, 0);
-            graphics.lineTo(constants.CELL_SIZE * 5 / 6, 0);
-            graphics.lineTo(constants.CELL_SIZE * 2 / 3, constants.CELL_SIZE / 6);
-            graphics.lineTo(constants.CELL_SIZE / 3, constants.CELL_SIZE / 6);
-            graphics.lineTo(constants.CELL_SIZE / 6, 0);
-            graphics.beginFill(constants.COLOURS.NPC.FRIENDLY[0], 1);
-            graphics.drawRect(constants.CELL_SIZE / 4, constants.CELL_SIZE / 4,
-                constants.CELL_SIZE / 2, constants.CELL_SIZE / 2);
-        }, source.x, source.y, null, null, source.direction);
+        common.render(source.x, source.y, source.direction, sourceForeground, sourceBackground);
     }
 
+    var renderedSink = common.preRender(function(ctx) {
+        ctx.fillStyle = constants.COLOURS.CELL[1];
+        ctx.fillRect(-unit/2, -unit/2, unit, unit);
+        shadeCell3d(ctx, false);
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = constants.COLOURS.BACKGROUND;
+        ctx.fillRect(-unit*5/12,-unit*5/12,unit*5/6,unit*5/6);
+    });
+
     function drawSink(sink) {
-        if (sink.player !== null) {
-            common.drawObject(function(graphics) {
-                graphics.lineStyle(4, 0xFFFFFF, 0.5);
-                graphics.beginFill(constants.COLOURS.PLAYER[sink.player], 1);
-                graphics.drawCircle(constants.CELL_SIZE / 2, constants.CELL_SIZE / 2, constants.CELL_SIZE / 3);
-                graphics.endFill();
-                graphics.lineStyle();
-            }, sink.x, sink.y);
-        } else {
-            common.drawObject(function (graphics) {
-                shadeCell3d(graphics, false);
-                graphics.beginFill(constants.COLOURS.BACKGROUND, 1);
-                graphics.drawRect(constants.CELL_SIZE / 12, constants.CELL_SIZE / 12,
-                    constants.CELL_SIZE * 5 / 6, constants.CELL_SIZE * 5 / 6);
-            }, sink.x, sink.y, constants.COLOURS.CELL[1], 1);
-        }
+        common.renderStatic(sink.x, sink.y, function(ctx) {
+            if (sink.player !== null) {
+                ctx.drawCircle(0, 0, unit/3);
+                ctx.strokeStyle = '#FFFFFF';
+                ctx.lineWidth = 4;
+                ctx.globalAlpha = 0.5;
+                ctx.stroke();
+                ctx.globalAlpha = 1;
+                ctx.fillStyle = constants.COLOURS.PLAYER[sink.player];
+                ctx.fill();
+            } else {
+                renderedSink(ctx);
+            }
+        });
     }
 
     return {

@@ -2,17 +2,11 @@
 
 exports.build = function build(parent, model) {
     var constants = require('../graphics/constants.js');
-
-    var stage = new PIXI.Stage(constants.COLOURS.BACKGROUND);
-
-    var renderer = PIXI.autoDetectRenderer(model.width * constants.CELL_SIZE, model.height * constants.CELL_SIZE);
-    parent.appendChild(renderer.view);
-
     var grid = require('../graphics/grid.js')(model);
     var fixtures = require('../graphics/fixtures.js')(grid);
     var sprites = require('../graphics/sprites.js')(grid);
+    parent.appendChild(grid.view);
 
-    stage.addChild(grid);
     var isRunning = true;
 
     function animate() {
@@ -20,11 +14,9 @@ exports.build = function build(parent, model) {
             return;
         }
 
-        while (grid.children.length) {
-            grid.removeChild(grid.getChildAt(0));
-        }
-
         model.update();
+
+        grid.clear();
 
         model.playerArrows.forEach(function(playerArrows, player) {
             playerArrows.forEach(function(arrow) {
@@ -44,7 +36,6 @@ exports.build = function build(parent, model) {
             sprites.drawCritter(critter);
         });
 
-        renderer.render(stage);
         window.requestAnimationFrame(animate);
     }
 
@@ -52,10 +43,10 @@ exports.build = function build(parent, model) {
 
     var clickCallback;
 
-    var offsetX = renderer.view.offsetLeft + (renderer.view.offsetWidth - renderer.view.width) / 2;
-    var offsetY = renderer.view.offsetTop + (renderer.view.offsetHeight - renderer.view.height) / 2;
+    var offsetX = grid.view.offsetLeft + (grid.view.offsetWidth - grid.view.width) / 2;
+    var offsetY = grid.view.offsetTop + (grid.view.offsetHeight - grid.view.height) / 2;
 
-    renderer.view.onmousedown = function(event) {
+    grid.view.onmousedown = function(event) {
         if (!clickCallback) {
             return;
         }
@@ -70,7 +61,7 @@ exports.build = function build(parent, model) {
 
     function close() {
         isRunning = false;
-        parent.removeChild(renderer.view);
+        parent.removeChild(grid.view);
     }
 
     return {

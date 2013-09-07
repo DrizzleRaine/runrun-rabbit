@@ -1,36 +1,76 @@
 'use strict';
 
+/*
+ http://diveintohtml5.info/canvas.html
+ http://www.ibm.com/developerworks/library/wa-canvashtml5layering/
+ https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Canvas_tutorial?redirectlocale=en-US&redirectslug=Canvas_tutorial
+ https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Canvas_tutorial/Transformations
+ http://www.html5rocks.com/en/tutorials/canvas/performance/
+ */
+
 module.exports = function(grid) {
-    var constants = require('./constants.js');
+    var unit = require('./constants.js').CELL_SIZE;
 
-    function drawObject(drawDetail, i, j, background, alpha, direction, scale) {
-        var graphics = new PIXI.Graphics();
+    CanvasRenderingContext2D.prototype.drawCircle = function (x, y, radius) {
+        this.beginPath();
+        this.arc(x, y, radius, 0, Math.PI * 2, false);
+    };
 
-        graphics.position.x = i * constants.CELL_SIZE + constants.CELL_SIZE / 2;
-        graphics.position.y = j * constants.CELL_SIZE + constants.CELL_SIZE / 2;
-        graphics.pivot.x = constants.CELL_SIZE / 2;
-        graphics.pivot.y = constants.CELL_SIZE / 2;
+    CanvasRenderingContext2D.prototype.drawEllipse = function (centreX, centreY, width, height) {
+        // See http://stackoverflow.com/questions/2172798/how-to-draw-an-oval-in-html5-canvas
+        var offset = .551784,
+            offsetX = (width / 2) * offset,
+            offsetY = (height / 2) * offset,
+            x = centreX - (width / 2),
+            y = centreY - (width / 2),
+            endX = x + width,
+            endY = y + height,
+            midX = x + width / 2,
+            midY = y + height / 2;
 
-        if (background !== null && typeof(background) !== 'undefined') {
-            graphics.beginFill(background, alpha);
-            graphics.drawRect(0, 0, constants.CELL_SIZE, constants.CELL_SIZE);
+        this.beginPath();
+        this.moveTo(x, midY);
+        this.bezierCurveTo(x, midY - offsetY, midX - offsetX, y, midX, y);
+        this.bezierCurveTo(midX + offsetX, y, endX, midY - offsetY, endX, midY);
+        this.bezierCurveTo(endX, midY + offsetY, midX + offsetX, endY, midX, endY);
+        this.bezierCurveTo(midX - offsetX, endY, x, midY + offsetY, x, midY);
+    };
+
+    function preRender(drawDetail, cellSize) {
+        cellSize = cellSize || unit;
+        var cell = document.createElement('canvas');
+        cell.width = cellSize;
+        cell.height = cellSize;
+        var ctx = cell.getContext('2d');
+        ctx.translate(cellSize / 2, cellSize / 2);
+        drawDetail(ctx);
+        return function(ctx) {
+            ctx.drawImage(cell, -cellSize / 2, -cellSize / 2);
+        };
+    }
+
+    function renderStatic(x, y, background) {
+        return render(x, y, null, null, background);
+    }
+
+    function render(x, y, direction, foreground, background) {
+        grid.context.save();
+        grid.context.translate((unit * x) + (unit / 2), (unit * y) + (unit / 2));
+        if (background) {
+            grid.context.save();
+            background(grid.context);
+            grid.context.restore();
         }
-
-        drawDetail(graphics, constants.CELL_SIZE);
-        grid.addChild(graphics);
-
-        if (direction) {
-            graphics.rotation = (direction || 0) * Math.PI / 2;
+        if (foreground) {
+            grid.context.rotate(direction * Math.PI / 2);
+            foreground(grid.context);
         }
-        if (scale) {
-            graphics.scale.x = scale;
-            graphics.scale.y = scale;
-        }
-
-        return graphics;
+        grid.context.restore();
     }
 
     return {
-        drawObject: drawObject
+        preRender: preRender,
+        render: render,
+        renderStatic: renderStatic
     };
 };

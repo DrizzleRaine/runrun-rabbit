@@ -31,7 +31,6 @@ module.exports = function(grunt) {
                     ignores: ['client/lib/**/*.js'],
                     browser: true,
                     globals: {
-                        PIXI: false,
                         $: false,
                         io: false
                     }

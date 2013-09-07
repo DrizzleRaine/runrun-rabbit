@@ -8,11 +8,7 @@ exports.build = function build(parent, player) {
 
     var doneCallback;
 
-    var stage = new PIXI.Stage(0xFFFFFF);
-    var renderer = new PIXI.CanvasRenderer(144, 144);
-
     var timer = new graphics.Timer(constants.COLOURS.PLAYER[player], 144);
-    stage.addChild(timer);
 
     var hudDiv = document.createElement('div');
     hudDiv.setAttribute('class', 'hud');
@@ -40,7 +36,7 @@ exports.build = function build(parent, player) {
     timeHeader.appendChild(document.createTextNode('Time:'));
     hudDiv.appendChild(timeHeader);
 
-    hudDiv.appendChild(renderer.view);
+    hudDiv.appendChild(timer.view);
 
     parent.appendChild(hudDiv);
 
@@ -51,9 +47,8 @@ exports.build = function build(parent, player) {
     };
 
     function update(stats) {
-        score.textContent = stats.score;
+        score.textContent = stats.score.toString();
         timer.update(stats.time);
-        window.requestAnimationFrame(function() { renderer.render(stage); });
     }
 
     return {

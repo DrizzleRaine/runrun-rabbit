@@ -3,13 +3,13 @@
 module.exports = {
     CELL_SIZE: 48,
     COLOURS: {
-        BACKGROUND: 0x000000,
-        CELL: [0xEEEEEE, 0xCCCCCC, 0xAAAAAA],
-        PLAYER: [0x007fff, 0x3fb618],
-        ARROW: 0xFFFFFF,
+        BACKGROUND: '#000000',
+        CELL: ['#EEEEEE', '#CCCCCC', '#AAAAAA'],
+        PLAYER: ['#007fff', '#3fb618'],
+        ARROW: '#FFFFFF',
         NPC: {
-            FRIENDLY: [0x9954bb,0xAD76C9],
-            ENEMY: [0xff7518, 0xE05804]
+            FRIENDLY: ['#9954bb','#AD76C9'],
+            ENEMY: ['#ff7518', '#E05804']
         }
     }
 };
