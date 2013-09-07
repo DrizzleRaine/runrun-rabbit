@@ -1,9 +1,7 @@
 RunRun Rabbit
 =============
 
-My entry for Ludum Dare #27
-
-Competitive puzzle game for two players
+Competitive puzzle game for two players. My entry for js13kgames 2013
 
 Pre-requisites
 --------------
