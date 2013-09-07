@@ -45,5 +45,5 @@ module.exports.Timer = function Timer(colour, unit) {
     return {
         view: container,
         update: update
-    }
+    };
 };

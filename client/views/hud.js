@@ -1,7 +1,5 @@
 'use strict';
 
-var buttonClass = ['primary', 'success'];
-
 exports.build = function build(parent, player) {
     var graphics = require('../graphics/hud.js');
     var constants = require('../graphics/constants.js');

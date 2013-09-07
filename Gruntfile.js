@@ -2,7 +2,7 @@
 
 module.exports = function(grunt) {
     grunt.initConfig({
-        clean: [ 'build' ],
+        clean: [ 'build', 'release' ],
         jshint: {
             options: {
                 camelcase: true,
@@ -32,7 +32,8 @@ module.exports = function(grunt) {
                     browser: true,
                     globals: {
                         $: false,
-                        io: false
+                        io: false,
+                        CanvasRenderingContext2D: false
                     }
                 },
                 files: {
@@ -47,15 +48,34 @@ module.exports = function(grunt) {
             }
         },
         uglify: {
+            all: {
+                files: [
+                    { expand: true, cwd: 'build/', src: ['**/*.js'], dest: 'build/' }
+                ]
+            }
+        },
+        compress: {
             client: {
-                files: {
-                    'build/client/bundle.js': ['build/client/bundle.js']
-                }
+                options: {
+                    archive: 'release/client.zip'
+                },
+                expand: true,
+                cwd: 'build/client',
+                src: ['**/*']
+            },
+            server: {
+                options: {
+                    archive: 'release/server.zip'
+                },
+                expand: true,
+                cwd: 'build',
+                src: ['package.json', 'server/**/*', 'shared/**/*']
             }
         },
         copy: {
             main: {
                 files: [
+                    { src: ['release.package.json'], dest: 'build/package.json' },
                     { src: ['client/static/*'], dest: 'build/client/', expand: true, flatten: true },
                     { src: ['server/**'], dest: 'build/' },
                     { src: ['shared/**'], dest: 'build/' }
@@ -63,7 +83,7 @@ module.exports = function(grunt) {
             }
         },
         watch: {
-            files: ['client/**/*.js', 'shared/**/*.js', 'client/**/*.html', 'client/**/*.css'],
+            files: ['client/**/*.js', 'shared/**/*.js', 'server/**/*.js', 'client/**/*.html', 'client/**/*.css'],
             tasks: ['browserify', 'copy'],
             options: {
                 livereload: true
@@ -72,7 +92,7 @@ module.exports = function(grunt) {
         nodemon: {
             dev: {
                 options: {
-                    file: 'start.js',
+                    file: 'build/server/start.js',
                     watchedFolders: ['build'],
                     delayTime: 1
                 }
@@ -96,8 +116,9 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-concurrent');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-compress');
 
-    grunt.registerTask('default', ['clean', 'browserify', 'copy']);
-    grunt.registerTask('release', ['default', 'uglify']);
+    grunt.registerTask('default', ['test', 'clean', 'browserify', 'copy']);
+    grunt.registerTask('release', ['default', 'uglify', 'compress']);
     grunt.registerTask('test', ['jshint']);
 };

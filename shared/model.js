@@ -7,6 +7,8 @@ exports.build = function build(gameData) {
     var arrayUtils = require('./utils/array.js');
     var sprites = require('./sprites.js');
     var level = require('./levels.js')[gameData.levelId];
+//    var RNG = require('./utils/rng.js').RNG;
+//    var random = new RNG(gameData.seed);
 
     var MAX_ARROWS = 3;
     var playerArrows = arrayUtils.initialise(gameData.totalPlayers, function() { return []; });

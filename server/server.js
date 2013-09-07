@@ -1,16 +1,12 @@
 'use strict';
 
-var express = require('express');
-var path = require('path');
 var lobby = require('./lobby.js');
 
-var server;
-
-exports.TEST_PORT = 5000;
+var TEST_PORT = 5000;
 
 exports.start = function(callback) {
 
-    var port = process.env.PORT || exports.TEST_PORT;
+    var port = process.env.PORT || TEST_PORT;
     var fs = require('fs');
 
     function handler (req, res) {
@@ -35,5 +31,4 @@ exports.start = function(callback) {
     console.log('starting server on port ' + port);
     server.listen(port, callback);
     lobby(server);
-    callback();
 };

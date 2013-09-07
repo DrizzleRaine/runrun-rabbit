@@ -1,6 +1,6 @@
 'use strict';
 
-var server = require('./build/server/server.js');
+var server = require('./server.js');
 server.start(function() {
     console.info('Server started...');
 });

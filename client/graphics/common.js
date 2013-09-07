@@ -18,7 +18,7 @@ module.exports = function(grid) {
 
     CanvasRenderingContext2D.prototype.drawEllipse = function (centreX, centreY, width, height) {
         // See http://stackoverflow.com/questions/2172798/how-to-draw-an-oval-in-html5-canvas
-        var offset = .551784,
+        var offset = 0.551784,
             offsetX = (width / 2) * offset,
             offsetY = (height / 2) * offset,
             x = centreX - (width / 2),

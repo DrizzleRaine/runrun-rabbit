@@ -1,20 +1,24 @@
 'use strict';
 
 var modelFactory = require('../shared/model.js');
+var crypto = require('crypto');
 
 function configure(io) {
     function start(room) {
         var gameData = {
             levelId: 1,
-            totalPlayers: io.sockets.clients(room).length
+            totalPlayers: io.sockets.clients(room).length,
+            seed: crypto.pseudoRandomBytes(16)
         };
         var model = modelFactory.build(gameData);
+        setInterval(model.update, 100);
 
         io.sockets.clients(room).forEach(function (socket, index) {
             socket.emit('start', {
                 playerId: index,
                 levelId: gameData.levelId,
-                totalPlayers: gameData.totalPlayers
+                totalPlayers: gameData.totalPlayers,
+                seed: gameData.seed
             });
             socket.on('placeArrow', function(arrow) {
                 arrow.confirmed = true;

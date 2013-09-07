@@ -9,7 +9,7 @@ module.exports = function(model) {
     var canvas = document.createElement('canvas');
     canvas.setAttribute('width', width.toString());
     canvas.setAttribute('height', height.toString());
-    canvas.style.backgroundImage = "url('./background.png')";
+    canvas.style.backgroundImage = 'url("./background.png")';
     canvas.classList.add('arena');
 
     var context = canvas.getContext('2d');
@@ -22,5 +22,5 @@ module.exports = function(model) {
         view: canvas,
         context: context,
         clear: clear
-    }
+    };
 };
