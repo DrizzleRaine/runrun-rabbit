@@ -4,6 +4,14 @@
  */
 'use strict';
 
+function seedFromSystemRandom() {
+    var seed = [];
+    for (var i = 0; i < 16; ++i) {
+        seed.push(Math.floor(Math.random() * 256));
+    }
+    return seed;
+}
+
 /**
  * @param {String} seed A byte array to seed the generator.
  * @constructor
@@ -15,9 +23,11 @@ function RC4(seed) {
     for (var i = 0; i < 256; i++) {
         this.s[i] = i;
     }
-    if (seed) {
-        this.mix(seed);
+    this._normal = null;
+    if (!seed) {
+        seed = seedFromSystemRandom();
     }
+    this.mix(seed);
 }
 
 RC4.prototype._swap = function(i, j) {
@@ -92,6 +102,23 @@ RNG.prototype.random = function(n, m) {
         n = 0;
     }
     return n + Math.floor(this.uniform() * (m - n));
+};
+
+/**
+ * Generates numbers using this.uniform() with the Box-Muller transform.
+ * @returns {number} Normally-distributed random number of mean 0, variance 1.
+ */
+RNG.prototype.normal = function() {
+    if (this._normal !== null) {
+        var n = this._normal;
+        this._normal = null;
+        return n;
+    } else {
+        var x = this.uniform() || Math.pow(2, -53); // can't be exactly 0
+        var y = this.uniform();
+        this._normal = Math.sqrt(-2 * Math.log(x)) * Math.sin(2 * Math.PI * y);
+        return Math.sqrt(-2 * Math.log(x)) * Math.cos(2 * Math.PI * y);
+    }
 };
 
 module.exports.RNG = RNG;

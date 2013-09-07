@@ -16,7 +16,7 @@ module.exports = (function() {
         var container = document.getElementById('game');
         playArea = require('./views/arena.js').build(container, model);
 
-        playArea.click(function(cell) {
+        playArea.click(function playAreaClick(cell) {
             if (activeKey !== null) {
                 var newArrow = {
                     x: cell.x,
@@ -48,7 +48,7 @@ module.exports = (function() {
         }
     }
 
-    var init = function(multiplayer) {
+    var init = function init(multiplayer) {
         window.oncontextmenu = function() { return false; };
 
         document.onkeydown = function (event) {

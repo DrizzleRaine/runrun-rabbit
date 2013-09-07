@@ -44,7 +44,7 @@ module.exports = function(grid) {
         var ctx = cell.getContext('2d');
         ctx.translate(cellSize / 2, cellSize / 2);
         drawDetail(ctx);
-        return function(ctx) {
+        return function preRenderSprite(ctx) {
             ctx.drawImage(cell, -cellSize / 2, -cellSize / 2);
         };
     }

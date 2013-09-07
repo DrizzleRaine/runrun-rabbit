@@ -7,8 +7,7 @@ exports.build = function build(gameData) {
     var arrayUtils = require('./utils/array.js');
     var sprites = require('./sprites.js');
     var level = require('./levels.js')[gameData.levelId];
-//    var RNG = require('./utils/rng.js').RNG;
-//    var random = new RNG(gameData.seed);
+    var RNG = require('./utils/rng.js').RNG;
 
     var MAX_ARROWS = 3;
     var playerArrows = arrayUtils.initialise(gameData.totalPlayers, function() { return []; });
@@ -75,14 +74,13 @@ exports.build = function build(gameData) {
         playerHuds[player] = hud;
     }
 
-    var lastUpdate = new Date().getTime();
-    var TICK = 1000;
-    var FOX_TICK = 10000;
+    var startTime = new Date().getTime();
+    var lastUpdate = 0;
     var currentPlayer = 0;
 
     function update() {
-        var now = new Date().getTime();
-        var delta = now - lastUpdate;
+        var gameTime = new Date().getTime() - startTime;
+        var delta = gameTime - lastUpdate;
 
         if (delta > 1000) {
             throw new Error('Lagged out...');
@@ -107,19 +105,11 @@ exports.build = function build(gameData) {
             critters.push(remainingCritters.pop());
         }
 
-        if (Math.floor(now / TICK) > Math.floor(lastUpdate / TICK)) {
-            if (Math.floor(now / FOX_TICK) > Math.floor(lastUpdate / FOX_TICK)) {
-                level.sources.forEach(function(source) {
-                    critters.push(new sprites.Critter(source, sprites.FOX));
-                });
-            } else {
-                level.sources.forEach(function(source) {
-                    critters.push(new sprites.Critter(source, sprites.RABBIT));
-                });
-            }
-        }
+        level.sources.forEach(function(source) {
+            source.update(model, gameTime);
+        });
 
-        lastUpdate = now;
+        lastUpdate = gameTime;
 
         playerHuds.forEach(function(hud, player) {
             hud.update({
@@ -142,6 +132,7 @@ exports.build = function build(gameData) {
     model.cancelArrow = cancelArrow;
     model.getArrow = getArrow;
     model.modifyScore = modifyScore;
+    model.random = new RNG(gameData.seed);
 
     return model;
 };

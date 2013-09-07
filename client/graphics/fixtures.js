@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function(grid) {
+module.exports = function initFixtures(grid) {
     var constants = require('./constants.js');
     var common = require('./common.js')(grid);
 

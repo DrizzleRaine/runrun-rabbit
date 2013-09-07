@@ -33,7 +33,7 @@ function configure(io) {
                     socket.emit('cancelArrow', arrow);
                 }
             });
-            socket.on('disconnect', function() {
+            socket.on('disconnect', function socketDisconnect() {
                 socket.broadcast.to(room).emit('opponentDisconnect');
             });
         });
