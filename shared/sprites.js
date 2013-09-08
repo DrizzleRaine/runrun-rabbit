@@ -1,5 +1,7 @@
 'use strict';
 
+module.exports.MAX_TICK = 400;
+
 module.exports.RABBIT = {
     speed: 0.0024,
     score: function(currentScore) {
@@ -17,7 +19,7 @@ module.exports.FOX = {
 var gridUtils = require('./utils/grid.js');
 var directionUtils = require('./utils/direction.js');
 
-function Critter(source, type) {
+function Critter(source, type, gameTime) {
     this.x = source.x;
     this.y = source.y;
     this.direction = source.direction;
@@ -27,9 +29,37 @@ function Critter(source, type) {
     var offset = directionUtils.components(source.direction);
     this.x += 0.5 * offset.x;
     this.y += 0.5 * offset.y;
+
+    this.lastUpdate = gameTime;
+    this.fromPoint = {
+        x: this.x,
+        y: this.y,
+        t: gameTime,
+        direction: source.direction
+    };
 }
 
-Critter.prototype.update = function(model, deltaT) {
+Critter.prototype.inRangeOf = function inRangeOf(arrow, deltaT) {
+    var limit = this.type.speed * deltaT;
+    var deltaX = this.x - arrow.x;
+    var deltaY = this.y - arrow.y;
+    return ((deltaX * deltaX) + (deltaY * deltaY)) < (limit * limit);
+};
+
+Critter.prototype.replay = function replay(model, gameTime) {
+    this.x = this.fromPoint.x;
+    this.y = this.fromPoint.y;
+    this.direction = this.fromPoint.direction;
+    this.lastUpdate = this.fromPoint.t;
+    while (this.lastUpdate < gameTime) {
+        this.update(model, Math.min(gameTime, this.lastUpdate + module.exports.MAX_TICK));
+    }
+};
+
+Critter.prototype.update = function(model, gameTime) {
+    var deltaT = gameTime - this.lastUpdate;
+    this.lastUpdate = gameTime;
+
     var oldDirection = directionUtils.components(this.direction);
 
     var newX = this.x + (deltaT * this.type.speed * oldDirection.x);
@@ -52,10 +82,10 @@ Critter.prototype.update = function(model, deltaT) {
                 model.modifyScore(sink.player, this.type.score);
             }
         } else {
-            var arrow = model.getArrow(centreX, centreY);
+            var arrow = model.getActiveArrow(gameTime, centreX, centreY);
             var newDirection = this.direction;
-            if (arrow && arrow.confirmed && (arrow.d !== this.direction)) {
-                newDirection = arrow.d;
+            if (arrow && (arrow.direction !== this.direction)) {
+                newDirection = arrow.direction;
             }
 
             while (!directionUtils.isValid(directionUtils.components(newDirection), model, centreX, centreY)) {
@@ -64,7 +94,7 @@ Critter.prototype.update = function(model, deltaT) {
 
             if (newDirection !== oldDirection) {
                 this.direction = newDirection;
-                var deltaD = (deltaT * this.type.speed) - Math.abs(this.x - centreX) - Math.abs(this.y - centreY);
+                var deltaD = Math.abs(deltaT * this.type.speed) - Math.abs(this.x - centreX) - Math.abs(this.y - centreY);
                 var newComponents = directionUtils.components(newDirection);
                 newX = centreX + deltaD * newComponents.x;
                 newY = centreY + deltaD * newComponents.y;

@@ -39,12 +39,35 @@ module.exports = function(grunt) {
                 files: {
                     src: ['client/**/*.js']
                 }
+            },
+            tests: {
+                options: {
+                    node: true,
+                    globals: {
+                        describe: false,
+                        before: false,
+                        beforeEach: false,
+                        it: false
+                    }
+                },
+                files: {
+                    src: ['test/**/*.js']
+                }
             }
         },
         browserify: {
             main: {
                 src: ['client/main.js'],
                 dest: 'build/client/bundle.js'
+            }
+        },
+        mochaTest: {
+            test: {
+                options: {
+                    ui: 'bdd',
+                    reporter: 'spec'
+                },
+                src: ['test/**/*.js']
             }
         },
         uglify: {
@@ -105,6 +128,24 @@ module.exports = function(grunt) {
                     logConcurrentOutput: true
                 }
             }
+        },
+        instrument: {
+            files: ['client/**/*.js', 'shared/**/*.js', 'server/**/*.js', 'test/**/*.js'],
+            lazy: false,
+            basePath: 'build/instrument/'
+        },
+        storeCoverage : {
+            options : {
+                dir : 'build/reports/coverage'
+            }
+        },
+        makeReport : {
+            src : 'build/reports/**/*.json',
+            options : {
+                type : 'lcov',
+                dir : 'build/reports/coverage',
+                print : 'detail'
+            }
         }
     });
 
@@ -117,8 +158,15 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-compress');
+    grunt.loadNpmTasks('grunt-mocha-test');
+    grunt.loadNpmTasks('grunt-istanbul');
+
+    grunt.registerTask('setInstrumentedSourceRoot', function() {
+        process.env.SOURCE_ROOT = '/build/instrument';
+    });
 
     grunt.registerTask('default', ['test', 'clean', 'browserify', 'copy']);
     grunt.registerTask('release', ['default', 'uglify', 'compress']);
-    grunt.registerTask('test', ['jshint']);
+    grunt.registerTask('test', ['jshint', 'mochaTest']);
+    grunt.registerTask('cover', ['clean', 'instrument', 'setInstrumentedSourceRoot', 'mochaTest', 'storeCoverage', 'makeReport']);
 };

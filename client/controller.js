@@ -5,24 +5,28 @@ module.exports = (function() {
 
     var modelFactory = require('../shared/model.js');
     var direction = require('../shared/utils/direction.js');
+    var levels = require('../shared/levels.js');
+    var RNG = require('../shared/utils/rng.js').RNG;
 
     var model;
     var playArea;
     var socket;
 
     function startGame(gameData) {
+        gameData.level = levels[gameData.levelId];
+        gameData.random = new RNG(gameData.seed);
         model = modelFactory.build(gameData);
 
         var container = document.getElementById('game');
         playArea = require('./views/arena.js').build(container, model);
 
-        playArea.click(function playAreaClick(cell) {
+        playArea.click(function playAreaClick(cell, time) {
             if (activeKey !== null) {
                 var newArrow = {
                     x: cell.x,
                     y: cell.y,
-                    d: direction.fromKey(activeKey),
-                    confirmed: !socket
+                    direction: direction.fromKey(activeKey),
+                    from: time
                 };
 
                 if (model.addArrow(gameData.playerId, newArrow) && socket) {
@@ -51,14 +55,14 @@ module.exports = (function() {
     var init = function init(multiplayer) {
         window.oncontextmenu = function() { return false; };
 
-        document.onkeydown = function (event) {
+        window.onkeydown = function (event) {
             if (direction.fromKey(event.keyCode) !== null) {
                 activeKey = event.keyCode;
                 event.preventDefault();
             }
         };
 
-        document.onkeyup = function (event) {
+        window.onkeyup = function (event) {
             if (event.keyCode === activeKey) {
                 activeKey = null;
             }

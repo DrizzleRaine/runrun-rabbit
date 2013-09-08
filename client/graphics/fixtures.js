@@ -55,9 +55,9 @@ module.exports = function initFixtures(grid) {
     });
 
     function drawArrow(player, arrow) {
-        common.render(arrow.x, arrow.y, arrow.d, arrowForeground,
+        common.render(arrow.x, arrow.y, arrow.direction, arrowForeground,
         function(ctx) {
-            ctx.globalAlpha = arrow.confirmed ? 0.6 : 0.2;
+            ctx.globalAlpha = 0.6;
             ctx.fillStyle = constants.COLOURS.PLAYER[player];
             ctx.fillRect(-unit / 2, -unit / 2, unit, unit);
         });

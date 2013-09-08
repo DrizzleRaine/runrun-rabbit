@@ -1,9 +1,15 @@
 /**
- * Adapted from: https://github.com/skeeto/rng-js
- * Seedable random number generator functions.
+ * Adapted from: https://github.com/skeeto/rng-js (v1.0.0)
+ * Seedable random number generator functions, to allow co-ordination between pseudo-random
+ * systems running on multiple nodes.
  */
 'use strict';
 
+/**
+ * Generates a seed using the built-in Math.random,
+ * useful when you don't need consistency between nodes
+ * @returns {Array}
+ */
 function seedFromSystemRandom() {
     var seed = [];
     for (var i = 0; i < 16; ++i) {

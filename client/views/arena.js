@@ -8,19 +8,22 @@ exports.build = function build(parent, model) {
     parent.appendChild(grid.view);
 
     var isRunning = true;
+    var startTime = new Date().getTime();
 
     function animate() {
         if (!isRunning) {
             return;
         }
 
-        model.update();
+        model.update(new Date().getTime() - startTime);
 
         grid.clear();
 
         model.playerArrows.forEach(function(playerArrows, player) {
             playerArrows.forEach(function(arrow) {
-                fixtures.drawArrow(player, arrow);
+                if (model.isArrowActive(arrow)) {
+                    fixtures.drawArrow(player, arrow);
+                }
             });
         });
 
@@ -56,7 +59,7 @@ exports.build = function build(parent, model) {
         cell.x = Math.floor((event.clientX - offsetX) / constants.CELL_SIZE);
         cell.y = Math.floor((event.clientY - offsetY) / constants.CELL_SIZE);
 
-        clickCallback(cell);
+        clickCallback(cell, new Date().getTime() - startTime);
     };
 
     function close() {

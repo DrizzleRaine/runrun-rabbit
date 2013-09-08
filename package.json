@@ -14,7 +14,12 @@
     "grunt-nodemon": "~0.1.0",
     "grunt-concurrent": "~0.3.1",
     "grunt-contrib-uglify": "~0.2.4",
-    "grunt-contrib-compress": "~0.5.2"
+    "grunt-contrib-compress": "~0.5.2",
+    "mocha": "1.12.x",
+    "sinon": "1.7.x",
+    "chai": "1.7.x",
+    "grunt-mocha-test": "0.6.x",
+    "grunt-istanbul": "0.2.x"
   },
   "engines": {
     "node": "0.10.x",

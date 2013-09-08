@@ -1,47 +1,75 @@
 'use strict';
 
+var HORIZON = exports.HORIZON = 1000; // How far back in the past we'll go to compensate for lag
+
 exports.build = function build(gameData) {
     var model = {};
 
     var gridUtils = require('./utils/grid.js');
     var arrayUtils = require('./utils/array.js');
-    var sprites = require('./sprites.js');
-    var level = require('./levels.js')[gameData.levelId];
-    var RNG = require('./utils/rng.js').RNG;
 
     var MAX_ARROWS = 3;
     var playerArrows = arrayUtils.initialise(gameData.totalPlayers, function() { return []; });
     var playerScores = arrayUtils.initialise(gameData.totalPlayers, 0);
     var playerTimes = arrayUtils.initialise(gameData.totalPlayers, 9999);
     var playerHuds = [];
+    var critters = [];
+
+    function isArrowActive(arrow, gameTime) {
+        gameTime = gameTime || lastUpdate;
+        return arrow.from <= gameTime && !arrow.to;
+    }
 
     function addArrow(player, arrow) {
-        var existingArrow = getArrow(arrow.x, arrow.y);
+        if (gridUtils.getAtCell(gameData.level.sinks, arrow.x, arrow.y) ||
+            gridUtils.getAtCell(gameData.level.sources, arrow.x, arrow.y)) {
+            return;
+        }
+
+        var existingArrow = getActiveArrow(arrow.from, arrow.x, arrow.y);
         if (existingArrow) {
-            if (arrow.confirmed && !existingArrow.confirmed) {
-                existingArrow.confirmed = true;
-                return true;
-            } else {
-                return false;
-            }
+            return false;
         }
 
         var ownArrows = playerArrows[player];
-        if (ownArrows.length === MAX_ARROWS) {
-            ownArrows.shift();
+        var currentArrows = 0;
+        for (var i = ownArrows.length - 1; i >= 0; --i) {
+            if (isArrowActive(ownArrows[i], arrow.from)) {
+                if (++currentArrows === MAX_ARROWS) {
+                    ownArrows[i].to = arrow.from;
+                    break;
+                }
+            }
         }
 
         ownArrows.push(arrow);
+
+        if (arrow.from < lastUpdate) {
+            critters.forEach(function(critter) {
+                if (critter.inRangeOf(arrow, lastUpdate - arrow.from)) {
+                    critter.replay(model, lastUpdate);
+                }
+            });
+        }
+
         return true;
     }
 
-    function getArrow(i, j) {
-        for (var p = 0; p < playerArrows.length; ++p) {
-            var arrow = gridUtils.getAtCell(playerArrows[p], i, j);
-            if (arrow) {
-                return arrow;
+    function getActiveArrow(time, x, y) {
+        var haveMoreArrows = true;
+        for (var i = 1; haveMoreArrows; ++i) {
+            haveMoreArrows = false;
+            for (var p = 0; p < playerArrows.length; ++p) {
+                if (i <= playerArrows[p].length) {
+                    haveMoreArrows = true;
+                    var arrow = playerArrows[p][playerArrows[p].length - i];
+                    if (arrow.x === x && arrow.y === y && isArrowActive(arrow, time)) {
+                        return arrow;
+                    }
+                }
             }
         }
+
         return null;
     }
 
@@ -54,8 +82,6 @@ exports.build = function build(gameData) {
         }
         return false;
     }
-
-    var critters = [];
 
     function modifyScore(player, modifier) {
         playerScores[player] = modifier(playerScores[player]);
@@ -74,15 +100,14 @@ exports.build = function build(gameData) {
         playerHuds[player] = hud;
     }
 
-    var startTime = new Date().getTime();
     var lastUpdate = 0;
     var currentPlayer = 0;
 
-    function update() {
-        var gameTime = new Date().getTime() - startTime;
+    function update(gameTime) {
         var delta = gameTime - lastUpdate;
+        lastUpdate = gameTime;
 
-        if (delta > 1000) {
+        if (delta > HORIZON) {
             throw new Error('Lagged out...');
         }
 
@@ -96,7 +121,7 @@ exports.build = function build(gameData) {
         var remainingCritters = [];
         while (critters.length) {
             var critter = critters.pop();
-            critter.update(model, delta);
+            critter.update(model, gameTime);
             if (critter.inPlay) {
                 remainingCritters.push(critter);
             }
@@ -105,11 +130,9 @@ exports.build = function build(gameData) {
             critters.push(remainingCritters.pop());
         }
 
-        level.sources.forEach(function(source) {
+        gameData.level.sources.forEach(function(source) {
             source.update(model, gameTime);
         });
-
-        lastUpdate = gameTime;
 
         playerHuds.forEach(function(hud, player) {
             hud.update({
@@ -119,10 +142,10 @@ exports.build = function build(gameData) {
         });
     }
 
-    model.width = level.width;
-    model.height = level.height;
-    model.sources = level.sources;
-    model.sinks = level.sinks;
+    model.width = gameData.level.width;
+    model.height = gameData.level.height;
+    model.sources = gameData.level.sources;
+    model.sinks = gameData.level.sinks;
     model.critters = critters;
     model.playerArrows = playerArrows;
     model.playerTimes = playerTimes;
@@ -130,9 +153,10 @@ exports.build = function build(gameData) {
     model.update = update;
     model.addArrow = addArrow;
     model.cancelArrow = cancelArrow;
-    model.getArrow = getArrow;
+    model.getActiveArrow = getActiveArrow;
     model.modifyScore = modifyScore;
-    model.random = new RNG(gameData.seed);
+    model.random = gameData.random;
+    model.isArrowActive = isArrowActive;
 
     return model;
 };
