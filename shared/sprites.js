@@ -82,7 +82,7 @@ Critter.prototype.update = function(model, gameTime) {
                 model.modifyScore(sink.player, this.type.score);
             }
         } else {
-            var arrow = model.getActiveArrow(gameTime, centreX, centreY);
+            var arrow = model.getActiveArrow(gameTime, centreX, centreY).arrow;
             var newDirection = this.direction;
             if (arrow && (arrow.direction !== this.direction)) {
                 newDirection = arrow.direction;

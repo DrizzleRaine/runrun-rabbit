@@ -20,33 +20,58 @@ exports.build = function build(gameData) {
         return arrow.from <= gameTime && !arrow.to;
     }
 
-    function addArrow(player, arrow) {
-        if (gridUtils.getAtCell(gameData.level.sinks, arrow.x, arrow.y) ||
-            gridUtils.getAtCell(gameData.level.sources, arrow.x, arrow.y)) {
+    function addArrow(player, newArrow) {
+        if (gridUtils.getAtCell(gameData.level.sinks, newArrow.x, newArrow.y) ||
+            gridUtils.getAtCell(gameData.level.sources, newArrow.x, newArrow.y)) {
             return;
         }
 
-        var existingArrow = getActiveArrow(arrow.from, arrow.x, arrow.y);
-        if (existingArrow) {
-            return false;
+        var revisedArrows = [];
+        var existing = getActiveArrow(null, newArrow.x, newArrow.y);
+        if (existing.arrow) {
+            if (newArrow.from <= existing.arrow.from) {
+                // Remove the existing arrow that was pre-empted by another player
+                revisedArrows = playerArrows[existing.player].splice(existing.index, 1);
+
+                // If the arrow we just removed replaced another arrow, re-instate it
+                for (var j = playerArrows[existing.player].length - 1; j >= 0; --j) {
+                    var oldArrow = playerArrows[existing.player][j];
+                    if (oldArrow.to === revisedArrows[0].from) {
+                        delete oldArrow.to;
+                        revisedArrows.push(oldArrow);
+                        break;
+                    }
+                }
+            }
         }
 
         var ownArrows = playerArrows[player];
         var currentArrows = 0;
         for (var i = ownArrows.length - 1; i >= 0; --i) {
-            if (isArrowActive(ownArrows[i], arrow.from)) {
+            if (isArrowActive(ownArrows[i], newArrow.from)) {
                 if (++currentArrows === MAX_ARROWS) {
-                    ownArrows[i].to = arrow.from;
+                    ownArrows[i].to = newArrow.from;
                     break;
                 }
             }
         }
 
-        ownArrows.push(arrow);
+        ownArrows.push(newArrow);
 
-        if (arrow.from < lastUpdate) {
+        if (newArrow.from < lastUpdate) {
+            revisedArrows.push(newArrow);
+        }
+
+        if (revisedArrows.length) {
             critters.forEach(function(critter) {
-                if (critter.inRangeOf(arrow, lastUpdate - arrow.from)) {
+                var replay = false;
+                for (var k = 0; k < revisedArrows.length; ++k) {
+                    if (critter.inRangeOf(revisedArrows[k], lastUpdate - newArrow.from)) {
+                        replay = true;
+                        break;
+                    }
+                }
+                if (replay) {
                     critter.replay(model, lastUpdate);
                 }
             });
@@ -62,15 +87,20 @@ exports.build = function build(gameData) {
             for (var p = 0; p < playerArrows.length; ++p) {
                 if (i <= playerArrows[p].length) {
                     haveMoreArrows = true;
-                    var arrow = playerArrows[p][playerArrows[p].length - i];
+                    var index = playerArrows[p].length - i;
+                    var arrow = playerArrows[p][index];
                     if (arrow.x === x && arrow.y === y && isArrowActive(arrow, time)) {
-                        return arrow;
+                        return {
+                            arrow: arrow,
+                            player: p,
+                            index: index
+                        };
                     }
                 }
             }
         }
 
-        return null;
+        return {};
     }
 
     function cancelArrow(player, arrow) {

@@ -15,7 +15,6 @@ describe('model', function() {
 
     var model;
     var gameData;
-    var critter;
     var gameTime;
 
     beforeEach(function() {
@@ -25,14 +24,6 @@ describe('model', function() {
         };
 
         model = modelFactory.build(gameData);
-
-        critter = new sprites.Critter({
-            x: 0,
-            y: 2,
-            direction: 1
-        }, sprites.RABBIT, 0);
-
-        model.critters.push(critter);
         gameTime = 0;
     });
 
@@ -60,6 +51,14 @@ describe('model', function() {
     });
 
     it('should alter critter direction based on arrows', function() {
+        var critter = new sprites.Critter({
+            x: 0,
+            y: 2,
+            direction: 1
+        }, sprites.RABBIT, 0);
+
+        model.critters.push(critter);
+
         var arrow = {
             x: 2,
             y: 2,
@@ -81,6 +80,14 @@ describe('model', function() {
     });
 
     it('should compensate for arrows placed in the past', function() {
+        var critter = new sprites.Critter({
+            x: 0,
+            y: 2,
+            direction: 1
+        }, sprites.RABBIT, 0);
+
+        model.critters.push(critter);
+
         while (critter.x <= 2) {
             model.update(gameTime);
             gameTime += 100;
@@ -97,6 +104,78 @@ describe('model', function() {
 
         assert.equal(critter.direction, arrow.direction,
             'arrow should have effected critter direction retroactively');
+    });
+
+    it('should compensate arrows removed/replaced due to overriding arrow', function() {
+        var critter0 = new sprites.Critter({
+            x: 0,
+            y: 0,
+            direction: 1
+        }, sprites.RABBIT, 0);
+
+        model.critters.push(critter0);
+
+        var critter1 = new sprites.Critter({
+            x: 0,
+            y: 1,
+            direction: 1
+        }, sprites.RABBIT, 0);
+
+        model.critters.push(critter1);
+
+        model.addArrow(0, {
+            x: 2,
+            y: 0,
+            direction: 2,
+            from: 0
+        });
+
+        model.addArrow(0, {
+            x: 2,
+            y: 4,
+            direction: 2,
+            from: 0
+        });
+
+        model.addArrow(0, {
+            x: 2,
+            y: 3,
+            direction: 2,
+            from: 0
+        });
+
+        while (critter1.x + (critter1.type.speed * 100) <= 2) {
+            model.update(gameTime);
+            gameTime += 100;
+        }
+
+        model.addArrow(0, {
+            x: 2,
+            y: 1,
+            direction: 2,
+            from: gameTime - 100
+        });
+
+        model.update(gameTime);
+
+        // This is just a check on our assumptions so far, not the purpose of this test
+        // At this point, we'd expect the new arrow to take effect on critter1, and the oldest
+        // arrow to become inactive, so not affect critter0
+        assert.equal(critter1.direction, 2);
+        assert.equal(critter0.direction, 1);
+
+        // Now place an arrow from the other player, that pre-empts the last arrow placed above
+        model.addArrow(1, {
+            x: 2,
+            y: 1,
+            direction: 0,
+            from: gameTime - 200
+        });
+
+        // Now, it's as if the arrow that affected critter0 had never been removed, and the arrow
+        // that affected critter1 is the arrow placed by the other player.
+        assert.equal(critter1.direction, 0);
+        assert.equal(critter0.direction, 2);
     });
 
     it('should return active arrow when an active arrow is placed over an inactive one', function() {
