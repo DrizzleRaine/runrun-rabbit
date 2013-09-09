@@ -17,7 +17,7 @@ exports.build = function build(gameData) {
 
     function isArrowActive(arrow, gameTime) {
         gameTime = gameTime || lastUpdate;
-        return arrow.from <= gameTime && !arrow.to;
+        return arrow.from <= gameTime && (!arrow.to || arrow.to > gameTime);
     }
 
     function addArrow(player, newArrow) {
@@ -42,6 +42,8 @@ exports.build = function build(gameData) {
                         break;
                     }
                 }
+            } else {
+                return false;
             }
         }
 
@@ -101,16 +103,6 @@ exports.build = function build(gameData) {
         }
 
         return {};
-    }
-
-    function cancelArrow(player, arrow) {
-        for (var i = 0; i < playerArrows[player].length; ++i) {
-            if (playerArrows[player][i].x === arrow.x && playerArrows[player][i].y === arrow.y) {
-                playerArrows[player].splice(i, 1);
-                return true;
-            }
-        }
-        return false;
     }
 
     function modifyScore(player, modifier) {
@@ -182,7 +174,6 @@ exports.build = function build(gameData) {
     model.registerHud = registerHud;
     model.update = update;
     model.addArrow = addArrow;
-    model.cancelArrow = cancelArrow;
     model.getActiveArrow = getActiveArrow;
     model.modifyScore = modifyScore;
     model.random = gameData.random;

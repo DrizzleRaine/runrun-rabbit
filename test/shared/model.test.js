@@ -27,6 +27,25 @@ describe('model', function() {
         gameTime = 0;
     });
 
+    it('should prevent placing arrows on top of other arrows', function() {
+        model.addArrow(0, {
+            x: 2,
+            y: 2,
+            direction: 0,
+            from: 0
+        });
+
+        var result = model.addArrow(1, {
+            x: 2,
+            y: 2,
+            direction: 1,
+            from: 100
+        });
+
+        assert.isFalse(result);
+        assert.equal(model.playerArrows[1].length, 0);
+    });
+
     it('should prevent placing arrows on top of other fixtures', function() {
         model.addArrow(0, {
             x: model.sinks[0].x,
@@ -47,7 +66,7 @@ describe('model', function() {
 
     it('should prevent the same player from placing more than three arrows', function() {
         placeArrows();
-        assert.isFalse(model.isArrowActive(model.playerArrows[0][0]));
+        assert.isFalse(model.isArrowActive(model.playerArrows[0][0], 5));
     });
 
     it('should alter critter direction based on arrows', function() {

@@ -26,7 +26,7 @@ module.exports = (function() {
                     x: cell.x,
                     y: cell.y,
                     direction: direction.fromKey(activeKey),
-                    from: time
+                    from: time + 100 // Give us a little bit of leeway for network lag, but not enough to be perceptible
                 };
 
                 if (model.addArrow(gameData.playerId, newArrow) && socket) {
@@ -40,10 +40,7 @@ module.exports = (function() {
             socket.on('placeArrow', function (arrowData) {
                 model.addArrow(arrowData.playerId, arrowData.arrow);
             });
-
-            socket.on('cancelArrow', function (data) {
-                model.cancelArrow(data);
-            });
+            socket.emit('started');
         }
 
         var hudFactory = require('./views/hud.js');

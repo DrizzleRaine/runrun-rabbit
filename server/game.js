@@ -1,6 +1,7 @@
 'use strict';
 
 var modelFactory = require('../shared/model.js');
+var sprites = require('../shared/sprites.js');
 var levels = require('../shared/levels.js');
 var crypto = require('crypto');
 var RNG = require('../shared/utils/rng.js').RNG;
@@ -17,10 +18,15 @@ function configure(io) {
             totalPlayers: gameData.totalPlayers,
             random: new RNG(gameData.seed)
         });
-        var startTime = new Date().getTime();
-        setInterval(function() {
-            model.update(new Date().getTime() - startTime);
-        }, 100);
+
+        var startGame = function startGame() {
+            var startTime = new Date().getTime();
+            setInterval(function() {
+                model.update(new Date().getTime() - startTime);
+            }, sprites.MAX_TICK);
+        };
+
+        var clientsStarted = 0;
 
         io.sockets.clients(room).forEach(function (socket, index) {
             socket.emit('start', {
@@ -37,8 +43,11 @@ function configure(io) {
                     };
 
                     socket.broadcast.to(room).emit('placeArrow', arrowData);
-                } else {
-                    socket.emit('cancelArrow', arrow);
+                }
+            });
+            socket.on('started', function clientStarted() {
+                if (++clientsStarted === gameData.totalPlayers) {
+                    startGame();
                 }
             });
             socket.on('disconnect', function socketDisconnect() {
