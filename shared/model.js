@@ -12,7 +12,7 @@ exports.build = function build(gameData) {
     var playerArrows = arrayUtils.initialise(gameData.totalPlayers, function() { return []; });
     var playerScores = arrayUtils.initialise(gameData.totalPlayers, 0);
     var playerTimes = arrayUtils.initialise(gameData.totalPlayers, 9999);
-    var playerHuds = [];
+    var hud;
     var critters = [];
 
     function isArrowActive(arrow, gameTime) {
@@ -115,17 +115,18 @@ exports.build = function build(gameData) {
         }
     }
 
-    function registerHud(hud, player) {
-        hud.done(function() {
-            completePlayerTurn(player);
-        });
-        playerHuds[player] = hud;
+    function registerHud(newHud) {
+        hud = newHud;
     }
 
     var lastUpdate = 0;
     var currentPlayer = 0;
 
     function update(gameTime) {
+        if (gameTime >= gameData.totalTime) {
+            model.isRunning = false;
+        }
+
         var delta = gameTime - lastUpdate;
         lastUpdate = gameTime;
 
@@ -156,12 +157,12 @@ exports.build = function build(gameData) {
             source.update(model, gameTime);
         });
 
-        playerHuds.forEach(function(hud, player) {
+        if (hud) {
             hud.update({
-                score: playerScores[player],
-                time: playerTimes[player]
+                score: playerScores,
+                time: gameData.totalTime - gameTime
             });
-        });
+        }
     }
 
     model.width = gameData.level.width;
@@ -178,6 +179,7 @@ exports.build = function build(gameData) {
     model.modifyScore = modifyScore;
     model.random = gameData.random;
     model.isArrowActive = isArrowActive;
+    model.isRunning = true;
 
     return model;
 };

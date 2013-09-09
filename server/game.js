@@ -11,7 +11,8 @@ function configure(io) {
         var gameData = {
             levelId: 1,
             totalPlayers: io.sockets.clients(room).length,
-            seed: crypto.pseudoRandomBytes(16)
+            seed: crypto.pseudoRandomBytes(16),
+            totalTime: 90000
         };
         var model = modelFactory.build({
             level: levels[gameData.levelId],
@@ -33,7 +34,8 @@ function configure(io) {
                 playerId: index,
                 levelId: gameData.levelId,
                 totalPlayers: gameData.totalPlayers,
-                seed: gameData.seed
+                seed: gameData.seed,
+                totalTime: gameData.totalTime
             });
             socket.on('placeArrow', function(arrow) {
                 if (model.addArrow(index, arrow)) {

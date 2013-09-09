@@ -1,21 +1,22 @@
 'use strict';
 
-module.exports.Timer = function Timer(colour, unit) {
+var constants = require('../graphics/constants.js');
+
+module.exports.Timer = function Timer(unit, totalTime) {
     var container = document.createElement('div');
     container.style.position = 'relative';
+    container.classList.add('timer');
 
     var canvas = document.createElement('canvas');
     canvas.width = unit;
     canvas.height = unit;
     var ctx = canvas.getContext('2d');
-    ctx.strokeStyle = colour;
     ctx.lineWidth = unit * 3 / 24;
 
     var textField = document.createElement('h3');
-    textField.setAttribute('class', 'score');
+    textField.setAttribute('class', 'time');
     textField.style.position = 'absolute';
-    textField.style.width = '100%';
-    textField.style.top = (unit * 5 / 36) + 'px';
+    textField.style.top = '0px';
 
     var text = document.createTextNode('');
     textField.appendChild(text);
@@ -26,6 +27,10 @@ module.exports.Timer = function Timer(colour, unit) {
         ctx.clearRect(0, 0, unit, unit);
 
         var seconds = millis / 1000;
+
+        ctx.strokeStyle = millis > (totalTime / 10) ?
+            constants.COLOURS.NPC.FRIENDLY[0] : constants.COLOURS.NPC.ENEMY[0];
+
         var number = Math.ceil(seconds);
         var remainder = seconds % 1;
 

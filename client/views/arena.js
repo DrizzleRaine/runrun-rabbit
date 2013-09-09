@@ -11,11 +11,15 @@ exports.build = function build(parent, model) {
     var startTime = new Date().getTime();
 
     function animate() {
+        model.update(new Date().getTime() - startTime);
+
+        if (!model.isRunning) {
+            close();
+        }
+
         if (!isRunning) {
             return;
         }
-
-        model.update(new Date().getTime() - startTime);
 
         grid.clear();
 

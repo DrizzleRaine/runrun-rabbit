@@ -44,9 +44,7 @@ module.exports = (function() {
         }
 
         var hudFactory = require('./views/hud.js');
-        for (var player = 0; player < gameData.totalPlayers; ++player) {
-            model.registerHud(hudFactory.build(container, player), player);
-        }
+        model.registerHud(hudFactory.build(container, gameData));
     }
 
     var init = function init(multiplayer) {
@@ -80,7 +78,8 @@ module.exports = (function() {
             startGame({
                 playerId: 0,
                 levelId: 1,
-                totalPlayers: 2
+                totalPlayers: 2,
+                totalTime: 90000
             });
         }
     };

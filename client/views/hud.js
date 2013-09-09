@@ -1,56 +1,40 @@
 'use strict';
 
-exports.build = function build(parent, player) {
+exports.build = function build(parent, gameData) {
     var graphics = require('../graphics/hud.js');
-    var constants = require('../graphics/constants.js');
 
-    var doneCallback;
-
-    var timer = new graphics.Timer(constants.COLOURS.PLAYER[player], 144);
+    var timer = new graphics.Timer(144, gameData.totalTime);
 
     var hudDiv = document.createElement('div');
     hudDiv.setAttribute('class', 'hud');
-    hudDiv.setAttribute('id', 'hud-' + player);
 
-    var doneButton = document.createElement('button');
-    doneButton.setAttribute('type', 'button');
-    doneButton.setAttribute('class', 'btn btn-lg player-' + player);
-    doneButton.appendChild(document.createTextNode('Done'));
-    hudDiv.appendChild(doneButton);
+    var scores = [];
 
-    var scoreHeader = document.createElement('h2');
-    scoreHeader.setAttribute('class', 'score');
-    scoreHeader.appendChild(document.createTextNode('Score:'));
-    hudDiv.appendChild(scoreHeader);
+    for (var p = 0; p < gameData.totalPlayers; ++p) {
+        if (p === Math.floor(gameData.totalPlayers / 2)) {
+            hudDiv.appendChild(timer.view);
+        }
 
-    var scoreField = document.createElement('h3');
-    scoreField.setAttribute('class', 'score');
+        var scoreField = document.createElement('h3');
+        scoreField.classList.add('score');
+        scoreField.classList.add('player-' + p);
 
-    var score = document.createTextNode('');
-    scoreField.appendChild(score);
-    hudDiv.appendChild(scoreField);
-
-    var timeHeader = document.createElement('h2');
-    timeHeader.appendChild(document.createTextNode('Time:'));
-    hudDiv.appendChild(timeHeader);
-
-    hudDiv.appendChild(timer.view);
+        var score = document.createTextNode('');
+        scores.push(score);
+        scoreField.appendChild(score);
+        hudDiv.appendChild(scoreField);
+    }
 
     parent.appendChild(hudDiv);
 
-    doneButton.onclick = function() {
-        if (doneCallback) {
-            doneCallback();
-        }
-    };
-
     function update(stats) {
-        score.textContent = stats.score.toString();
+        for (var p = 0; p < gameData.totalPlayers; ++p) {
+            scores[p].textContent = stats.score[p].toString();
+        }
         timer.update(stats.time);
     }
 
     return {
-        done: function(callback) { doneCallback = callback; },
         update: update
     };
 };

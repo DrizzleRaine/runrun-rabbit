@@ -2,7 +2,7 @@
     text-align: center;
 }
 
-#game canvas {
+#game canvas, .hud {
     display: block;
     margin: 0 auto;
 }
@@ -15,36 +15,10 @@
 .hud {
     text-align: center;
     padding-top: 2em;
-}
-
-#hud-0 {
-    float: left;
-    margin-left: 10%;
-}
-
-#hud-1 {
-    float: right;
-    margin-right: 10%;
+    width: 576px;
 }
 
 @media screen and (min-width: 1200px) {
-    #game canvas {
-        float: left;
-        margin-left: 25%;
-    }
-
-    #hud-0 {
-        width: 25%;
-        clear: none;
-        margin: 0 0 0 -75%;
-    }
-
-    #hud-1 {
-        width: 25%;
-        clear: none;
-        margin: 0;
-    }
-
     .container {
         max-width: 1170px;
     }
@@ -87,12 +61,26 @@ h1 {
     font-size: 3.5em;
 }
 
-.hud h2 {
-    font-size: 2.5em;
+.hud h3, .hud .timer {
+    float: left;
+}
+
+.hud h3 {
+    font-size: 48px;
+    text-align: center;
+    width: 144px;
+    height: 96px;
+    padding-top: 48px;
+    margin: 0;
+}
+
+.hud .timer {
+    margin: 0 72px;
 }
 
 h3.score {
-    font-size: 3em;
+    color: #fff;
+    border-radius: 24px;
 }
 
 .btn {
@@ -106,16 +94,11 @@ h3.score {
     border: 0;
 }
 
-.btn-lg {
-    font-weight: normal;
-    font-size: 2em;
-}
-
 .player-0 {
     background-color: #007fff;
 }
 
-.player-0:hover {
+.btn.player-0:hover {
     background-color:#006bd6;
 }
 
@@ -123,6 +106,6 @@ h3.score {
     background-color: #3fb618;
 }
 
-.player-1:hover {
+.btn.player-1:hover {
     background-color:#339213;
 }
