@@ -68,6 +68,13 @@ exports.build = function build(gameData) {
             critters.forEach(function(critter) {
                 var replay = false;
                 for (var k = 0; k < revisedArrows.length; ++k) {
+                    // It is correct that we use newArrow.from here, rather than revisedArrows[k].from
+                    // There are actually only three possible arrows in this list:
+                    // * The new arrow itself
+                    // * An arrow it pre-empted, in which case revisedArrows[k].from.from > newArrow.from
+                    //   anyway (by the definition of pre-empted), so we're just picking the larger range
+                    // * An arrow we're re-instating due to removing the pre-empted arrow, which
+                    //   could be quite old but we only care about recent interactions with it
                     if (critter.inRangeOf(revisedArrows[k], lastUpdate - newArrow.from)) {
                         replay = true;
                         break;

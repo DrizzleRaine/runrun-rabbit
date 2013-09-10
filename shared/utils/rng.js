@@ -29,7 +29,6 @@ function RC4(seed) {
     for (var i = 0; i < 256; i++) {
         this.s[i] = i;
     }
-    this._normal = null;
     if (!seed) {
         seed = seedFromSystemRandom();
     }
@@ -95,36 +94,13 @@ RNG.prototype.uniform = function() {
 };
 
 /**
- * Produce a random integer within [n, m).
- * @param {number} [n=0]
- * @param {number} m
- *
- */
-RNG.prototype.random = function(n, m) {
-    if (n === null) {
-        return this.uniform();
-    } else if (m === null) {
-        m = n;
-        n = 0;
-    }
-    return n + Math.floor(this.uniform() * (m - n));
-};
-
-/**
  * Generates numbers using this.uniform() with the Box-Muller transform.
  * @returns {number} Normally-distributed random number of mean 0, variance 1.
  */
 RNG.prototype.normal = function() {
-    if (this._normal !== null) {
-        var n = this._normal;
-        this._normal = null;
-        return n;
-    } else {
-        var x = this.uniform() || Math.pow(2, -53); // can't be exactly 0
-        var y = this.uniform();
-        this._normal = Math.sqrt(-2 * Math.log(x)) * Math.sin(2 * Math.PI * y);
-        return Math.sqrt(-2 * Math.log(x)) * Math.cos(2 * Math.PI * y);
-    }
+    var x = this.uniform() || Math.pow(2, -53); // can't be exactly 0
+    var y = this.uniform();
+    return Math.sqrt(-2 * Math.log(x)) * Math.cos(2 * Math.PI * y);
 };
 
 module.exports.RNG = RNG;

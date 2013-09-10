@@ -168,5 +168,5 @@ module.exports = function(grunt) {
     grunt.registerTask('default', ['test', 'clean', 'browserify', 'copy']);
     grunt.registerTask('release', ['default', 'uglify', 'compress']);
     grunt.registerTask('test', ['jshint', 'mochaTest']);
-    grunt.registerTask('cover', ['clean', 'instrument', 'setInstrumentedSourceRoot', 'mochaTest', 'storeCoverage', 'makeReport']);
+    grunt.registerTask('cover', ['clean', 'instrument', 'setInstrumentedSourceRoot', 'test', 'storeCoverage', 'makeReport']);
 };
