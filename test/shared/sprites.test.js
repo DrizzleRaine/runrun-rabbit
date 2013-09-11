@@ -13,4 +13,20 @@ describe('sprites', function() {
             }
         });
     });
+
+    describe('update', function() {
+        it('should check for arrows at the correct point in time', function() {
+            var type = {
+                speed: 0.01
+            };
+
+            var source = {
+                x: 0,
+                y: 0,
+                direction: 1
+            };
+
+            var critter = new sprites.Critter(source, type, 50);
+        });
+    })
 });
