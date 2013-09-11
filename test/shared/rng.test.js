@@ -8,8 +8,6 @@ describe('rng', function() {
     it('should return the same values for the same seed', function() {
         var seed = crypto.pseudoRandomBytes(16);
 
-        console.log(seed);
-
         var rng1 = new rng.RNG(seed);
         var rng2 = new rng.RNG(crypto.pseudoRandomBytes(16));
         var rng3 = new rng.RNG(seed);

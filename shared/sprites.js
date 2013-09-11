@@ -46,19 +46,10 @@ Critter.prototype.inRangeOf = function inRangeOf(arrow, deltaT) {
     return ((deltaX * deltaX) + (deltaY * deltaY)) < (limit * limit);
 };
 
-Critter.prototype.replay = function replay(model, gameTime) {
-    this.x = this.fromPoint.x;
-    this.y = this.fromPoint.y;
-    this.direction = this.fromPoint.direction;
-    this.lastUpdate = this.fromPoint.t;
-    while (this.lastUpdate < gameTime) {
-        this.update(model, Math.min(gameTime, this.lastUpdate + module.exports.MAX_TICK));
-    }
-};
 
-Critter.prototype.update = function(model, gameTime) {
+function updateInternal(model, gameTime) {
+    /*jshint validthis:true */
     var deltaT = gameTime - this.lastUpdate;
-    this.lastUpdate = gameTime;
 
     var oldDirection = directionUtils.components(this.direction);
 
@@ -82,7 +73,8 @@ Critter.prototype.update = function(model, gameTime) {
                 model.modifyScore(sink.player, this.type.score);
             }
         } else {
-            var arrow = model.getActiveArrow(gameTime, centreX, centreY).arrow;
+            var timeToCentre = (Math.abs(this.x - centreX) + Math.abs(this.y - centreY)) / this.type.speed;
+            var arrow = model.getActiveArrow(this.lastUpdate + timeToCentre, centreX, centreY).arrow;
             var newDirection = this.direction;
             if (arrow && (arrow.direction !== this.direction)) {
                 newDirection = arrow.direction;
@@ -104,6 +96,21 @@ Critter.prototype.update = function(model, gameTime) {
 
     this.x = newX;
     this.y = newY;
+    this.lastUpdate = gameTime;
+}
+
+Critter.prototype.replay = function replay(model, gameTime) {
+    this.x = this.fromPoint.x;
+    this.y = this.fromPoint.y;
+    this.direction = this.fromPoint.direction;
+    this.lastUpdate = this.fromPoint.t;
+    this.update(model, gameTime);
+};
+
+Critter.prototype.update = function(model, gameTime) {
+    while (this.lastUpdate < gameTime) {
+        updateInternal.call(this, model, Math.min(gameTime, this.lastUpdate + module.exports.MAX_TICK));
+    }
 };
 
 module.exports.Critter = Critter;

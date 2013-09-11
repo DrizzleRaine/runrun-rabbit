@@ -211,6 +211,29 @@ describe('model', function() {
         assert.isNotNull(result);
     });
 
+    it('should update correctly when updating is delayed', function() {
+        var critter = new sprites.Critter({
+            x: 0,
+            y: 2,
+            direction: 1
+        }, sprites.RABBIT, 0);
+
+        model.critters.push(critter);
+
+        var arrow = {
+            x: 2,
+            y: 2,
+            direction: 0,
+            from: 0
+        };
+
+        model.addArrow(0, arrow);
+        model.update(3 / critter.type.speed);
+
+        assert.equal(critter.direction, arrow.direction,
+            'arrow should have effected critter direction');
+    });
+
     function placeArrows() {
         model.addArrow(0, {
             x: 0,

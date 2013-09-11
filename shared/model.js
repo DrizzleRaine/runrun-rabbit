@@ -1,7 +1,5 @@
 'use strict';
 
-var HORIZON = exports.HORIZON = 1000; // How far back in the past we'll go to compensate for lag
-
 exports.build = function build(gameData) {
     var model = {};
 
@@ -136,10 +134,6 @@ exports.build = function build(gameData) {
 
         var delta = gameTime - lastUpdate;
         lastUpdate = gameTime;
-
-        if (delta > HORIZON) {
-            throw new Error('Lagged out...');
-        }
 
         playerTimes[currentPlayer] -= delta;
 
