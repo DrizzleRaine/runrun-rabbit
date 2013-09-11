@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function build(parent, model, placeArrowCallback) {
+module.exports = function build(parent, model) {
     var grid = require('../graphics/grid.js')(model);
     var fixtures = require('../graphics/fixtures.js')(grid);
     var sprites = require('../graphics/sprites.js')(grid);
@@ -10,11 +10,16 @@ module.exports = function build(parent, model, placeArrowCallback) {
     var isRunning = true;
     var startTime = new Date().getTime();
 
+    var gameOverCallback;
+
     function animate() {
         model.update(new Date().getTime() - startTime);
 
         if (!model.isRunning) {
             close();
+            if (gameOverCallback) {
+                gameOverCallback();
+            }
         }
 
         if (!isRunning) {
@@ -48,6 +53,8 @@ module.exports = function build(parent, model, placeArrowCallback) {
 
     window.requestAnimationFrame(animate);
 
+    var placeArrowCallback;
+
     require('./input.js')(grid.view, function(x, y, direction) {
         if (!placeArrowCallback) {
             return;
@@ -68,6 +75,8 @@ module.exports = function build(parent, model, placeArrowCallback) {
     }
 
     return {
-        close: close
+        close: close,
+        placeArrow: function(callback) { placeArrowCallback = callback; },
+        gameOver: function(callback) { gameOverCallback = callback; }
     };
 };

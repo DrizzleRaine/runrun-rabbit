@@ -169,4 +169,5 @@ module.exports = function(grunt) {
     grunt.registerTask('release', ['default', 'uglify', 'compress']);
     grunt.registerTask('test', ['jshint', 'mochaTest']);
     grunt.registerTask('cover', ['clean', 'instrument', 'setInstrumentedSourceRoot', 'test', 'storeCoverage', 'makeReport']);
+    grunt.registerTask('run', ['default', 'concurrent']);
 };
