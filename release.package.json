@@ -1,11 +1,13 @@
 {
-    "name": "runrun-rabbit",
-    "version": "0.0.1",
-    "dependencies": {
-        "socket.io": "0.9.x"
-    },
-    "engines": {
-        "node": "0.10.x",
-        "npm": "1.2.x"
-    }
+  "name": "runrun-rabbit",
+  "subdomain": "runrun-rabbit",
+  "version": "0.0.1",
+  "dependencies": {
+    "socket.io": "0.9.x"
+  },
+  "scripts": { "start": "node ./server/start.js" },
+  "engines": {
+    "node": "0.10.x",
+    "npm": "1.2.x"
+  }
 }
