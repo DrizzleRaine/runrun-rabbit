@@ -5,6 +5,8 @@
  */
 'use strict';
 
+var DEFAULT_SEED_LENGTH = 16;
+
 /**
  * Generates a seed using the built-in Math.random,
  * useful when you don't need consistency between nodes
@@ -12,14 +14,14 @@
  */
 function seedFromSystemRandom() {
     var seed = [];
-    for (var i = 0; i < 16; ++i) {
+    for (var i = 0; i < DEFAULT_SEED_LENGTH; ++i) {
         seed.push(Math.floor(Math.random() * 256));
     }
     return seed;
 }
 
 /**
- * @param {String} seed A byte array to seed the generator.
+ * @param {Array} seed A byte array to seed the generator.
  * @constructor
  */
 function RC4(seed) {
@@ -43,7 +45,7 @@ RC4.prototype._swap = function(i, j) {
 
 /**
  * Mix additional entropy into this generator.
- * @param {String} seed
+ * @param {Array} seed
  */
 RC4.prototype.mix = function(seed) {
     var j = 0;
@@ -57,7 +59,7 @@ RC4.prototype.mix = function(seed) {
 /**
  * @returns {number} The next byte of output from the generator.
  */
-RC4.prototype.next = function() {
+RC4.prototype.nextByte = function() {
     this.i = (this.i + 1) % 256;
     this.j = (this.j + this.s[this.i]) % 256;
     this._swap(this.i, this.j);
@@ -65,42 +67,15 @@ RC4.prototype.next = function() {
 };
 
 /**
- * Create a new random number generator with the specified seed
- * @param seed A byte array used to seed the generator.
- * @constructor
+ * Spawns another generator from this one. This isn't a naive attempt to make things 'more random',
+ * but a way to make it easier to ensure random number generators are called in a consistent order
  */
-function RNG(seed) {
-    this._state = new RC4(seed);
-}
-
-/**
- * @returns {number} Uniform random number between 0 and 255.
- */
-RNG.prototype.nextByte = function() {
-    return this._state.next();
-};
-
-/**
- * @returns {number} Uniform random number between 0 and 1.
- */
-RNG.prototype.uniform = function() {
-    var BYTES = 7; // 56 bits to make a 53-bit double
-    var output = 0;
-    for (var i = 0; i < BYTES; i++) {
-        output *= 256;
-        output += this.nextByte();
+RC4.prototype.spawn = function() {
+    var seed = [];
+    for (var i = 0; i < DEFAULT_SEED_LENGTH; ++i) {
+        seed.push(this.nextByte());
     }
-    return output / (Math.pow(2, BYTES * 8) - 1);
+    return new RC4(seed);
 };
 
-/**
- * Generates numbers using this.uniform() with the Box-Muller transform.
- * @returns {number} Normally-distributed random number of mean 0, variance 1.
- */
-RNG.prototype.normal = function() {
-    var x = this.uniform() || Math.pow(2, -53); // can't be exactly 0
-    var y = this.uniform();
-    return Math.sqrt(-2 * Math.log(x)) * Math.cos(2 * Math.PI * y);
-};
-
-module.exports.RNG = RNG;
+module.exports.RNG = RC4;

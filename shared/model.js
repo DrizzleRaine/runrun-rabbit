@@ -13,6 +13,10 @@ exports.build = function build(gameData) {
     var hud;
     var critters = [];
 
+    gameData.level.sources.forEach(function(source) {
+        source.init(gameData.random.spawn());
+    });
+
     function isArrowActive(arrow, gameTime) {
         gameTime = gameTime || lastUpdate;
         return arrow.from <= gameTime && (!arrow.to || arrow.to > gameTime);
@@ -130,6 +134,7 @@ exports.build = function build(gameData) {
     function update(gameTime) {
         if (gameTime >= gameData.totalTime) {
             model.isRunning = false;
+            return;
         }
 
         var delta = gameTime - lastUpdate;
@@ -178,7 +183,6 @@ exports.build = function build(gameData) {
     model.addArrow = addArrow;
     model.getActiveArrow = getActiveArrow;
     model.modifyScore = modifyScore;
-    model.random = gameData.random;
     model.isArrowActive = isArrowActive;
     model.isRunning = true;
 

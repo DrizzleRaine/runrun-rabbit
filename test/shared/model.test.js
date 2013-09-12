@@ -9,22 +9,32 @@ describe('model', function() {
     var testLevel = {
         width: 5,
         height: 5,
-        sources: [ { x: 0, y: 2, update: sinon.spy() } ],
+        sources: [ { x: 0, y: 2, update: sinon.spy(), init: sinon.spy() } ],
         sinks: [ { x:4, y:2, player: null, update: sinon.spy() } ]
     };
 
     var model;
     var gameData;
     var gameTime;
+    var dummyRandom = {};
 
     beforeEach(function() {
         gameData = {
             totalPlayers: 2,
-            level: testLevel
+            level: testLevel,
+            random: {
+                spawn: function() {
+                    return dummyRandom;
+                }
+            }
         };
 
         model = modelFactory.build(gameData);
         gameTime = 0;
+    });
+
+    it('should initialise sources with individual pseudo-random number generators', function() {
+        assert.isTrue(testLevel.sources[0].init.withArgs(dummyRandom).calledOnce);
     });
 
     it('should prevent placing arrows on top of other arrows', function() {

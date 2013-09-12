@@ -19,12 +19,16 @@ var TICK = 100;
 
 var sprites = require('./sprites.js');
 
+Source.prototype.init = function initSource(random) {
+    this.random = random;
+};
+
 Source.prototype.update = function updateSource(model, gameTime) {
-    for (var time = this.lastUpdate + TICK - (this.lastUpdate % TICK); time < gameTime; time += TICK) {
-        var rand = model.random.normal();
-        if (rand > 2.5) {
+    for (var time = this.lastUpdate + TICK - (this.lastUpdate % TICK); time <= gameTime; time += TICK) {
+        var rand = this.random.nextByte();
+        if (rand > 253) {
             model.critters.push(new sprites.Critter(this, sprites.FOX, time));
-        } else if (rand > 1) {
+        } else if (rand > 220) {
             model.critters.push(new sprites.Critter(this, sprites.RABBIT, time));
         }
     }
