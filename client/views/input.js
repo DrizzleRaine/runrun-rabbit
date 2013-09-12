@@ -12,7 +12,7 @@ var keyMap = {
 };
 
 function directionFromKey(keyCode) {
-    if (keyMap.hasOwnProperty(keyCode.toString())) {
+    if (keyCode && keyMap.hasOwnProperty(keyCode.toString())) {
         return keyMap[keyCode];
     } else {
         return null;
@@ -47,14 +47,16 @@ module.exports = function build(arena, placeArrowCallback) {
             return;
         }
 
-        if (activeKey === null) {
+        var direction = directionFromKey(activeKey);
+
+        if (direction === null) {
             return;
         }
 
         placeArrowCallback(
             Math.floor((event.clientX - offsetX) / constants.CELL_SIZE),
             Math.floor((event.clientY - offsetY) / constants.CELL_SIZE),
-            directionFromKey(activeKey)
+            direction
         );
     };
 };
