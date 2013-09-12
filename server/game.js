@@ -17,13 +17,17 @@ function configure(io) {
         var model = modelFactory.build({
             level: levels[gameData.levelId],
             totalPlayers: gameData.totalPlayers,
-            random: new RNG(gameData.seed)
+            random: new RNG(gameData.seed),
+            totalTime: gameData.totalTime
         });
 
         var startGame = function startGame() {
             var startTime = new Date().getTime();
-            setInterval(function() {
+            var interval = setInterval(function() {
                 model.update(new Date().getTime() - startTime);
+                if (!model.isRunning) {
+                    clearInterval(interval);
+                }
             }, sprites.MAX_TICK);
         };
 

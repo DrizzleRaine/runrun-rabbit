@@ -51,10 +51,10 @@ function updateInternal(model, gameTime) {
     /*jshint validthis:true */
     var deltaT = gameTime - this.lastUpdate;
 
-    var oldDirection = directionUtils.components(this.direction);
+    var directionVector = directionUtils.components(this.direction);
 
-    var newX = this.x + (deltaT * this.type.speed * oldDirection.x);
-    var newY = this.y + (deltaT * this.type.speed * oldDirection.y);
+    var newX = this.x + (deltaT * this.type.speed * directionVector.x);
+    var newY = this.y + (deltaT * this.type.speed * directionVector.y);
 
     var oldCellX = Math.floor(this.x);
     var oldCellY = Math.floor(this.y);
@@ -63,8 +63,10 @@ function updateInternal(model, gameTime) {
     var newCellY = Math.floor(newY);
 
     if (newCellX !== oldCellX || newCellY !== oldCellY) {
-        var centreX = Math.max(oldCellX, newCellX);
-        var centreY = Math.max(oldCellY, newCellY);
+        // Changing this from Math.max(oldCellX, newCellX) fixes a *consistently reproducible*
+        // bug on the server side, due to Math.max(0, -1) apparently returning -1...
+        var centreX = oldCellX > newCellX ? oldCellX : newCellX;
+        var centreY = oldCellY > newCellY ? oldCellY : newCellY;
 
         var sink = gridUtils.getAtCell(model.sinks, centreX, centreY);
         if (sink !== null) {
@@ -84,12 +86,13 @@ function updateInternal(model, gameTime) {
                 newDirection = (newDirection + 1) % 4;
             }
 
-            if (newDirection !== oldDirection) {
+            if (newDirection !== this.direction) {
                 this.direction = newDirection;
+
                 var deltaD = Math.abs(deltaT * this.type.speed) - Math.abs(this.x - centreX) - Math.abs(this.y - centreY);
-                var newComponents = directionUtils.components(newDirection);
-                newX = centreX + deltaD * newComponents.x;
-                newY = centreY + deltaD * newComponents.y;
+                var newDirectionVector = directionUtils.components(newDirection);
+                newX = centreX + deltaD * newDirectionVector.x;
+                newY = centreY + deltaD * newDirectionVector.y;
             }
         }
     }

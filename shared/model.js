@@ -134,7 +134,7 @@ exports.build = function build(gameData) {
     function update(gameTime) {
         if (gameTime >= gameData.totalTime) {
             model.isRunning = false;
-            return;
+            gameTime = gameData.totalTime;
         }
 
         var delta = gameTime - lastUpdate;
