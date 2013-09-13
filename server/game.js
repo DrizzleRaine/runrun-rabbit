@@ -9,7 +9,7 @@ var RNG = require('../shared/utils/rng.js').RNG;
 function configure(io) {
     function start(room) {
         var gameData = {
-            levelId: 1,
+            levelId: new Date().getTime() % levels.length,
             totalPlayers: io.sockets.clients(room).length,
             seed: crypto.pseudoRandomBytes(16),
             totalTime: 90000

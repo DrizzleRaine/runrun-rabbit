@@ -28,6 +28,7 @@ describe('sprites', function() {
 
         it('should check for arrows at the correct point in time', function() {
             var model = {
+                sources: [],
                 sinks: [],
                 getActiveArrow: sinon.stub(),
                 width: 2,
@@ -50,6 +51,7 @@ describe('sprites', function() {
             };
 
             var model = {
+                sources: [],
                 sinks: [],
                 getActiveArrow: sinon.stub(),
                 width: 3,
@@ -73,6 +75,7 @@ describe('sprites', function() {
             };
 
             var model = {
+                sources: [],
                 sinks: [],
                 getActiveArrow: sinon.stub(),
                 width: 3,
@@ -96,6 +99,7 @@ describe('sprites', function() {
             };
 
             var model = {
+                sources: [],
                 sinks: [],
                 getActiveArrow: sinon.stub(),
                 width: 3,

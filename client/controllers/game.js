@@ -90,7 +90,7 @@ module.exports = (function() {
         } else {
             startGame({
                 playerId: 0,
-                levelId: 1,
+                levelId: new Date().getTime() % levels.length,
                 totalPlayers: 2,
                 totalTime: 90000
             });

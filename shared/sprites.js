@@ -80,6 +80,11 @@ function updateInternal(model, gameTime) {
             var newDirection = this.direction;
             if (arrow && (arrow.direction !== this.direction)) {
                 newDirection = arrow.direction;
+            } else {
+                var source = gridUtils.getAtCell(model.sources, centreX, centreY);
+                if (source) {
+                    newDirection = source.direction;
+                }
             }
 
             var rotation = 0;
