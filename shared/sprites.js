@@ -82,8 +82,9 @@ function updateInternal(model, gameTime) {
                 newDirection = arrow.direction;
             }
 
+            var rotation = 0;
             while (!directionUtils.isValid(directionUtils.components(newDirection), model, centreX, centreY)) {
-                newDirection = (newDirection + 1) % 4;
+                newDirection = (newDirection + (++rotation)) % 4;
             }
 
             if (newDirection !== this.direction) {
