@@ -1,8 +1,8 @@
 'use strict';
 
-var modelFactory = require('../shared/model.js');
-var levels = require('../shared/levels.js');
-var RNG = require('../shared/utils/rng.js').RNG;
+var modelFactory = require('../../shared/model.js');
+var levels = require('../../shared/levels.js');
+var RNG = require('../../shared/utils/rng.js').RNG;
 
 module.exports = (function() {
     var model;
@@ -11,6 +11,7 @@ module.exports = (function() {
     var socket;
     var connected = false;
     var container;
+    var inputMethod;
 
     function disconnect() {
         if (connected) {
@@ -23,13 +24,14 @@ module.exports = (function() {
         gameData.level = levels[gameData.levelId];
         gameData.random = new RNG(gameData.seed);
         model = modelFactory.build(gameData);
-        arena = require('./views/arena.js')(container, model);
-
-        arena.placeArrow(function placeArrow(newArrow) {
+        arena = require('./../views/arena.js')(container, model, function placeArrow(newArrow) {
             if (model.addArrow(gameData.playerId, newArrow) && socket) {
                 socket.emit('placeArrow', newArrow);
             }
         });
+
+        arena.inputMethod(inputMethod);
+
         arena.gameOver(function() {
             message.setText('Game over!');
             connected = false;
@@ -42,13 +44,17 @@ module.exports = (function() {
             socket.emit('started');
         }
 
-        var hudFactory = require('./views/hud.js');
+        var hudFactory = require('./../views/hud.js');
         model.registerHud(hudFactory.build(container, gameData));
     }
 
-    var init = function init(multiplayer) {
-        container = document.getElementById('game');
-        message = require('./views/message.js').build(container);
+    var init = function init(multiplayer, selectedInputMethod) {
+        container = document.createElement('div');
+        container.setAttribute('id', 'game');
+        document.body.appendChild(container);
+        inputMethod = selectedInputMethod;
+
+        message = require('./../views/message.js').build(container);
         container.appendChild(message.view);
 
         if (multiplayer) {

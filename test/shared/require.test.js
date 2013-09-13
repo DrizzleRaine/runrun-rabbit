@@ -9,7 +9,7 @@
 var fs = require('fs');
 var path = require('path');
 
-var excludes = ['graphics', 'start.js', 'main.js'];
+var excludes = ['graphics', 'start.js', 'main.js', 'settings.js'];
 
 function processDir(dir) {
     fs.readdirSync(dir).forEach(function(file) {

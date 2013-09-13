@@ -1,9 +1,10 @@
 'use strict';
 
-module.exports = function build(parent, model) {
+module.exports = function build(parent, model, placeArrowCallback) {
     var grid = require('../graphics/grid.js')(model);
     var fixtures = require('../graphics/fixtures.js')(grid);
     var sprites = require('../graphics/sprites.js')(grid);
+    var inputMethods = require('./input.js');
 
     parent.appendChild(grid.view);
 
@@ -53,30 +54,37 @@ module.exports = function build(parent, model) {
 
     window.requestAnimationFrame(animate);
 
-    var placeArrowCallback;
+    var currentInputMethod;
 
-    require('./input.js')(grid.view, function(x, y, direction) {
-        if (!placeArrowCallback) {
-            return;
+    function setInputMethod(inputMethod) {
+        if (currentInputMethod) {
+            currentInputMethod.unbind();
         }
 
-        placeArrowCallback({
-            x: x,
-            y: y,
-            direction: direction,
-            from: new Date().getTime() - startTime + 100
-            // Give us a little bit of leeway for network lag, but not enough to be perceptible
+        currentInputMethod = inputMethods[inputMethod](grid.view, function(x, y, direction) {
+            if (!placeArrowCallback) {
+                return;
+            }
+
+            placeArrowCallback({
+                x: x,
+                y: y,
+                direction: direction,
+                from: new Date().getTime() - startTime + 100
+                // Give us a little bit of leeway for network lag, but not enough to be perceptible
+            });
         });
-    });
+    }
 
     function close() {
         isRunning = false;
+        grid.clear();
         parent.removeChild(grid.view);
     }
 
     return {
         close: close,
-        placeArrow: function(callback) { placeArrowCallback = callback; },
+        inputMethod: setInputMethod,
         gameOver: function(callback) { gameOverCallback = callback; }
     };
 };

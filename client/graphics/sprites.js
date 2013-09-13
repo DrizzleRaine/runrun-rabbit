@@ -23,7 +23,7 @@ module.exports = function initSprites(grid) {
     });
     sprites.FOX.view = common.preRender(function(ctx) {
         ctx.fillStyle = constants.COLOURS.NPC.ENEMY[1];
-        ctx.drawEllipse(0, 0, unit / 3, unit * 2 / 3);
+        ctx.drawEllipse(0, 0, unit * 6 / 12, unit * 5 / 6);
         ctx.fill();
         ctx.beginPath();
         ctx.moveTo(0, unit * 2 / 3);
@@ -35,8 +35,8 @@ module.exports = function initSprites(grid) {
         ctx.fillStyle = constants.COLOURS.NPC.ENEMY[0];
         ctx.beginPath();
         ctx.moveTo(0, -unit * 2 / 3);
-        ctx.lineTo(unit * 5 / 24, -unit / 8);
-        ctx.lineTo(-unit * 5 / 24, -unit / 8);
+        ctx.lineTo(unit * 6 / 24, 0);
+        ctx.lineTo(-unit * 6 / 24, 0);
         ctx.lineTo(0, -unit * 2 / 3);
         ctx.fill();
 

@@ -19,11 +19,25 @@ function directionFromKey(keyCode) {
     }
 }
 
-module.exports = function build(arena, placeArrowCallback) {
-    var constants = require('../graphics/constants.js');
+var methods = {};
+var constants = require('../graphics/constants.js');
 
+module.exports = methods;
+
+function clearHandlers(arena) {
+    window.oncontextmenu = null;
+    window.onkeydown = null;
+    window.onkeyup = null;
+    arena.onmousedown = null;
+    arena.onmousemove = null;
+}
+
+methods.desktop = function desktop(arena, placeArrowCallback) {
     var activeKey;
-    
+
+    var offsetX;
+    var offsetY;
+
     window.oncontextmenu = function() { return false; };
 
     window.onkeydown = function (event) {
@@ -39,9 +53,6 @@ module.exports = function build(arena, placeArrowCallback) {
         }
     };
 
-    var offsetX = arena.offsetLeft + (arena.offsetWidth - arena.width) / 2;
-    var offsetY = arena.offsetTop + (arena.offsetHeight - arena.height) / 2;
-
     arena.onmousedown = function(event) {
         if (!placeArrowCallback) {
             return;
@@ -53,10 +64,55 @@ module.exports = function build(arena, placeArrowCallback) {
             return;
         }
 
+        offsetX = offsetX || arena.offsetLeft + (arena.offsetWidth - arena.width) / 2;
+        offsetY = offsetY || arena.offsetTop + (arena.offsetHeight - arena.height) / 2;
+
         placeArrowCallback(
             Math.floor((event.clientX - offsetX) / constants.CELL_SIZE),
             Math.floor((event.clientY - offsetY) / constants.CELL_SIZE),
             direction
         );
+    };
+
+    return {
+        unbind: function() { clearHandlers(arena); }
+    };
+};
+
+methods.laptop = function desktop(arena, placeArrowCallback) {
+    var currentLocation = {};
+
+    var offsetX;
+    var offsetY;
+
+    window.oncontextmenu = function() { return false; };
+
+    arena.onmousemove = function(event) {
+        offsetX = offsetX || arena.offsetLeft + (arena.offsetWidth - arena.width) / 2;
+        offsetY = offsetY || arena.offsetTop + (arena.offsetHeight - arena.height) / 2;
+
+        currentLocation.x = event.clientX - offsetX;
+        currentLocation.y = event.clientY - offsetY;
+    };
+
+    window.onkeydown = function(event) {
+        event.preventDefault();
+    };
+
+    window.onkeyup = function (event) {
+        var direction = directionFromKey(event.keyCode);
+        if (direction !== null && currentLocation.x > 0 && currentLocation.y > 0 &&
+            currentLocation.x < arena.width && currentLocation.y < arena.height) {
+            placeArrowCallback(
+                Math.floor(currentLocation.x / constants.CELL_SIZE),
+                Math.floor(currentLocation.y / constants.CELL_SIZE),
+                direction
+            );
+            event.preventDefault();
+        }
+    };
+
+    return {
+        unbind: function() { clearHandlers(arena); }
     };
 };
