@@ -176,6 +176,7 @@ exports.build = function build(gameData) {
     model.sources = gameData.level.sources;
     model.sinks = gameData.level.sinks;
     model.critters = critters;
+    model.playerId = gameData.playerId;
     model.playerArrows = playerArrows;
     model.playerTimes = playerTimes;
     model.registerHud = registerHud;

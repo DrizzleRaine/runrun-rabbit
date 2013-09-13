@@ -61,6 +61,8 @@ module.exports = function build(parent, model, placeArrowCallback) {
             currentInputMethod.unbind();
         }
 
+        grid.view.style.cursor = 'url("cursor-' + model.playerId + '.cur"), default';
+
         currentInputMethod = inputMethods[inputMethod](grid.view, function(x, y, direction) {
             if (!placeArrowCallback) {
                 return;
