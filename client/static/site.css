@@ -12,6 +12,10 @@ canvas.arena {
     border-radius: 3px;
 }
 
+h2.message {
+    text-align: center;
+}
+
 #settings {
     text-align: center;
 }

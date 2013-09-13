@@ -1,19 +1,39 @@
 'use strict';
 
+var newVisitor = !document.cookie;
+
 var gameController = require('./controllers/game.js');
 var settingsController = require('./controllers/settings.js');
+var hintMessage = require('./views/message.js').build(document.getElementById('container'));
 
 var settingsOpen = false;
 
 var hideMenu = function hideMenu() {
     document.getElementById('menu').classList.add('hidden');
+    hintMessage.view.classList.add('hidden');
     document.getElementById('backToMenu').classList.remove('hidden');
 };
 
-var showMenu = function hideMenu() {
+var showMenu = function showMenu() {
     document.getElementById('menu').classList.remove('hidden');
+    hintMessage.view.classList.remove('hidden');
     document.getElementById('backToMenu').classList.add('hidden');
 };
+
+function setupHintMessage(elementId, message) {
+    var element = document.getElementById(elementId);
+    element.onmouseover = function() { hintMessage.setText(message); };
+    element.onmouseout = function() { hintMessage.setText(''); };
+}
+
+setupHintMessage('startSinglePlayer',
+    'Start a single player game: This is just a sandbox mode, as there are no AI opponents (yet!)');
+
+setupHintMessage('startMultiplayer',
+    'Start a multiplayer game against a randomly chosen opponent');
+
+setupHintMessage('settingsAndInstructions',
+    'View instructions and configure input options');
 
 document.getElementById('startSinglePlayer').onclick = function() {
     hideMenu();
@@ -27,19 +47,20 @@ document.getElementById('startMultiplayer').onclick = function() {
 
 var openSettings = function() {
     hideMenu();
+    settingsOpen = true;
     settingsController.show();
 };
 
 document.getElementById('settingsAndInstructions').onclick = openSettings;
 
-if (!document.cookie) {
+if (newVisitor) {
     openSettings();
-    settingsOpen = true;
 }
 
 document.getElementById('backToMenu').onclick = function(event) {
     if (settingsOpen) {
         settingsController.hide();
+        settingsOpen = false;
         showMenu();
         event.preventDefault();
     }
