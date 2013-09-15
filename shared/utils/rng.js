@@ -66,16 +66,4 @@ RC4.prototype.nextByte = function() {
     return this.s[(this.s[this.i] + this.s[this.j]) % 256];
 };
 
-/**
- * Spawns another generator from this one. This isn't a naive attempt to make things 'more random',
- * but a way to make it easier to ensure random number generators are called in a consistent order
- */
-RC4.prototype.spawn = function() {
-    var seed = [];
-    for (var i = 0; i < DEFAULT_SEED_LENGTH; ++i) {
-        seed.push(this.nextByte());
-    }
-    return new RC4(seed);
-};
-
 module.exports.RNG = RC4;

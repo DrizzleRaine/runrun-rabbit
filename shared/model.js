@@ -5,17 +5,19 @@ exports.build = function build(gameData) {
 
     var gridUtils = require('./utils/grid.js');
     var arrayUtils = require('./utils/array.js');
+    var sprites = require('./sprites.js');
+    var spawning = require('./spawning.js');
 
     var MAX_ARROWS = 3;
     var playerArrows = arrayUtils.initialise(gameData.totalPlayers, function() { return []; });
     var playerScores = arrayUtils.initialise(gameData.totalPlayers, 0);
-    var playerTimes = arrayUtils.initialise(gameData.totalPlayers, 9999);
     var hud;
+
+    var spawningStrategy = gameData.initialSpawning || spawning.standard;
+
     var critters = [];
 
-    gameData.level.sources.forEach(function(source) {
-        source.init(gameData.random.spawn());
-    });
+    var TICK = 100;
 
     function isArrowActive(arrow, gameTime) {
         gameTime = gameTime || lastUpdate;
@@ -73,7 +75,7 @@ exports.build = function build(gameData) {
                     // It is correct that we use newArrow.from here, rather than revisedArrows[k].from
                     // There are actually only three possible arrows in this list:
                     // * The new arrow itself
-                    // * An arrow it pre-empted, in which case revisedArrows[k].from.from > newArrow.from
+                    // * An arrow it pre-empted, in which case revisedArrows[k].from > newArrow.from
                     //   anyway (by the definition of pre-empted), so we're just picking the larger range
                     // * An arrow we're re-instating due to removing the pre-empted arrow, which
                     //   could be quite old but we only care about recent interactions with it
@@ -118,18 +120,33 @@ exports.build = function build(gameData) {
         playerScores[player] = modifier(playerScores[player]);
     }
 
-    function completePlayerTurn(player) {
-        if (currentPlayer === player) {
-            currentPlayer = (++currentPlayer) % gameData.totalPlayers;
-        }
-    }
-
     function registerHud(newHud) {
         hud = newHud;
     }
 
+    function updateCritters(gameTime) {
+        var remainingCritters = [];
+        var critter;
+        var foxCount = 0;
+        while (critters.length) {
+            critter = critters.pop();
+            critter.update(model, gameTime);
+            if (critter.inPlay) {
+                remainingCritters.push(critter);
+            }
+        }
+        while (remainingCritters.length) {
+            critter = remainingCritters.pop();
+            if (critter.type === sprites.FOX) {
+                ++foxCount;
+            }
+            critters.push(critter);
+        }
+        return foxCount;
+    }
+
     var lastUpdate = 0;
-    var currentPlayer = 0;
+    var lastFullUpdate = 0;
 
     function update(gameTime) {
         if (gameTime >= gameData.totalTime) {
@@ -137,38 +154,26 @@ exports.build = function build(gameData) {
             gameTime = gameData.totalTime;
         }
 
-        var delta = gameTime - lastUpdate;
-        lastUpdate = gameTime;
-
-        playerTimes[currentPlayer] -= delta;
-
-        if (playerTimes[currentPlayer] <= 0) {
-            playerTimes[currentPlayer] = 0;
-            completePlayerTurn(currentPlayer);
-        }
-
-        var remainingCritters = [];
-        while (critters.length) {
-            var critter = critters.pop();
-            critter.update(model, gameTime);
-            if (critter.inPlay) {
-                remainingCritters.push(critter);
+        if (Math.floor(gameTime / TICK) > Math.floor(lastFullUpdate / TICK)) {
+            for (var time = lastFullUpdate + TICK - (lastFullUpdate % TICK); time <= gameTime; time += TICK) {
+                updateCritters(time);
+                spawningStrategy.rabbits(model, time, gameData.random);
+                spawningStrategy.foxes(model, time, gameData.random);
             }
-        }
-        while (remainingCritters.length) {
-            critters.push(remainingCritters.pop());
+
+            lastFullUpdate = gameTime;
+
+            if (hud) {
+                hud.update({
+                    score: playerScores,
+                    time: gameData.totalTime - gameTime
+                });
+            }
+        } else {
+            updateCritters(gameTime);
         }
 
-        gameData.level.sources.forEach(function(source) {
-            source.update(model, gameTime);
-        });
-
-        if (hud) {
-            hud.update({
-                score: playerScores,
-                time: gameData.totalTime - gameTime
-            });
-        }
+        lastUpdate = gameTime;
     }
 
     model.width = gameData.level.width;
@@ -178,7 +183,7 @@ exports.build = function build(gameData) {
     model.critters = critters;
     model.playerId = gameData.playerId;
     model.playerArrows = playerArrows;
-    model.playerTimes = playerTimes;
+    model.playerScores = playerScores;
     model.registerHud = registerHud;
     model.update = update;
     model.addArrow = addArrow;

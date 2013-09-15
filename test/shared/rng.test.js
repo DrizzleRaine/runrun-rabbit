@@ -40,24 +40,4 @@ describe('rng', function() {
 
         assert.notDeepEqual(results1, results2);
     });
-
-    it('should spawn other pseudo-random generators that return different values', function() {
-        var rng1 = new rng.RNG();
-        var rng2 = rng1.spawn();
-        var rng3 = rng1.spawn();
-
-        var results1 = [];
-        var results2 = [];
-        var results3 = [];
-
-        for (var i = 0; i < 10; ++i) {
-            results1.push(rng1.nextByte());
-            results2.push(rng2.nextByte());
-            results3.push(rng3.nextByte());
-        }
-
-        assert.notDeepEqual(results1, results2);
-        assert.notDeepEqual(results1, results3);
-        assert.notDeepEqual(results2, results3);
-    });
 });

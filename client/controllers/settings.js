@@ -3,25 +3,11 @@
 module.exports = (function() {
     var createView = require('./../views/arena.js');
     var modelFactory = require('../../shared/model.js');
-    var sprites = require('../../shared/sprites.js');
+    var spawning = require('../../shared/spawning.js');
+    var fixtures = require('../../shared/fixtures.js');
+    var RNG = require('../../shared/utils/rng.js').RNG;
 
-    function noOp() {}
-
-    function PeriodicSource(x, y, direction, period, type) {
-        this.x = x;
-        this.y = y;
-        this.direction = direction;
-        this.lastUpdate = 0;
-        this.init = noOp;
-        this.update = function(model, gameTime) {
-            if (Math.floor(gameTime / period) > Math.floor(this.lastUpdate / period)) {
-                model.critters.push(new sprites.Critter(this, type, gameTime));
-            }
-            this.lastUpdate = gameTime;
-        };
-    }
-
-    function createModel(sources, sinks) {
+    function createModel(sources, sinks, initialSpawning) {
         return modelFactory.build({
             playerId: 0,
             level: {
@@ -32,7 +18,8 @@ module.exports = (function() {
             },
             totalPlayers: 1,
             totalTime: Infinity,
-            random: { spawn: noOp }
+            random: new RNG(),
+            initialSpawning: initialSpawning
         });
     }
 
@@ -50,18 +37,26 @@ module.exports = (function() {
 
     controller.show = function show() {
         var rabbitsModel = createModel(
-            [ new PeriodicSource(0, 1, 1, 1000, sprites.RABBIT) ], [ { player:0, x:2, y: 1 } ]);
+            [ new fixtures.Source(0, 1, 1) ],
+            [ { player:0, x:2, y: 1 } ],
+            spawning.rabbitsOnly
+        );
         createView(document.getElementById('rabbits'), rabbitsModel);
         models.push(rabbitsModel);
 
         var foxesModel = createModel(
-            [ new PeriodicSource(1, 2, 0, 2000, sprites.FOX)], [ { player:0, x:1, y: 0 } ]);
+            [ new fixtures.Source(1, 2, 0)],
+            [ { player:0, x:1, y: 0 } ],
+            spawning.foxesOnly
+        );
         createView(document.getElementById('foxes'), foxesModel);
         models.push(foxesModel);
 
         var arrowsModel = createModel(
-            [ new PeriodicSource(0, 0, 1, 1000, sprites.RABBIT) ],
-            [ { player:null, x:2, y:0}, {player:0, x:2, y: 2} ]);
+            [ new fixtures.Source(0, 0, 1) ],
+            [ { player:null, x:2, y:0}, {player:0, x:2, y: 2} ],
+            spawning.rabbitsOnly
+        );
         arrowsModel.addArrow(0, {
             x: 1,
             y: 0,
