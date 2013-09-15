@@ -146,7 +146,6 @@ exports.build = function build(gameData) {
     }
 
     var lastUpdate = 0;
-    var lastFullUpdate = 0;
 
     function update(gameTime) {
         if (gameTime >= gameData.totalTime) {
@@ -154,14 +153,14 @@ exports.build = function build(gameData) {
             gameTime = gameData.totalTime;
         }
 
-        if (Math.floor(gameTime / TICK) > Math.floor(lastFullUpdate / TICK)) {
-            for (var time = lastFullUpdate + TICK - (lastFullUpdate % TICK); time <= gameTime; time += TICK) {
+        if (Math.floor(gameTime / TICK) > Math.floor(lastUpdate / TICK)) {
+            for (var time = lastUpdate + TICK - (lastUpdate % TICK); time <= gameTime; time += TICK) {
                 updateCritters(time);
                 spawningStrategy.rabbits(model, time, gameData.random);
                 spawningStrategy.foxes(model, time, gameData.random);
             }
 
-            lastFullUpdate = gameTime;
+            lastUpdate = gameTime;
 
             if (hud) {
                 hud.update({
@@ -169,11 +168,7 @@ exports.build = function build(gameData) {
                     time: gameData.totalTime - gameTime
                 });
             }
-        } else {
-            updateCritters(gameTime);
         }
-
-        lastUpdate = gameTime;
     }
 
     model.width = gameData.level.width;

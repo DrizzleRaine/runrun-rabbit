@@ -5,6 +5,7 @@ module.exports = function initSprites(grid) {
     var common = require('./common.js')(grid);
     var sprites = require('../../shared/sprites.js');
     var unit = constants.CELL_SIZE;
+    var directionUtils = require('../../shared/utils/direction.js');
 
     sprites.RABBIT.view = common.preRender(function(ctx) {
         ctx.fillStyle = constants.COLOURS.NPC.FRIENDLY[0];
@@ -69,8 +70,14 @@ module.exports = function initSprites(grid) {
         ctx.fill();
     });
 
-    function drawCritter(critter) {
-        common.render(critter.x, critter.y, critter.direction, critter.type.view);
+    function drawCritter(critter, exactTime) {
+        var directionVector = directionUtils.components(critter.direction);
+        var deltaT = exactTime - critter.lastUpdate;
+
+        common.render(
+            critter.x + deltaT * directionVector.x * critter.type.speed,
+            critter.y + deltaT * directionVector.y * critter.type.speed,
+            critter.direction, critter.type.view);
     }
 
     return {

@@ -15,7 +15,8 @@ module.exports = function build(parent, model, placeArrowCallback) {
     var gameOverCallback;
 
     function animate() {
-        model.update(new Date().getTime() - startTime);
+        var gameTime = new Date().getTime() - startTime;
+        model.update(gameTime);
 
         if (!model.isRunning) {
             close();
@@ -51,12 +52,12 @@ module.exports = function build(parent, model, placeArrowCallback) {
             if (critter.type === critters.FOX) {
                 foxes.push(critter);
             } else {
-                sprites.drawCritter(critter);
+                sprites.drawCritter(critter, gameTime);
             }
         });
 
         while (foxes.length) {
-            sprites.drawCritter(foxes.shift());
+            sprites.drawCritter(foxes.shift(), gameTime);
         }
 
         window.requestAnimationFrame(animate);
@@ -84,6 +85,7 @@ module.exports = function build(parent, model, placeArrowCallback) {
                 direction: direction,
                 from: new Date().getTime() - startTime + 100
                 // Give us a little bit of leeway for network lag, but not enough to be perceptible
+                // TODO: This concern should really be handled elsewhere.
             });
         });
     }
