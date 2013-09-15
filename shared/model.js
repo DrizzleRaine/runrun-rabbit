@@ -5,7 +5,6 @@ exports.build = function build(gameData) {
 
     var gridUtils = require('./utils/grid.js');
     var arrayUtils = require('./utils/array.js');
-    var sprites = require('./sprites.js');
     var spawning = require('./spawning.js');
 
     var MAX_ARROWS = 3;
@@ -121,23 +120,16 @@ exports.build = function build(gameData) {
 
     function updateCritters(gameTime) {
         var remainingCritters = [];
-        var critter;
-        var foxCount = 0;
         while (critters.length) {
-            critter = critters.pop();
+            var critter = critters.pop();
             critter.update(model, gameTime);
             if (critter.inPlay) {
                 remainingCritters.push(critter);
             }
         }
         while (remainingCritters.length) {
-            critter = remainingCritters.pop();
-            if (critter.type === sprites.FOX) {
-                ++foxCount;
-            }
-            critters.push(critter);
+            critters.push(remainingCritters.pop());
         }
-        return foxCount;
     }
 
     var lastUpdate = 0;
