@@ -36,16 +36,15 @@ module.exports = function(grid) {
         this.bezierCurveTo(midX - offsetX, endY, x, midY + offsetY, x, midY);
     };
 
-    function preRender(drawDetail, cellSize) {
-        cellSize = cellSize || unit;
+    function preRender(drawDetail) {
         var cell = document.createElement('canvas');
-        cell.width = cellSize;
-        cell.height = cellSize;
+        cell.width = unit;
+        cell.height = unit;
         var ctx = cell.getContext('2d');
-        ctx.translate(cellSize / 2, cellSize / 2);
+        ctx.translate(unit / 2, unit / 2);
         drawDetail(ctx);
         return function preRenderSprite(ctx) {
-            ctx.drawImage(cell, -cellSize / 2, -cellSize / 2);
+            ctx.drawImage(cell, -unit / 2, -unit / 2);
         };
     }
 

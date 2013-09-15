@@ -4,6 +4,7 @@ module.exports = function build(parent, model, placeArrowCallback) {
     var grid = require('../graphics/grid.js')(model);
     var fixtures = require('../graphics/fixtures.js')(grid);
     var sprites = require('../graphics/sprites.js')(grid);
+    var critters = require('../../shared/sprites.js');
     var inputMethods = require('./input.js');
 
     parent.appendChild(grid.view);
@@ -45,9 +46,18 @@ module.exports = function build(parent, model, placeArrowCallback) {
             fixtures.drawSink(sink);
         });
 
+        var foxes = [];
         model.critters.forEach(function(critter) {
-            sprites.drawCritter(critter);
+            if (critter.type === critters.FOX) {
+                foxes.push(critter);
+            } else {
+                sprites.drawCritter(critter);
+            }
         });
+
+        while (foxes.length) {
+            sprites.drawCritter(foxes.shift());
+        }
 
         window.requestAnimationFrame(animate);
     }

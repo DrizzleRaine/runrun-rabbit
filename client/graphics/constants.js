@@ -9,7 +9,7 @@ module.exports = {
         ARROW: '#FFFFFF',
         NPC: {
             FRIENDLY: ['#9954bb','#AD76C9'],
-            ENEMY: ['#ff7518', '#E05804']
+            ENEMY: ['#ff7518', '#E05804', '#993F07' ]
         }
     }
 };
