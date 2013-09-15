@@ -1,13 +1,16 @@
 'use strict';
 
-module.exports = function build(parent, model, placeArrowCallback) {
+module.exports = function build(parent, model, gameData, placeArrowCallback) {
+    var inputMethods = require('./input.js');
+    var critters = require('../../shared/sprites.js');
+
     var grid = require('../graphics/grid.js')(model);
     var fixtures = require('../graphics/fixtures.js')(grid);
+
     var sprites = require('../graphics/sprites.js')(grid);
-    var critters = require('../../shared/sprites.js');
-    var inputMethods = require('./input.js');
 
     parent.appendChild(grid.view);
+    var hud = require('./hud').build(parent, gameData);
 
     var isRunning = true;
     var startTime = new Date().getTime();
@@ -59,6 +62,11 @@ module.exports = function build(parent, model, placeArrowCallback) {
         while (foxes.length) {
             sprites.drawCritter(foxes.shift(), gameTime);
         }
+
+        hud.update({
+            score: model.playerScores,
+            time: gameTime
+        });
 
         window.requestAnimationFrame(animate);
     }

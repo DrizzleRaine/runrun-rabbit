@@ -11,7 +11,6 @@ exports.build = function build(gameData) {
     var MAX_ARROWS = 3;
     var playerArrows = arrayUtils.initialise(gameData.totalPlayers, function() { return []; });
     var playerScores = arrayUtils.initialise(gameData.totalPlayers, 0);
-    var hud;
 
     var spawningStrategy = gameData.initialSpawning || spawning.standard;
 
@@ -120,10 +119,6 @@ exports.build = function build(gameData) {
         playerScores[player] = modifier(playerScores[player]);
     }
 
-    function registerHud(newHud) {
-        hud = newHud;
-    }
-
     function updateCritters(gameTime) {
         var remainingCritters = [];
         var critter;
@@ -161,13 +156,6 @@ exports.build = function build(gameData) {
             }
 
             lastUpdate = gameTime;
-
-            if (hud) {
-                hud.update({
-                    score: playerScores,
-                    time: gameData.totalTime - gameTime
-                });
-            }
         }
     }
 
@@ -179,7 +167,6 @@ exports.build = function build(gameData) {
     model.playerId = gameData.playerId;
     model.playerArrows = playerArrows;
     model.playerScores = playerScores;
-    model.registerHud = registerHud;
     model.update = update;
     model.addArrow = addArrow;
     model.getActiveArrow = getActiveArrow;

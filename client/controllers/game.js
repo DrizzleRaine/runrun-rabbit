@@ -24,11 +24,13 @@ module.exports = (function() {
         gameData.level = levels[gameData.levelId];
         gameData.random = new RNG(gameData.seed);
         model = modelFactory.build(gameData);
-        arena = require('./../views/arena.js')(container, model, function placeArrow(newArrow) {
-            if (model.addArrow(gameData.playerId, newArrow) && socket) {
-                socket.emit('placeArrow', newArrow);
+        arena = require('./../views/arena.js')(container, model, gameData,
+            function placeArrow(newArrow) {
+                if (model.addArrow(gameData.playerId, newArrow) && socket) {
+                    socket.emit('placeArrow', newArrow);
+                }
             }
-        });
+        );
 
         arena.inputMethod(inputMethod);
 
@@ -44,8 +46,6 @@ module.exports = (function() {
             socket.emit('started');
         }
 
-        var hudFactory = require('./../views/hud.js');
-        model.registerHud(hudFactory.build(container, gameData));
     }
 
     var init = function init(multiplayer, selectedInputMethod) {

@@ -31,7 +31,7 @@ exports.build = function build(parent, gameData) {
         for (var p = 0; p < gameData.totalPlayers; ++p) {
             scores[p].textContent = stats.score[p].toString();
         }
-        timer.update(stats.time);
+        timer.update(gameData.totalTime - stats.time);
     }
 
     return {
