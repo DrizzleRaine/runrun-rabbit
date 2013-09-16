@@ -37,7 +37,7 @@ module.exports = function build(parent, model, gameData, placeArrowCallback) {
         model.playerArrows.forEach(function(playerArrows, player) {
             playerArrows.forEach(function(arrow) {
                 if (model.isArrowActive(arrow)) {
-                    fixtures.drawArrow(player, arrow);
+                    fixtures.drawArrow(player, arrow, gameTime);
                 }
             });
         });

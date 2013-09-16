@@ -54,10 +54,10 @@ module.exports = function initFixtures(grid) {
         ctx.fill();
     });
 
-    function drawArrow(player, arrow) {
+    function drawArrow(player, arrow, gameTime) {
         common.render(arrow.x, arrow.y, arrow.direction, arrowForeground,
         function(ctx) {
-            ctx.globalAlpha = 0.6;
+            ctx.globalAlpha = gameTime + 500 > arrow.to ? 0.2 : 0.6;
             ctx.fillStyle = constants.COLOURS.PLAYER[player];
             ctx.fillRect(-unit / 2, -unit / 2, unit, unit);
         });

@@ -14,6 +14,7 @@ exports.build = function build(gameData) {
     var spawningStrategy = gameData.initialSpawning || spawning.standard;
 
     var critters = [];
+    var ais = [];
 
     var TICK = 100;
 
@@ -60,6 +61,7 @@ exports.build = function build(gameData) {
             }
         }
 
+        newArrow.to = newArrow.from + 10000;
         ownArrows.push(newArrow);
 
         if (newArrow.from < lastUpdate) {
@@ -134,6 +136,12 @@ exports.build = function build(gameData) {
 
     var lastUpdate = 0;
 
+    function updateAis(gameTime) {
+        ais.forEach(function(ai) {
+            ai.update(model, gameTime);
+        });
+    }
+
     function update(gameTime) {
         if (gameTime >= gameData.totalTime) {
             model.isRunning = false;
@@ -145,10 +153,15 @@ exports.build = function build(gameData) {
                 updateCritters(time);
                 spawningStrategy.rabbits(model, time, gameData.random);
                 spawningStrategy.foxes(model, time, gameData.random);
+                updateAis(time);
             }
 
             lastUpdate = gameTime;
         }
+    }
+
+    function addAi(ai) {
+        ais.push(ai);
     }
 
     model.width = gameData.level.width;
@@ -165,6 +178,7 @@ exports.build = function build(gameData) {
     model.modifyScore = modifyScore;
     model.isArrowActive = isArrowActive;
     model.isRunning = true;
+    model.addAi = addAi;
 
     return model;
 };
