@@ -20,7 +20,7 @@ module.exports = (function() {
         }
     }
 
-    function startGame(gameData) {
+    function startGame(gameData, ai) {
         gameData.level = levels[gameData.levelId];
         gameData.random = new RNG(gameData.seed);
         model = modelFactory.build(gameData);
@@ -44,6 +44,10 @@ module.exports = (function() {
                 model.addArrow(arrowData.playerId, arrowData.arrow);
             });
             socket.emit('started');
+        }
+
+        if (ai) {
+            model.addAi(ai);
         }
 
     }
@@ -88,12 +92,14 @@ module.exports = (function() {
             socket.on('disconnect', connectionError);
             socket.on('opponentDisconnect', connectionError);
         } else {
-            startGame({
+            var gameData = {
                 playerId: 0,
                 levelId: new Date().getTime() % levels.length,
                 totalPlayers: 2,
                 totalTime: 90000
-            });
+            };
+
+            startGame(gameData, require('../../shared/ai.js')(1));
         }
     };
 
