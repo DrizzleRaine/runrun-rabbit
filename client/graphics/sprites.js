@@ -70,14 +70,32 @@ module.exports = function initSprites(grid) {
         ctx.fill();
     });
 
+    var DYING_ANIM_LENGTH = 1000;
+
     function drawCritter(critter, exactTime) {
-        var directionVector = directionUtils.components(critter.direction);
         var deltaT = exactTime - critter.lastUpdate;
 
-        common.render(
-            critter.x + deltaT * directionVector.x * critter.type.speed,
-            critter.y + deltaT * directionVector.y * critter.type.speed,
-            critter.direction, critter.type.view);
+        if (critter.isAlive) {
+            var directionVector = directionUtils.components(critter.direction);
+
+            common.render(
+                critter.x + deltaT * directionVector.x * critter.type.speed,
+                critter.y + deltaT * directionVector.y * critter.type.speed,
+                critter.direction, critter.type.view);
+        } else if (deltaT < DYING_ANIM_LENGTH) {
+            grid.context.save();
+            grid.context.globalAlpha = (DYING_ANIM_LENGTH - deltaT) / DYING_ANIM_LENGTH;
+
+            if (grid.context.globalAlpha > 0)
+            {
+                common.render(
+                    critter.x + Math.sin(deltaT * 3 * Math.PI / DYING_ANIM_LENGTH) / 10,
+                    critter.y - deltaT * 0.0025,
+                    critter.direction, critter.type.view);
+            }
+
+            grid.context.restore();
+        }
     }
 
     return {

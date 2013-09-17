@@ -5,6 +5,10 @@ module.exports.MAX_TICK = 400;
 module.exports.RABBIT = {
     speed: 0.0024,
     score: function(currentScore) {
+        if (this.isAlive) {
+            return currentScore;
+        }
+
         return currentScore + 1;
     }
 };
@@ -23,6 +27,7 @@ function Critter(source, type, gameTime) {
     this.x = source.x;
     this.y = source.y;
     this.direction = source.direction;
+    this.isAlive = true;
     this.inPlay = true;
     this.type = type;
 
@@ -46,10 +51,13 @@ Critter.prototype.inRangeOf = function inRangeOf(arrow, deltaT) {
     return ((deltaX * deltaX) + (deltaY * deltaY)) < (limit * limit);
 };
 
-
-function updateInternal(model, gameTime) {
+Critter.prototype.update = function(model, gameTime) {
     /*jshint validthis:true */
     var deltaT = gameTime - this.lastUpdate;
+
+    if (!this.isAlive) {
+        return;
+    }
 
     var directionVector = directionUtils.components(this.direction);
 
@@ -72,7 +80,7 @@ function updateInternal(model, gameTime) {
         if (sink !== null) {
             this.inPlay = false;
             if (sink.player !== null) {
-                model.modifyScore(sink.player, this.type.score);
+                model.modifyScore(sink.player, this.type.score.bind(this));
             }
         } else {
             var timeToCentre = (Math.abs(this.x - centreX) + Math.abs(this.y - centreY)) / this.type.speed;
@@ -106,20 +114,40 @@ function updateInternal(model, gameTime) {
     this.x = newX;
     this.y = newY;
     this.lastUpdate = gameTime;
-}
+};
 
 Critter.prototype.replay = function replay(model, gameTime) {
     this.x = this.fromPoint.x;
     this.y = this.fromPoint.y;
     this.direction = this.fromPoint.direction;
     this.lastUpdate = this.fromPoint.t;
-    this.update(model, gameTime);
+    this.isAlive = true;
+    while (this.lastUpdate < gameTime) {
+        this.update(model, Math.min(gameTime, this.lastUpdate + module.exports.MAX_TICK));
+    }
 };
 
-Critter.prototype.update = function(model, gameTime) {
-    while (this.lastUpdate < gameTime) {
-        updateInternal.call(this, model, Math.min(gameTime, this.lastUpdate + module.exports.MAX_TICK));
-    }
+module.exports.performInteractions = function(critters) {
+    var foxes = [];
+    var rabbits = [];
+
+    critters.forEach(function(critter) {
+        if (critter.type === module.exports.FOX) {
+            foxes.push(critter);
+        } else {
+            rabbits.push(critter);
+        }
+    });
+
+    foxes.forEach(function(fox) {
+        rabbits.forEach(function(rabbit) {
+            var dx = fox.x - rabbit.x;
+            var dy = fox.y - rabbit.y;
+            if (dx * dx + dy * dy < 0.05) {
+                rabbit.isAlive = false;
+            }
+        });
+    });
 };
 
 module.exports.Critter = Critter;

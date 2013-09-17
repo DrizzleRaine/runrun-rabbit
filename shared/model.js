@@ -6,6 +6,7 @@ exports.build = function build(gameData) {
     var gridUtils = require('./utils/grid.js');
     var arrayUtils = require('./utils/array.js');
     var spawning = require('./spawning.js');
+    var sprites = require('./sprites.js');
 
     var MAX_ARROWS = 3;
     var playerArrows = arrayUtils.initialise(gameData.totalPlayers, function() { return []; });
@@ -132,6 +133,7 @@ exports.build = function build(gameData) {
         while (remainingCritters.length) {
             critters.push(remainingCritters.pop());
         }
+        sprites.performInteractions(critters);
     }
 
     var lastUpdate = 0;
