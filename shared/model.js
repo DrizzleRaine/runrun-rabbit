@@ -1,6 +1,8 @@
 'use strict';
 
-exports.build = function build(gameData) {
+var TICK_INTERVAL = module.exports.TICK_INTERVAL = 100;
+
+module.exports.build = function build(gameData) {
     var model = {};
 
     var gridUtils = require('./utils/grid.js');
@@ -11,17 +13,24 @@ exports.build = function build(gameData) {
     var MAX_ARROWS = 3;
     var playerArrows = arrayUtils.initialise(gameData.totalPlayers, function() { return []; });
     var playerScores = arrayUtils.initialise(gameData.totalPlayers, 0);
+    var scoreHistory = [];
 
     var spawningStrategy = gameData.initialSpawning || spawning.standard;
 
     var critters = [];
     var ais = [];
 
-    var TICK = 100;
-
     function isArrowActive(arrow, gameTime) {
         gameTime = gameTime || lastUpdate;
         return arrow.from <= gameTime && (!arrow.to || arrow.to > gameTime);
+    }
+
+    function restoreState(tick) {
+        model.playerScores = scoreHistory[tick];
+        model.critters.forEach(function(critter) {
+            critter.restore(tick);
+        });
+        lastUpdate = tick * TICK_INTERVAL;
     }
 
     function addArrow(player, newArrow) {
@@ -30,19 +39,17 @@ exports.build = function build(gameData) {
             return;
         }
 
-        var revisedArrows = [];
         var existing = getActiveArrow(null, newArrow.x, newArrow.y);
         if (existing.arrow) {
             if (newArrow.from <= existing.arrow.from) {
                 // Remove the existing arrow that was pre-empted by another player
-                revisedArrows = playerArrows[existing.player].splice(existing.index, 1);
+                var removedArrow = playerArrows[existing.player].splice(existing.index, 1)[0];
 
                 // If the arrow we just removed replaced another arrow, re-instate it
                 for (var j = playerArrows[existing.player].length - 1; j >= 0; --j) {
                     var oldArrow = playerArrows[existing.player][j];
-                    if (oldArrow.to === revisedArrows[0].from) {
+                    if (oldArrow.to === removedArrow.from) {
                         delete oldArrow.to;
-                        revisedArrows.push(oldArrow);
                         break;
                     }
                 }
@@ -66,29 +73,7 @@ exports.build = function build(gameData) {
         ownArrows.push(newArrow);
 
         if (newArrow.from < lastUpdate) {
-            revisedArrows.push(newArrow);
-        }
-
-        if (revisedArrows.length) {
-            critters.forEach(function(critter) {
-                var replay = false;
-                for (var k = 0; k < revisedArrows.length; ++k) {
-                    // It is correct that we use newArrow.from here, rather than revisedArrows[k].from
-                    // There are actually only three possible arrows in this list:
-                    // * The new arrow itself
-                    // * An arrow it pre-empted, in which case revisedArrows[k].from > newArrow.from
-                    //   anyway (by the definition of pre-empted), so we're just picking the larger range
-                    // * An arrow we're re-instating due to removing the pre-empted arrow, which
-                    //   could be quite old but we only care about recent interactions with it
-                    if (critter.inRangeOf(revisedArrows[k], lastUpdate - newArrow.from)) {
-                        replay = true;
-                        break;
-                    }
-                }
-                if (replay) {
-                    critter.replay(model, lastUpdate);
-                }
-            });
+            restoreState(Math.floor(newArrow.from / TICK_INTERVAL));
         }
 
         return true;
@@ -150,12 +135,14 @@ exports.build = function build(gameData) {
             gameTime = gameData.totalTime;
         }
 
-        if (Math.floor(gameTime / TICK) > Math.floor(lastUpdate / TICK)) {
-            for (var time = lastUpdate + TICK - (lastUpdate % TICK); time <= gameTime; time += TICK) {
+        if (Math.floor(gameTime / TICK_INTERVAL) > Math.floor(lastUpdate / TICK_INTERVAL)) {
+            for (var time = lastUpdate + TICK_INTERVAL - (lastUpdate % TICK_INTERVAL); time <= gameTime; time += TICK_INTERVAL) {
                 updateCritters(time);
                 spawningStrategy.rabbits(model, time, gameData.random);
                 spawningStrategy.foxes(model, time, gameData.random);
                 updateAis(time);
+
+                scoreHistory[time / TICK_INTERVAL] = model.playerScores.concat();
             }
 
             lastUpdate = gameTime;

@@ -88,8 +88,78 @@ describe('model', function() {
 
         model.addArrow(0, arrow);
 
+        model.update(gameTime);
+
         assert.equal(critter.direction, arrow.direction,
             'arrow should have effected critter direction retroactively');
+    });
+
+    it('should compensate for critter interactions due to arrows placed in the past', function() {
+        var rabbit1 = new sprites.Critter({
+            x: 0,
+            y: 0,
+            direction: 1
+        }, sprites.RABBIT, 0);
+
+        var rabbit2 = new sprites.Critter({
+            x: 4,
+            y: 4,
+            direction: 3
+        }, sprites.RABBIT, 0);
+
+        model.critters.push(rabbit1);
+        model.critters.push(rabbit2);
+        model.critters.push(new sprites.Critter({
+            x: 2,
+            y: 2,
+            direction: 1
+        }, sprites.FOX, 0));
+        model.critters.push(new sprites.Critter({
+            x: 2,
+            y: 2,
+            direction: 3
+        }, sprites.FOX, 0));
+
+        model.addArrow(0, {
+            x: 2,
+            y: 0,
+            direction: 2,
+            from: 0
+        });
+
+        model.addArrow(0, {
+            x: 1,
+            y: 2,
+            direction: 1,
+            from: 10
+        });
+
+        model.addArrow(0, {
+            x: 3,
+            y: 2,
+            direction: 3,
+            from: 20
+        });
+
+        while (rabbit1.isAlive) {
+            model.update(gameTime);
+
+            gameTime += 100;
+        }
+
+        console.log(gameTime);
+
+        model.addArrow(0, {
+            x: 2,
+            y: 4,
+            direction: 0,
+            from: 100
+        });
+
+        model.update(gameTime);
+
+        assert.isTrue(rabbit1.isAlive);
+        assert.isFalse(rabbit2.isAlive);
     });
 
     it('should compensate arrows removed/replaced due to overriding arrow', function() {
@@ -158,6 +228,8 @@ describe('model', function() {
             from: gameTime - 200
         });
 
+        model.update(gameTime + 10);
+
         // Now, it's as if the arrow that affected critter0 had never been removed, and the arrow
         // that affected critter1 is the arrow placed by the other player.
         assert.equal(critter1.direction, 0);
@@ -185,6 +257,16 @@ describe('model', function() {
 
         assert.equal(critter.direction, arrow.direction,
             'arrow should have effected critter direction');
+    });
+
+    describe('TICK_INTERVAL', function() {
+        it('should not allow any sprite to skip over a whole cell', function() {
+            for (var p in sprites) {
+                if (sprites.hasOwnProperty(p) && sprites[p].hasOwnProperty('speed')) {
+                    assert.isTrue(modelFactory.TICK_INTERVAL * sprites[p].speed < 1);
+                }
+            }
+        });
     });
 
     describe('source', function() {

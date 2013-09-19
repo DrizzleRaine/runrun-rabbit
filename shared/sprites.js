@@ -1,11 +1,9 @@
 'use strict';
 
-module.exports.MAX_TICK = 400;
-
 module.exports.RABBIT = {
     speed: 0.0024,
     score: function(currentScore) {
-        if (this.isAlive) {
+        if (!this.isAlive) {
             return currentScore;
         }
 
@@ -22,6 +20,7 @@ module.exports.FOX = {
 
 var gridUtils = require('./utils/grid.js');
 var directionUtils = require('./utils/direction.js');
+var TICK_INTERVAL = require('./model.js').TICK_INTERVAL;
 
 function Critter(source, type, gameTime) {
     this.x = source.x;
@@ -30,6 +29,8 @@ function Critter(source, type, gameTime) {
     this.isAlive = true;
     this.inPlay = true;
     this.type = type;
+
+    this.history = [];
 
     var offset = directionUtils.components(source.direction);
     this.x += 0.5 * offset.x;
@@ -43,13 +44,6 @@ function Critter(source, type, gameTime) {
         direction: source.direction
     };
 }
-
-Critter.prototype.inRangeOf = function inRangeOf(arrow, deltaT) {
-    var limit = this.type.speed * deltaT;
-    var deltaX = this.x - arrow.x;
-    var deltaY = this.y - arrow.y;
-    return ((deltaX * deltaX) + (deltaY * deltaY)) < (limit * limit);
-};
 
 Critter.prototype.update = function(model, gameTime) {
     /*jshint validthis:true */
@@ -114,17 +108,20 @@ Critter.prototype.update = function(model, gameTime) {
     this.x = newX;
     this.y = newY;
     this.lastUpdate = gameTime;
+    this.history[gameTime / TICK_INTERVAL] = {
+        x: this.x,
+        y: this.y,
+        direction: this.direction,
+        isAlive: this.isAlive
+    };
 };
 
-Critter.prototype.replay = function replay(model, gameTime) {
-    this.x = this.fromPoint.x;
-    this.y = this.fromPoint.y;
-    this.direction = this.fromPoint.direction;
-    this.lastUpdate = this.fromPoint.t;
-    this.isAlive = true;
-    while (this.lastUpdate < gameTime) {
-        this.update(model, Math.min(gameTime, this.lastUpdate + module.exports.MAX_TICK));
-    }
+Critter.prototype.restore = function restore(tick) {
+    this.x = this.history[tick].x;
+    this.y = this.history[tick].y;
+    this.direction = this.history[tick].direction;
+    this.lastUpdate = tick * TICK_INTERVAL;
+    this.isAlive = this.history[tick].isAlive;
 };
 
 module.exports.performInteractions = function(critters) {

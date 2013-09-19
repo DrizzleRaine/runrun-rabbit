@@ -5,16 +5,6 @@ var assert = require('chai').assert;
 var sinon = require('sinon');
 
 describe('sprites', function() {
-    describe('MAX_TICK', function() {
-        it('should not allow any sprite to skip over a whole cell', function() {
-            for (var p in sprites) {
-                if (sprites.hasOwnProperty(p) && sprites[p].hasOwnProperty('speed')) {
-                    assert.isTrue(sprites.MAX_TICK * sprites[p].speed < 1);
-                }
-            }
-        });
-    });
-
     describe('update', function() {
         var type = {
             speed: 0.01
