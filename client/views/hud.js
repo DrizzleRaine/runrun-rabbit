@@ -1,6 +1,12 @@
 'use strict';
 
 exports.build = function build(parent, gameData) {
+    if (!gameData) {
+        return {
+            update: function() {}
+        };
+    }
+
     var graphics = require('../graphics/hud.js');
 
     var timer = new graphics.Timer(144, gameData.totalTime);
