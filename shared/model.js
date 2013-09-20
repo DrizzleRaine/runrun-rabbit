@@ -15,7 +15,7 @@ module.exports.build = function build(gameData) {
     var playerScores = arrayUtils.initialise(gameData.totalPlayers, 0);
     var scoreHistory = [];
 
-    var spawningStrategy = gameData.initialSpawning || spawning.standard;
+    var spawningStrategy = gameData.initialSpawning || spawning.standard();
 
     var critters = [];
     var ais = [];
@@ -27,9 +27,19 @@ module.exports.build = function build(gameData) {
 
     function restoreState(tick) {
         model.playerScores = scoreHistory[tick];
-        model.critters.forEach(function(critter) {
+
+        var remainingCritters = [];
+        while (critters.length) {
+            var critter = critters.pop();
             critter.restore(tick);
-        });
+            if (critter.inPlay) {
+                remainingCritters.push(critter);
+            }
+        }
+        while (remainingCritters.length) {
+            critters.push(remainingCritters.pop());
+        }
+
         lastUpdate = tick * TICK_INTERVAL;
     }
 

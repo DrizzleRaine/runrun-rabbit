@@ -29,7 +29,7 @@ describe('model', function() {
             totalPlayers: 2,
             level: testLevel,
             random: dummyRandom,
-            initialSpawning: spawning.rabbitsOnly
+            initialSpawning: spawning.rabbitsOnly()
         };
 
         model = modelFactory.build(gameData);
@@ -92,6 +92,39 @@ describe('model', function() {
 
         assert.equal(critter.direction, arrow.direction,
             'arrow should have effected critter direction retroactively');
+    });
+
+    it('should preserve critter count when compensating for arrows placed in the past', function() {
+        model.addArrow(0, {
+            x: 3,
+            y: 2,
+            direction: 3,
+            from: 0
+        });
+
+        while (gameTime < 2000) {
+            dummyRandom.nextByte.returns(((gameTime / modelFactory.TICK_INTERVAL) % 2 ) * 255);
+            model.update(gameTime);
+            gameTime += 100;
+        }
+
+        model.update(gameTime);
+
+        var expected = model.critters.length;
+
+        model.addArrow(0, {
+            x: 2,
+            y: 0,
+            direction: 2,
+            from: 1000
+        });
+
+        // Double the spawn rate
+        dummyRandom.nextByte.returns(255);
+
+        model.update(gameTime);
+
+        assert.equal(model.critters.length, expected, 'critter count should be preserved');
     });
 
     it('should compensate for critter interactions due to arrows placed in the past', function() {
@@ -270,7 +303,7 @@ describe('model', function() {
     });
 
     describe('source', function() {
-        it ('should create critters at predictable times', function() {
+        it('should create critters at predictable times', function() {
             dummyRandom.nextByte.returns(240);
 
             for (var gameTime = 50; gameTime < 500; gameTime += 100) {
@@ -283,7 +316,7 @@ describe('model', function() {
             });
         });
 
-        it ('should compensate for skipped updates', function() {
+        it('should compensate for skipped updates', function() {
             dummyRandom.nextByte.returns(240);
 
             model.update(450);

@@ -39,7 +39,7 @@ module.exports = (function() {
         var rabbitsModel = createModel(
             [ new fixtures.Source(0, 1, 1) ],
             [ { player:0, x:2, y: 1 } ],
-            spawning.rabbitsOnly
+            spawning.rabbitsOnly()
         );
         createView(document.getElementById('rabbits'), rabbitsModel);
         models.push(rabbitsModel);
@@ -47,7 +47,7 @@ module.exports = (function() {
         var foxesModel = createModel(
             [ new fixtures.Source(1, 2, 0)],
             [ { player:0, x:1, y: 0 } ],
-            spawning.foxesOnly
+            spawning.foxesOnly()
         );
         createView(document.getElementById('foxes'), foxesModel);
         models.push(foxesModel);
@@ -55,7 +55,7 @@ module.exports = (function() {
         var arrowsModel = createModel(
             [ new fixtures.Source(0, 0, 1) ],
             [ { player:null, x:2, y:0}, {player:0, x:2, y: 2} ],
-            spawning.rabbitsOnly
+            spawning.rabbitsOnly()
         );
         arrowsModel.addArrow(0, {
             x: 1,

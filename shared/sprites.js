@@ -117,11 +117,14 @@ Critter.prototype.update = function(model, gameTime) {
 };
 
 Critter.prototype.restore = function restore(tick) {
-    this.x = this.history[tick].x;
-    this.y = this.history[tick].y;
-    this.direction = this.history[tick].direction;
-    this.lastUpdate = tick * TICK_INTERVAL;
-    this.isAlive = this.history[tick].isAlive;
+    this.inPlay = !!this.history[tick];
+    if (this.inPlay) {
+        this.x = this.history[tick].x;
+        this.y = this.history[tick].y;
+        this.direction = this.history[tick].direction;
+        this.lastUpdate = tick * TICK_INTERVAL;
+        this.isAlive = this.history[tick].isAlive;
+    }
 };
 
 module.exports.performInteractions = function(critters) {

@@ -1,41 +1,83 @@
 'use strict';
 
 var sprites = require('./sprites.js');
+var TICK_INTERVAL = require('./model.js').TICK_INTERVAL;
 
 var none = function() {};
 
-function standardRabbits(model, time, random) {
-    model.sources.forEach(function(source) {
+function standardRabbits(model, random) {
+    var results = [];
+
+    model.sources.forEach(function(source, index) {
         if (random.nextByte() > 220) {
-            model.critters.push(new sprites.Critter(source, sprites.RABBIT, time));
+            results.push({
+                sourceId: index,
+                type: sprites.RABBIT
+            });
         }
     });
+
+    return results;
 }
 
-function standardFoxes(model, time, random) {
+function foxFilter(model) {
     var foxCount = 0;
     model.critters.forEach(function(critter) {
         if (critter.type === sprites.FOX) {
             ++foxCount;
         }
     });
-    if (foxCount === 0 && random.nextByte() > 127) {
-        var foxSource = model.sources[random.nextByte() % model.sources.length];
-        model.critters.push(new sprites.Critter(foxSource, sprites.FOX, time));
+    return foxCount === 0;
+}
+
+function standardFoxes(model, random) {
+    if (random.nextByte() > 127) {
+        return [{
+            sourceId: random.nextByte() % model.sources.length,
+            type: sprites.FOX
+        }];
     }
 }
 
-module.exports.standard = {
-    rabbits: standardRabbits,
-    foxes: standardFoxes
+function cached(strategy, filter) {
+    var history = [];
+
+    return function(model, time, random) {
+        var index = time / TICK_INTERVAL;
+        var spawns = history[index];
+
+        if (!spawns) {
+            spawns = strategy(model, random);
+            history[index] = spawns;
+        }
+
+        if (filter && !filter(model)) {
+            return;
+        }
+
+        spawns.forEach(function (spawn) {
+            model.critters.push(new sprites.Critter(model.sources[spawn.sourceId], spawn.type, time));
+        });
+    };
+}
+
+module.exports.standard = function () {
+    return {
+        rabbits: cached(standardRabbits),
+        foxes: cached(standardFoxes, foxFilter)
+    };
 };
 
-module.exports.rabbitsOnly = {
-    rabbits: standardRabbits,
-    foxes: none
+module.exports.rabbitsOnly = function() {
+    return {
+        rabbits: cached(standardRabbits),
+        foxes: none
+    };
 };
 
-module.exports.foxesOnly = {
-    rabbits: none,
-    foxes: standardFoxes
+module.exports.foxesOnly = function() {
+    return {
+        rabbits: none,
+        foxes: cached(standardFoxes, foxFilter)
+    };
 };
