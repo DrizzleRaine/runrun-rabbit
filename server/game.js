@@ -1,7 +1,6 @@
 'use strict';
 
 var modelFactory = require('../shared/model.js');
-var sprites = require('../shared/sprites.js');
 var levels = require('../shared/levels.js');
 var crypto = require('crypto');
 var RNG = require('../shared/utils/rng.js').RNG;
@@ -25,10 +24,11 @@ function configure(io) {
             var startTime = new Date().getTime();
             var interval = setInterval(function() {
                 model.update(new Date().getTime() - startTime);
+                //console.log(model.playerScores);
                 if (!model.isRunning) {
                     clearInterval(interval);
                 }
-            }, sprites.MAX_TICK);
+            }, 500);
         };
 
         var clientsStarted = 0;

@@ -11,7 +11,6 @@ module.exports = function(grunt) {
                 forin: true,
                 immed: true,
                 indent: 4,
-                latedef: true,
                 newcap: true,
                 noarg:true,
                 noempty: true,

@@ -36,6 +36,8 @@ function standardFoxes(model, random) {
             sourceId: random.nextByte() % model.sources.length,
             type: sprites.FOX
         }];
+    } else {
+        return [];
     }
 }
 
