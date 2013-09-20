@@ -1,16 +1,16 @@
 'use strict';
 
 var rng = require('../..' + (process.env.SOURCE_ROOT || '') + '/shared/utils/rng.js');
-var crypto = require('crypto');
 var assert = require('chai').assert;
 
 describe('rng', function() {
     it('should return the same values for the same seed', function() {
-        var seed = crypto.pseudoRandomBytes(16);
+        var seed1 = [ 28, 195, 114, 255, 164, 125, 53, 85, 84, 11, 44, 133, 138, 243, 250, 11 ];
+        var seed2 = [ 67, 134, 29, 84, 205, 191, 171, 146, 183, 46, 204, 85, 165, 66, 93, 97 ];
 
-        var rng1 = new rng.RNG(seed);
-        var rng2 = new rng.RNG(crypto.pseudoRandomBytes(16));
-        var rng3 = new rng.RNG(seed);
+        var rng1 = new rng.RNG(seed1);
+        var rng2 = new rng.RNG(seed2);
+        var rng3 = new rng.RNG(seed1);
 
         var results1 = [];
         var results2 = [];
