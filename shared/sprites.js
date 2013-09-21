@@ -37,11 +37,14 @@ function Critter(source, type, gameTime) {
     this.y += 0.5 * offset.y;
 
     this.lastUpdate = gameTime;
-    this.fromPoint = {
+
+    this.firstTick = gameTime / TICK_INTERVAL;
+
+    this.history[0] = {
         x: this.x,
         y: this.y,
-        t: gameTime,
-        direction: source.direction
+        direction: source.direction,
+        isAlive: this.isAlive
     };
 }
 
@@ -108,7 +111,7 @@ Critter.prototype.update = function(model, gameTime) {
     this.x = newX;
     this.y = newY;
     this.lastUpdate = gameTime;
-    this.history[gameTime / TICK_INTERVAL] = {
+    this.history[(gameTime / TICK_INTERVAL) - this.firstTick] = {
         x: this.x,
         y: this.y,
         direction: this.direction,
@@ -117,30 +120,33 @@ Critter.prototype.update = function(model, gameTime) {
 };
 
 Critter.prototype.restore = function restore(tick) {
-    this.inPlay = !!this.history[tick];
+    var relativeTick = tick - this.firstTick;
+    this.inPlay = !!this.history[relativeTick];
     if (this.inPlay) {
-        this.x = this.history[tick].x;
-        this.y = this.history[tick].y;
-        this.direction = this.history[tick].direction;
+        this.x = this.history[relativeTick].x;
+        this.y = this.history[relativeTick].y;
+        this.direction = this.history[relativeTick].direction;
         this.lastUpdate = tick * TICK_INTERVAL;
-        this.isAlive = this.history[tick].isAlive;
+        this.isAlive = this.history[relativeTick].isAlive;
     }
 };
 
 module.exports.performInteractions = function(critters) {
-    var foxes = [];
-    var rabbits = [];
+    var activeFoxes = [];
+    var activeRabbits = [];
 
     critters.forEach(function(critter) {
-        if (critter.type === module.exports.FOX) {
-            foxes.push(critter);
-        } else {
-            rabbits.push(critter);
+        if (critter.inPlay) {
+            if (critter.type === module.exports.FOX) {
+                activeFoxes.push(critter);
+            } else {
+                activeRabbits.push(critter);
+            }
         }
     });
 
-    foxes.forEach(function(fox) {
-        rabbits.forEach(function(rabbit) {
+    activeFoxes.forEach(function(fox) {
+        activeRabbits.forEach(function(rabbit) {
             var dx = fox.x - rabbit.x;
             var dy = fox.y - rabbit.y;
             if (dx * dx + dy * dy < 0.05) {

@@ -32,6 +32,7 @@ module.exports = function initSprites(grid) {
         ctx.fillStyle = constants.COLOURS.NPC.ENEMY[1];
         ctx.drawEllipse(0, unit/48, unit * 7/12, unit * 3 / 4);
         ctx.fill();
+
         // Root of the tail
         ctx.beginPath();
         ctx.moveTo(-unit/6, unit * 13/48);
@@ -39,8 +40,17 @@ module.exports = function initSprites(grid) {
         ctx.lineTo(unit/12, unit*19/48);
         ctx.quadraticCurveTo(unit*3/24, unit*7/16, -unit/6, unit*13/48);
         ctx.fill();
-        ctx.fillStyle = constants.COLOURS.NPC.ENEMY[0];
+        // Tip of the tail
+        ctx.fillStyle = '#FFFFFF';
+        ctx.beginPath();
+        ctx.moveTo(unit/4, unit * 19/48);
+        ctx.quadraticCurveTo(unit/8, unit*25/48, 0, unit*23/48);
+        ctx.lineTo(unit/24, unit*19/48);
+        ctx.quadraticCurveTo(unit*3/24, unit*21/48, unit/4, unit * 19/48);
+        ctx.fill();
+
         // Head
+        ctx.fillStyle = constants.COLOURS.NPC.ENEMY[0];
         ctx.drawEllipse(0, -unit * 7 / 48, unit / 3, unit / 2);
         ctx.fill();
         // Snout
@@ -50,6 +60,7 @@ module.exports = function initSprites(grid) {
         ctx.lineTo(-unit / 12, -unit * 17 / 48);
         ctx.fill();
         ctx.fillStyle = constants.COLOURS.NPC.ENEMY[2];
+
         // Ears
         ctx.beginPath();
         ctx.moveTo(-unit/6, -unit/48);
@@ -60,19 +71,16 @@ module.exports = function initSprites(grid) {
         ctx.lineTo(unit/12, -unit*9/48);
         ctx.lineTo(unit/24, -unit/48);
         ctx.fill();
-        ctx.fillStyle = '#FFFFFF';
-        // Tip of the tail
-        ctx.beginPath();
-        ctx.moveTo(unit/4, unit * 19/48);
-        ctx.quadraticCurveTo(unit/8, unit*25/48, 0, unit*23/48);
-        ctx.lineTo(unit/24, unit*19/48);
-        ctx.quadraticCurveTo(unit*3/24, unit*21/48, unit/4, unit * 19/48);
-        ctx.fill();
+
     });
 
     var DYING_ANIM_LENGTH = 1000;
 
     function drawCritter(critter, exactTime) {
+        if (!critter.inPlay) {
+            return;
+        }
+
         var deltaT = exactTime - critter.lastUpdate;
 
         if (critter.isAlive) {

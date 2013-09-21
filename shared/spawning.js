@@ -23,7 +23,7 @@ function standardRabbits(model, random) {
 function foxFilter(model) {
     var foxCount = 0;
     model.critters.forEach(function(critter) {
-        if (critter.type === sprites.FOX) {
+        if (critter.type === sprites.FOX && critter.inPlay) {
             ++foxCount;
         }
     });

@@ -105,4 +105,28 @@ describe('sprites', function() {
             assert.equal(3, critter.direction);
         });
     });
+
+    describe('performInteractions', function() {
+        it('should kill rabbits when colliding with foxes', function() {
+            var critters = [
+                { x: 1.49, y: 1.5, type: sprites.RABBIT, isAlive: true, inPlay: true },
+                { x: 1.5, y: 1.51, type: sprites.FOX, isAlive: true, inPlay: true}
+            ];
+
+            sprites.performInteractions(critters);
+
+            assert.isFalse(critters[0].isAlive);
+        });
+
+        it ('should not kill rabbits when colliding with foxes not in play', function() {
+            var critters = [
+                { x: 1.49, y: 1.5, type: sprites.RABBIT, isAlive: true, inPlay: true },
+                { x: 1.5, y: 1.51, type: sprites.FOX, isAlive: true, inPlay: false}
+            ];
+
+            sprites.performInteractions(critters);
+
+            assert.isTrue(critters[0].isAlive);
+        });
+    });
 });

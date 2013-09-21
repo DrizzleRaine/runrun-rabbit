@@ -132,8 +132,8 @@ function restoreState(model, tick) {
     var remainingCritters = [];
     while (model.critters.length) {
         var critter = model.critters.pop();
-        critter.restore(tick);
-        if (critter.inPlay) {
+        if (critter.firstTick <= tick) {
+            critter.restore(tick);
             remainingCritters.push(critter);
         }
     }
@@ -145,16 +145,10 @@ function restoreState(model, tick) {
 }
 
 function updateCritters(model, gameTime) {
-    var remainingCritters = [];
-    while (model.critters.length) {
-        var critter = model.critters.pop();
-        critter.update(model, gameTime);
+    model.critters.forEach(function(critter) {
         if (critter.inPlay) {
-            remainingCritters.push(critter);
+            critter.update(model, gameTime);
         }
-    }
-    while (remainingCritters.length) {
-        model.critters.push(remainingCritters.pop());
-    }
+    });
     sprites.performInteractions(model.critters);
 }

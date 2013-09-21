@@ -127,6 +127,28 @@ describe('model', function() {
         assert.equal(model.critters.length, expected, 'critter count should be preserved');
     });
 
+    it('should restore critters when compensating for arrows placed in the past', function() {
+        var critter = new sprites.Critter(model.sources[0], sprites.RABBIT, 0);
+
+        model.critters.push(critter);
+
+        while (critter.inPlay) {
+            model.update(gameTime);
+            gameTime += 100;
+        }
+
+        model.addArrow(0, {
+            x: 3,
+            y: 2,
+            direction: 3,
+            from: 200
+        });
+
+        model.update(gameTime);
+
+        assert.isTrue(critter.inPlay, 'critter should be restored');
+    });
+
     it('should compensate for critter interactions due to arrows placed in the past', function() {
         var rabbit1 = new sprites.Critter({
             x: 0,
@@ -176,7 +198,6 @@ describe('model', function() {
 
         while (rabbit1.isAlive) {
             model.update(gameTime);
-
             gameTime += 100;
         }
 
@@ -312,7 +333,7 @@ describe('model', function() {
 
             assert.equal(model.critters.length, 4);
             model.critters.forEach(function(critter) {
-                assert.equal(critter.fromPoint.t % 100, 0);
+                assert.equal(critter.firstTick, Math.floor(critter.firstTick));
             });
         });
 
@@ -322,9 +343,6 @@ describe('model', function() {
             model.update(450);
 
             assert.equal(model.critters.length, 4);
-            model.critters.forEach(function(critter) {
-                assert.equal(critter.fromPoint.t % 100, 0);
-            });
         });
 
         it('should create when update time falls exactly on a tick', function() {
@@ -333,7 +351,7 @@ describe('model', function() {
             model.update(100);
 
             assert.equal(model.critters.length, 1);
-            assert.equal(model.critters[0].fromPoint.t, 100);
+            assert.equal(model.critters[0].firstTick, 1);
         });
     });
 });

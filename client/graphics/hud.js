@@ -1,6 +1,6 @@
 'use strict';
 
-var constants = require('../graphics/constants.js');
+var constants = require('./constants.js');
 
 module.exports.Timer = function Timer(unit, totalTime) {
     var container = document.createElement('div');
