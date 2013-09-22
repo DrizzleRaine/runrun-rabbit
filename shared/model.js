@@ -50,7 +50,7 @@ function Model(gameData) {
 
 Model.prototype.isArrowActive = function isArrowActive(arrow, gameTime) {
     gameTime = gameTime || this.lastUpdate;
-    return arrow.from <= gameTime && (!arrow.to || arrow.to > gameTime);
+    return arrow.from <= gameTime && (!arrow.to || arrow.to > gameTime) && arrow.hits.length < 3;
 };
 
 Model.prototype.addArrow = function addArrow(player, newArrow) {
@@ -90,6 +90,7 @@ Model.prototype.addArrow = function addArrow(player, newArrow) {
     }
 
     newArrow.to = newArrow.from + ARROW_LIFETIME;
+    newArrow.hits = [];
     ownArrows.push(newArrow);
 
     if (newArrow.from < this.lastUpdate) {
@@ -140,6 +141,14 @@ function restoreState(model, tick) {
     while (remainingCritters.length) {
         model.critters.push(remainingCritters.pop());
     }
+
+    model.playerArrows.forEach(function(arrows) {
+        arrows.forEach(function(arrow) {
+            while (arrow.hits.length && arrow.hits[arrow.hits.length - 1] > tick * TICK_INTERVAL) {
+                arrow.hits.pop();
+            }
+        });
+    });
 
     model.lastUpdate = tick * TICK_INTERVAL;
 }

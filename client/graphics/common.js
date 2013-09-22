@@ -3,7 +3,7 @@
 /*
  http://diveintohtml5.info/canvas.html
  http://www.ibm.com/developerworks/library/wa-canvashtml5layering/
- https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Canvas_tutorial?redirectlocale=en-US&redirectslug=Canvas_tutorial
+ https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Canvas_tutorial
  https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Canvas_tutorial/Transformations
  http://www.html5rocks.com/en/tutorials/canvas/performance/
  */

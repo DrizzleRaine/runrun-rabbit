@@ -85,6 +85,9 @@ Critter.prototype.update = function(model, gameTime) {
             var newDirection = this.direction;
             if (arrow && (arrow.direction !== this.direction)) {
                 newDirection = arrow.direction;
+                if (this.type === module.exports.FOX) {
+                    arrow.hits.push(gameTime);
+                }
             } else {
                 var source = gridUtils.getAtCell(model.sources, centreX, centreY);
                 if (source) {

@@ -313,6 +313,74 @@ describe('model', function() {
             'arrow should have effected critter direction');
     });
 
+    it('should remove arrows after multiple collisions with foxes', function() {
+        var arrow = {
+            x: 3,
+            y: 2,
+            direction: 3,
+            from: 0
+        };
+
+        model.addArrow(0, arrow);
+
+        var fox = new sprites.Critter(
+            model.sources[0],
+            sprites.FOX,
+            0
+        );
+
+        model.critters.push(fox);
+
+        var lastDirection = fox.direction;
+        var directionChanges = 0;
+
+        while (directionChanges < 7 && fox.inPlay) {
+            if (lastDirection !== fox.direction) {
+                ++directionChanges;
+                lastDirection = fox.direction;
+            }
+            model.update(gameTime);
+            gameTime += 100;
+        }
+
+        assert.isFalse(model.isArrowActive(arrow, gameTime));
+    });
+
+
+
+    it('should not remove arrows after multiple collisions with rabbits', function() {
+        var arrow = {
+            x: 3,
+            y: 2,
+            direction: 3,
+            from: 0
+        };
+
+        model.addArrow(0, arrow);
+
+        var rabbit = new sprites.Critter(
+            model.sources[0],
+            sprites.RABBIT,
+            0
+        );
+
+        model.critters.push(rabbit);
+
+        var lastDirection = rabbit.direction;
+        var directionChanges = 0;
+
+        while (directionChanges < 7 && rabbit.inPlay) {
+            if (lastDirection !== rabbit.direction) {
+                ++directionChanges;
+                lastDirection = rabbit.direction;
+            }
+            model.update(gameTime);
+            gameTime += 100;
+        }
+
+        assert.isTrue(model.isArrowActive(arrow, gameTime));
+    });
+
     describe('TICK_INTERVAL', function() {
         it('should not allow any sprite to skip over a whole cell', function() {
             for (var p in sprites) {
