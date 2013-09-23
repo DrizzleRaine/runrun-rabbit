@@ -8,12 +8,7 @@ var sinon = require('sinon');
 var assert = require('chai').assert;
 
 describe('model', function() {
-    var testLevel = {
-        width: 5,
-        height: 5,
-        sources: [ new fixtures.Source(0, 2, 1) ],
-        sinks: [ { x:4, y:2, player: null, update: sinon.spy() } ]
-    };
+    var testLevel;
 
     var model;
     var gameData;
@@ -21,6 +16,13 @@ describe('model', function() {
     var dummyRandom;
 
     beforeEach(function() {
+        testLevel = {
+            width: 5,
+            height: 5,
+            sources: [ new fixtures.Source(0, 2, 1) ],
+            sinks: [ { x:4, y:2, player: null, update: sinon.spy() } ]
+        };
+
         dummyRandom = {
             nextByte: sinon.stub()
         };
@@ -183,18 +185,21 @@ describe('model', function() {
         });
 
         model.addArrow(0, {
-            x: 1,
-            y: 2,
-            direction: 1,
+            x: 4,
+            y: 0,
+            direction: 2,
             from: 10
         });
 
         model.addArrow(0, {
-            x: 3,
-            y: 2,
-            direction: 3,
+            x: 0,
+            y: 4,
+            direction: 0,
             from: 20
         });
+
+        model.sources.push(new fixtures.Source(1, 2, 1));
+        model.sources.push(new fixtures.Source(3, 2, 3));
 
         while (rabbit1.isAlive) {
             model.update(gameTime);
@@ -313,7 +318,7 @@ describe('model', function() {
             'arrow should have effected critter direction');
     });
 
-    it('should remove arrows after multiple collisions with foxes', function() {
+    it('should remove arrows after multiple head-on collisions with foxes', function() {
         var arrow = {
             x: 3,
             y: 2,
@@ -346,7 +351,38 @@ describe('model', function() {
         assert.isFalse(model.isArrowActive(arrow, gameTime));
     });
 
+    it('should not remove arrows after multiple side-on collisions with foxes', function() {
+        var arrow = {
+            x: 1,
+            y: 2,
+            direction: 2,
+            from: 0
+        };
 
+        model.addArrow(0, arrow);
+
+        var fox = new sprites.Critter(
+            model.sources[0],
+            sprites.FOX,
+            0
+        );
+
+        model.critters.push(fox);
+
+        var lastDirection = fox.direction;
+        var directionChanges = 0;
+
+        while (directionChanges < 14 && fox.inPlay) {
+            if (lastDirection !== fox.direction) {
+                ++directionChanges;
+                lastDirection = fox.direction;
+            }
+            model.update(gameTime);
+            gameTime += 100;
+        }
+
+        assert.isTrue(model.isArrowActive(arrow, gameTime));
+    });
 
     it('should not remove arrows after multiple collisions with rabbits', function() {
         var arrow = {

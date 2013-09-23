@@ -85,7 +85,7 @@ Critter.prototype.update = function(model, gameTime) {
             var newDirection = this.direction;
             if (arrow && (arrow.direction !== this.direction)) {
                 newDirection = arrow.direction;
-                if (this.type === module.exports.FOX) {
+                if (this.type === module.exports.FOX && (this.direction % 2 === arrow.direction % 2)) {
                     arrow.hits.push(gameTime);
                 }
             } else {

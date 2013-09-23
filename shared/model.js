@@ -50,7 +50,7 @@ function Model(gameData) {
 
 Model.prototype.isArrowActive = function isArrowActive(arrow, gameTime) {
     gameTime = gameTime || this.lastUpdate;
-    return arrow.from <= gameTime && (!arrow.to || arrow.to > gameTime) && arrow.hits.length < 3;
+    return arrow.from <= gameTime && (!arrow.to || arrow.to > gameTime) && arrow.hits.length < 2;
 };
 
 Model.prototype.addArrow = function addArrow(player, newArrow) {

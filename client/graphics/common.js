@@ -52,9 +52,12 @@ module.exports = function(grid) {
         return render(x, y, null, null, background);
     }
 
-    function render(x, y, direction, foreground, background) {
+    function render(x, y, direction, foreground, background, scale) {
         grid.context.save();
         grid.context.translate((unit * x) + (unit / 2), (unit * y) + (unit / 2));
+        if (scale) {
+            grid.context.scale(scale, scale);
+        }
         if (background) {
             grid.context.save();
             background(grid.context);

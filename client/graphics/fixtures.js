@@ -60,7 +60,7 @@ module.exports = function initFixtures(grid) {
             ctx.globalAlpha = gameTime + 500 > arrow.to ? 0.2 : 0.6;
             ctx.fillStyle = constants.COLOURS.PLAYER[player];
             ctx.fillRect(-unit / 2, -unit / 2, unit, unit);
-        });
+        }, 1 - arrow.hits.length * 0.3);
     }
 
     var sourceBackground = common.preRender(function(ctx) {
