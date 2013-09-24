@@ -47,14 +47,12 @@ describe('model', function() {
 
         model.critters.push(critter);
 
-        var arrow = {
+        var arrow = model.addArrow(0, {
             x: 2,
             y: 2,
             direction: 0,
             from: gameTime
-        };
-
-        model.addArrow(0, arrow);
+        });
 
         while (critter.x < 2) {
             model.update(gameTime);
@@ -81,14 +79,12 @@ describe('model', function() {
             gameTime += 100;
         }
 
-        var arrow = {
+        var arrow = model.addArrow(0, {
             x: 2,
             y: 2,
             direction: 0,
             from: gameTime - 200
-        };
-
-        model.addArrow(0, arrow);
+        });
 
         model.update(gameTime);
 
@@ -304,14 +300,12 @@ describe('model', function() {
 
         model.critters.push(critter);
 
-        var arrow = {
+        var arrow = model.addArrow(0, {
             x: 2,
             y: 2,
             direction: 0,
             from: 0
-        };
-
-        model.addArrow(0, arrow);
+        });
         model.update(3 / critter.type.speed);
 
         assert.equal(critter.direction, arrow.direction,
@@ -319,14 +313,12 @@ describe('model', function() {
     });
 
     it('should remove arrows after multiple head-on collisions with foxes', function() {
-        var arrow = {
+        var arrow = model.addArrow(0, {
             x: 3,
             y: 2,
             direction: 3,
             from: 0
-        };
-
-        model.addArrow(0, arrow);
+        });
 
         var fox = new sprites.Critter(
             model.sources[0],
@@ -348,18 +340,16 @@ describe('model', function() {
             gameTime += 100;
         }
 
-        assert.isFalse(model.isArrowActive(arrow, gameTime));
+        assert.isFalse(arrow.isActive(gameTime));
     });
 
     it('should not remove arrows after multiple side-on collisions with foxes', function() {
-        var arrow = {
+        var arrow = model.addArrow(0, {
             x: 1,
             y: 2,
             direction: 2,
             from: 0
-        };
-
-        model.addArrow(0, arrow);
+        });
 
         var fox = new sprites.Critter(
             model.sources[0],
@@ -381,18 +371,16 @@ describe('model', function() {
             gameTime += 100;
         }
 
-        assert.isTrue(model.isArrowActive(arrow, gameTime));
+        assert.isTrue(arrow.isActive(gameTime));
     });
 
     it('should not remove arrows after multiple collisions with rabbits', function() {
-        var arrow = {
+        var arrow = model.addArrow(0, {
             x: 3,
             y: 2,
             direction: 3,
             from: 0
-        };
-
-        model.addArrow(0, arrow);
+        });
 
         var rabbit = new sprites.Critter(
             model.sources[0],
@@ -414,7 +402,7 @@ describe('model', function() {
             gameTime += 100;
         }
 
-        assert.isTrue(model.isArrowActive(arrow, gameTime));
+        assert.isTrue(arrow.isActive(gameTime));
     });
 
     describe('TICK_INTERVAL', function() {

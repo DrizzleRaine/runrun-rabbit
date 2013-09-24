@@ -6,16 +6,14 @@ var gridUtils = require('./utils/grid.js');
 var arrayUtils = require('./utils/array.js');
 var spawning = require('./spawning.js');
 var sprites = require('./sprites.js');
-
-var MAX_ARROWS = 3;
-var ARROW_LIFETIME = 10000;
+var arrows = require('./arrows.js');
 
 module.exports.build = function build(gameData) {
     return new Model(gameData);
 };
 
 function Model(gameData) {
-    this.playerArrows = arrayUtils.initialise(gameData.totalPlayers, function() { return []; });
+    this.playerArrows = new arrows.PlayerArrows(gameData.totalPlayers);
     this.playerScores = arrayUtils.initialise(gameData.totalPlayers, 0);
     this.scoreHistory = [];
     this.spawningStrategy = gameData.initialSpawning || spawning.standard();
@@ -48,79 +46,23 @@ function Model(gameData) {
     };
 }
 
-Model.prototype.isArrowActive = function isArrowActive(arrow, gameTime) {
-    gameTime = gameTime || this.lastUpdate;
-    return arrow.from <= gameTime && (!arrow.to || arrow.to > gameTime) && arrow.hits.length < 2;
-};
-
-Model.prototype.addArrow = function addArrow(player, newArrow) {
-    if (gridUtils.getAtCell(this.sinks, newArrow.x, newArrow.y) ||
-        gridUtils.getAtCell(this.sources, newArrow.x, newArrow.y)) {
+Model.prototype.addArrow = function addArrow(player, arrowData) {
+    if (gridUtils.getAtCell(this.sinks, arrowData.x, arrowData.y) ||
+        gridUtils.getAtCell(this.sources, arrowData.x, arrowData.y)) {
         return;
     }
 
-    var existing = this.getActiveArrow(null, newArrow.x, newArrow.y);
-    if (existing.arrow) {
-        if (newArrow.from <= existing.arrow.from) {
-            // Remove the existing arrow that was pre-empted by another player
-            var removedArrow = this.playerArrows[existing.player].splice(existing.index, 1)[0];
+    var addedArrow = this.playerArrows.addArrow(player, arrowData, this.lastUpdate);
 
-            // If the arrow we just removed replaced another arrow, re-instate it
-            for (var j = this.playerArrows[existing.player].length - 1; j >= 0; --j) {
-                var oldArrow = this.playerArrows[existing.player][j];
-                if (oldArrow.to === removedArrow.from) {
-                    delete oldArrow.to;
-                    break;
-                }
-            }
-        } else {
-            return false;
-        }
+    if (addedArrow && arrowData.from < this.lastUpdate) {
+        restoreState(this, Math.floor(arrowData.from / TICK_INTERVAL));
     }
 
-    var ownArrows = this.playerArrows[player];
-    var currentArrows = 0;
-    for (var i = ownArrows.length - 1; i >= 0; --i) {
-        if (this.isArrowActive(ownArrows[i], newArrow.from)) {
-            if (++currentArrows === MAX_ARROWS) {
-                ownArrows[i].to = newArrow.from;
-                break;
-            }
-        }
-    }
-
-    newArrow.to = newArrow.from + ARROW_LIFETIME;
-    newArrow.hits = [];
-    ownArrows.push(newArrow);
-
-    if (newArrow.from < this.lastUpdate) {
-        restoreState(this, Math.floor(newArrow.from / TICK_INTERVAL));
-    }
-
-    return true;
+    return addedArrow;
 };
 
 Model.prototype.getActiveArrow = function getActiveArrow(time, x, y) {
-    var haveMoreArrows = true;
-    for (var i = 1; haveMoreArrows; ++i) {
-        haveMoreArrows = false;
-        for (var p = 0; p < this.playerArrows.length; ++p) {
-            if (i <= this.playerArrows[p].length) {
-                haveMoreArrows = true;
-                var index = this.playerArrows[p].length - i;
-                var arrow = this.playerArrows[p][index];
-                if (arrow.x === x && arrow.y === y && this.isArrowActive(arrow, time)) {
-                    return {
-                        arrow: arrow,
-                        player: p,
-                        index: index
-                    };
-                }
-            }
-        }
-    }
-
-    return {};
+    return this.playerArrows.getActiveArrow(time, x, y);
 };
 
 Model.prototype.modifyScore = function modifyScore(player, modifier) {
@@ -142,13 +84,7 @@ function restoreState(model, tick) {
         model.critters.push(remainingCritters.pop());
     }
 
-    model.playerArrows.forEach(function(arrows) {
-        arrows.forEach(function(arrow) {
-            while (arrow.hits.length && arrow.hits[arrow.hits.length - 1] > tick * TICK_INTERVAL) {
-                arrow.hits.pop();
-            }
-        });
-    });
+    model.playerArrows.restore(tick);
 
     model.lastUpdate = tick * TICK_INTERVAL;
 }

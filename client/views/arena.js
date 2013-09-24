@@ -34,12 +34,10 @@ module.exports = function build(parent, model, gameData, placeArrowCallback) {
 
         grid.clear();
 
-        model.playerArrows.forEach(function(playerArrows, player) {
-            playerArrows.forEach(function(arrow) {
-                if (model.isArrowActive(arrow)) {
-                    fixtures.drawArrow(player, arrow, gameTime);
-                }
-            });
+        model.playerArrows.forEach(function(arrow, player) {
+            if (arrow.isActive(gameTime)) {
+                fixtures.drawArrow(player, arrow, gameTime);
+            }
         });
 
         model.sources.forEach(function(source) {
