@@ -27,10 +27,10 @@ function setupHintMessage(elementId, message) {
 }
 
 setupHintMessage('startSinglePlayer',
-    'Start a single player game: This is just a sandbox mode, as there are no AI opponents (yet!)');
+    'Start a single player game against a computer-controlled opponent');
 
 setupHintMessage('startMultiplayer',
-    'Start a multiplayer game against a randomly chosen opponent');
+    'Start a multiplayer game against a randomly chosen human opponent');
 
 setupHintMessage('settingsAndInstructions',
     'View instructions and configure input options');

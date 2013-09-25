@@ -2,6 +2,7 @@
 
 var modelFactory = require('../../shared/model.js');
 var levels = require('../../shared/levels.js');
+var standard = require('../../shared/bots/standard.js');
 var RNG = require('../../shared/utils/rng.js').RNG;
 
 module.exports = (function() {
@@ -46,6 +47,11 @@ module.exports = (function() {
             socket.emit('started');
         }
 
+        if (gameData.bots && gameData.bots.length) {
+            gameData.bots.forEach(function (bot) {
+                bot.start(model);
+            });
+        }
     }
 
     var init = function init(multiplayer, selectedInputMethod) {
@@ -92,7 +98,8 @@ module.exports = (function() {
                 playerId: 0,
                 levelId: new Date().getTime() % levels.length,
                 totalPlayers: 2,
-                totalTime: 90000
+                totalTime: 90000,
+                bots: [ new standard.Bot(1) ]
             });
         }
     };

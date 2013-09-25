@@ -4,7 +4,7 @@
 var arrayUtils = require('./utils/array.js');
 var TICK_INTERVAL = require('./model.js').TICK_INTERVAL;
 var ARROW_LIFETIME = 10000;
-var MAX_ARROWS = 3;
+var MAX_ARROWS = module.exports.MAX_ARROWS = 3;
 
 var Arrow = module.exports.Arrow = function Arrow(x, y, direction, from) {
     this.x = x;
