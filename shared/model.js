@@ -3,10 +3,10 @@
 var TICK_INTERVAL = module.exports.TICK_INTERVAL = 100;
 
 var gridUtils = require('./utils/grid.js');
-var arrayUtils = require('./utils/array.js');
 var spawning = require('./spawning.js');
 var sprites = require('./sprites.js');
 var arrows = require('./arrows.js');
+var scores = require('./scores.js');
 
 module.exports.build = function build(gameData) {
     return new Model(gameData);
@@ -14,9 +14,8 @@ module.exports.build = function build(gameData) {
 
 function Model(gameData) {
     this.playerArrows = new arrows.PlayerArrows(gameData.totalPlayers);
-    this.scoreHistory = [];
+    this.playerScores = new scores.PlayerScores(gameData.totalPlayers);
     this.lastUpdate = 0;
-    this.playerScores = this.scoreHistory[this.lastUpdate / TICK_INTERVAL] = arrayUtils.initialise(gameData.totalPlayers, 0);
     this.spawningStrategy = gameData.initialSpawning || spawning.standard();
     this.critters = [];
     this.level = gameData.level;
@@ -36,7 +35,7 @@ function Model(gameData) {
                 updateCritters(this, time);
                 this.spawningStrategy.rabbits(this, time, gameData.random);
                 this.spawningStrategy.foxes(this, time, gameData.random);
-                this.scoreHistory[time / TICK_INTERVAL] = this.playerScores.concat();
+                this.playerScores.save(time / TICK_INTERVAL);
             }
 
             this.lastUpdate = gameTime;
@@ -67,12 +66,8 @@ Model.prototype.getActiveArrow = function getActiveArrow(time, x, y) {
     return this.playerArrows.getActiveArrow(time, x, y);
 };
 
-Model.prototype.modifyScore = function modifyScore(player, modifier) {
-    this.playerScores[player] = modifier(this.playerScores[player]);
-};
-
 function restoreState(model, tick) {
-    model.playerScores = model.scoreHistory[tick];
+    model.playerScores.restore(tick);
 
     var remainingCritters = [];
     while (model.critters.length) {

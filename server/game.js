@@ -24,7 +24,6 @@ function configure(io) {
             var startTime = new Date().getTime();
             var interval = setInterval(function() {
                 model.update(new Date().getTime() - startTime);
-                //console.log(model.playerScores);
                 if (!model.isRunning) {
                     clearInterval(interval);
                 }

@@ -68,7 +68,7 @@ function findFoxPaths(model, finder, playerId) {
     if (model.totalPlayers > 2) {
         var targetPlayerScore = 0;
 
-        model.playerScores.forEach(function (score, playerId) {
+        model.playerScores.current.forEach(function (score, playerId) {
             if (playerId !== playerId && score > targetPlayerScore) {
                 targetPlayerScore = score;
                 targetPlayerId = playerId;

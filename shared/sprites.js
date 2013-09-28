@@ -77,7 +77,7 @@ Critter.prototype.update = function(model, gameTime) {
         if (sink !== null) {
             this.inPlay = false;
             if (sink.player !== null) {
-                model.modifyScore(sink.player, this.type.score.bind(this));
+                model.playerScores.modify(sink.player, this.type.score.bind(this));
             }
         } else {
             var timeToCentre = (Math.abs(this.x - centreX) + Math.abs(this.y - centreY)) / this.type.speed;

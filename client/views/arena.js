@@ -62,7 +62,7 @@ module.exports = function build(parent, model, gameData, placeArrowCallback) {
         }
 
         hud.update({
-            score: model.playerScores,
+            score: model.playerScores.current,
             time: gameTime
         });
 
