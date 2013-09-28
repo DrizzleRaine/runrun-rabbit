@@ -26,7 +26,7 @@ module.exports.forEach = function forEachDirection(callback) {
     }
 };
 
-module.exports.isValid = function isValid(direction, model, centreX, centreY) {
+var isValid = module.exports.isValid = function isValid(direction, model, centreX, centreY) {
     var targetX = centreX + direction.x;
     var targetY = centreY + direction.y;
 
@@ -39,4 +39,12 @@ module.exports.opposing = function opposingDirection(a, b) {
 
 module.exports.equal = function equalDirection(a, b) {
     return a.x === b.x && a.y === b.y;
+};
+
+module.exports.getNatural = function getNaturalDirection(direction, model, centreX, centreY) {
+    var rotation = 0;
+    while (!isValid(components(direction), model, centreX, centreY)) {
+        direction = (direction + (++rotation)) % 4;
+    }
+    return direction;
 };

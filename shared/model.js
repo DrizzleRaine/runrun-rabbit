@@ -14,11 +14,11 @@ module.exports.build = function build(gameData) {
 
 function Model(gameData) {
     this.playerArrows = new arrows.PlayerArrows(gameData.totalPlayers);
-    this.playerScores = arrayUtils.initialise(gameData.totalPlayers, 0);
     this.scoreHistory = [];
+    this.lastUpdate = 0;
+    this.playerScores = this.scoreHistory[this.lastUpdate / TICK_INTERVAL] = arrayUtils.initialise(gameData.totalPlayers, 0);
     this.spawningStrategy = gameData.initialSpawning || spawning.standard();
     this.critters = [];
-    this.lastUpdate = 0;
     this.width = gameData.level.width;
     this.height = gameData.level.height;
     this.sources = gameData.level.sources;
@@ -47,6 +47,10 @@ function Model(gameData) {
 }
 
 Model.prototype.addArrow = function addArrow(player, arrowData) {
+    if (!('from' in arrowData)) {
+        arrowData.from = this.lastUpdate + TICK_INTERVAL;
+    }
+
     if (gridUtils.getAtCell(this.sinks, arrowData.x, arrowData.y) ||
         gridUtils.getAtCell(this.sources, arrowData.x, arrowData.y)) {
         return;
@@ -54,7 +58,7 @@ Model.prototype.addArrow = function addArrow(player, arrowData) {
 
     var addedArrow = this.playerArrows.addArrow(player, arrowData, this.lastUpdate);
 
-    if (addedArrow && arrowData.from < this.lastUpdate) {
+    if (addedArrow && arrowData.from <= this.lastUpdate) {
         restoreState(this, Math.floor(arrowData.from / TICK_INTERVAL));
     }
 
