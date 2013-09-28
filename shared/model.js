@@ -24,6 +24,7 @@ function Model(gameData) {
     this.sources = gameData.level.sources;
     this.sinks = gameData.level.sinks;
     this.playerId = gameData.playerId;
+    this.totalPlayers = gameData.totalPlayers;
     this.isRunning = true;
 
     this.update = function updateModel(gameTime) {

@@ -11,16 +11,18 @@ var ARROW_COST = 10;
 var PathFinder = module.exports.Finder = function PathFinder(model, playerId) {
     this.model = model;
     this.playerId = playerId;
-    this.heuristicCache = arrayUtils.initialise(model.width, function() {
-        return arrayUtils.initialise(model.height, function() {
-            return arrayUtils.initialise(4, undefined);
+    this.heuristicCache = arrayUtils.initialise(model.totalPlayers, function() {
+        return arrayUtils.initialise(model.width, function() {
+            return arrayUtils.initialise(model.height, function() {
+                return arrayUtils.initialise(4, undefined);
+            });
         });
     });
 };
 
-PathFinder.prototype.isPlayerSink = function (node) {
+PathFinder.prototype.isPlayerSink = function (node, playerId) {
     var sink = gridUtils.getAtCell(this.model.sinks, node.x, node.y);
-    return sink && (sink.player === this.playerId);
+    return sink && (sink.player === playerId);
 };
 
 
@@ -32,11 +34,11 @@ function sign(x) {
     return x === 0 ? 0 : (x > 0 ? 1 : -1);
 }
 
-PathFinder.prototype.heuristicCost = function (node) {
-    if (!this.heuristicCache[node.x][node.y][node.d]) {
+PathFinder.prototype.heuristicCost = function (node, playerId) {
+    if (!this.heuristicCache[playerId][node.x][node.y][node.d]) {
         var cheapest = Infinity;
         this.model.sinks.forEach(function(sink) {
-            if (sink.player === this.playerId) {
+            if (sink.player === playerId) {
                 var dx = sink.x - node.x;
                 var dy = sink.y - node.y;
 
@@ -53,10 +55,10 @@ PathFinder.prototype.heuristicCost = function (node) {
                 }
             }
         }.bind(this));
-        this.heuristicCache[node.x][node.y][node.d] = cheapest;
+        this.heuristicCache[playerId][node.x][node.y][node.d] = cheapest;
     }
 
-    return this.heuristicCache[node.x][node.y][node.d];
+    return this.heuristicCache[playerId][node.x][node.y][node.d];
 };
 
 PathFinder.prototype.reconstructPath = function (end) {
@@ -91,13 +93,13 @@ PathFinder.prototype.matchingNodeInSet = function (haystack, needle) {
     return {};
 };
 
-PathFinder.prototype.findBestPath = function findBestPath(start) {
+PathFinder.prototype.findBestPath = function findBestPath(start, playerId) {
     var open = [start];
     var closed = [];
     while (open.length) {
         var current = open.pop();
 
-        if (this.isPlayerSink(current)) {
+        if (this.isPlayerSink(current, playerId)) {
             return this.reconstructPath(current);
         }
 
@@ -111,20 +113,19 @@ PathFinder.prototype.findBestPath = function findBestPath(start) {
         }
 
         if (force) {
-            this.processDirection(current, open, closed)(directionUtils.components(force.direction), force.direction);
+            this.processDirection(current, open, closed, playerId)(directionUtils.components(force.direction), force.direction);
         } else {
             var natural = directionUtils.getNatural(current.d, this.model, current.x, current.y);
-            directionUtils.forEach(this.processDirection(current, open, closed, natural));
+            directionUtils.forEach(this.processDirection(current, open, closed, playerId, natural));
         }
 
-        console.log(open.length);
         open.sort(nodePriority);
     }
 
     return null;
 };
 
-PathFinder.prototype.processDirection = function(current, open, closed, natural) {
+PathFinder.prototype.processDirection = function(current, open, closed, playerId, natural) {
     return function(direction, index) {
         if (!directionUtils.isValid(direction, this.model, current.x, current.y)) {
             return;
@@ -138,7 +139,7 @@ PathFinder.prototype.processDirection = function(current, open, closed, natural)
         };
 
         var foundSink = gridUtils.getAtCell(this.model.sinks, neighbour.x, neighbour.y);
-        if (foundSink && foundSink.player !== this.playerId) {
+        if (foundSink && foundSink.player !== playerId) {
             return;
         }
 
@@ -154,8 +155,9 @@ PathFinder.prototype.processDirection = function(current, open, closed, natural)
 
         if (!neighbourInOpen.value && !neighbourInClosed.value) {
             neighbour.from = current;
-            neighbour.f = neighbour.g + this.heuristicCost(neighbour);
+            neighbour.f = neighbour.g + this.heuristicCost(neighbour, playerId);
             open.push(neighbour);
         }
+
     }.bind(this);
 };
