@@ -50,21 +50,21 @@ describe('model', function() {
 
     it('should prevent placing arrows on top of other fixtures', function() {
         model.addArrow(0, {
-            x: model.sinks[0].x,
-            y: model.sinks[0].y,
+            x: model.level.sinks[0].x,
+            y: model.level.sinks[0].y,
             direction: 0,
             from: 0
         });
 
         model.addArrow(0, {
-            x: model.sources[0].x,
-            y: model.sources[0].y,
+            x: model.level.sources[0].x,
+            y: model.level.sources[0].y,
             direction: 0,
             from: 0
         });
 
-        assert.isUndefined(model.getActiveArrow(0, model.sinks[0].x, model.sinks[0].y).arrow, 0);
-        assert.isUndefined(model.getActiveArrow(0, model.sources[0].x, model.sources[0].y).arrow, 0);
+        assert.isUndefined(model.getActiveArrow(0, model.level.sinks[0].x, model.level.sinks[0].y).arrow, 0);
+        assert.isUndefined(model.getActiveArrow(0, model.level.sources[0].x, model.level.sources[0].y).arrow, 0);
     });
 
     it('should prevent the same player from placing more than three arrows', function() {

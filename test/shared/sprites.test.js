@@ -18,11 +18,13 @@ describe('sprites', function() {
 
         it('should check for arrows at the correct point in time', function() {
             var model = {
-                sources: [],
-                sinks: [],
-                getActiveArrow: sinon.stub(),
-                width: 2,
-                height: 2
+                level: {
+                    sources: [],
+                    sinks: [],
+                    width: 2,
+                    height: 2
+                },
+                getActiveArrow: sinon.stub()
             };
 
             model.getActiveArrow.returns({});
@@ -41,11 +43,13 @@ describe('sprites', function() {
             };
 
             var model = {
-                sources: [],
-                sinks: [],
-                getActiveArrow: sinon.stub(),
-                width: 3,
-                height: 3
+                level: {
+                    sources: [],
+                    sinks: [],
+                    width: 3,
+                    height: 3
+                },
+                getActiveArrow: sinon.stub()
             };
 
             model.getActiveArrow.returns({});
@@ -65,11 +69,13 @@ describe('sprites', function() {
             };
 
             var model = {
-                sources: [],
-                sinks: [],
-                getActiveArrow: sinon.stub(),
-                width: 3,
-                height: 3
+                level: {
+                    sources: [],
+                    sinks: [],
+                    width: 3,
+                    height: 3
+                },
+                getActiveArrow: sinon.stub()
             };
 
             model.getActiveArrow.returns({});
@@ -89,11 +95,13 @@ describe('sprites', function() {
             };
 
             var model = {
-                sources: [],
-                sinks: [],
-                getActiveArrow: sinon.stub(),
-                width: 3,
-                height: 1
+                level: {
+                    sources: [],
+                    sinks: [],
+                    width: 3,
+                    height: 1
+                },
+                getActiveArrow: sinon.stub()
             };
 
             model.getActiveArrow.returns({});

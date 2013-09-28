@@ -3,8 +3,8 @@
 module.exports = function(model) {
     var constants = require('./constants.js');
 
-    var width = model.width * constants.CELL_SIZE;
-    var height = model.height * constants.CELL_SIZE;
+    var width = model.level.width * constants.CELL_SIZE;
+    var height = model.level.height * constants.CELL_SIZE;
 
     var canvas = document.createElement('canvas');
     canvas.setAttribute('width', width.toString());

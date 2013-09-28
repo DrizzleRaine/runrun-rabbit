@@ -16,7 +16,9 @@ describe('spawning', function() {
 
         model = {
             critters: [],
-            sources: [{}, {}, {}]
+            level: {
+                sources: [{}, {}, {}]
+            }
         };
     });
 

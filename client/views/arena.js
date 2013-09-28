@@ -40,11 +40,11 @@ module.exports = function build(parent, model, gameData, placeArrowCallback) {
             }
         });
 
-        model.sources.forEach(function(source) {
+        model.level.sources.forEach(function(source) {
             fixtures.drawSource(source);
         });
 
-        model.sinks.forEach(function(sink) {
+        model.level.sinks.forEach(function(sink) {
             fixtures.drawSink(sink);
         });
 

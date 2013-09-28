@@ -126,7 +126,7 @@ describe('model', function() {
     });
 
     it('should restore critters when compensating for arrows placed in the past', function() {
-        var critter = new sprites.Critter(model.sources[0], sprites.RABBIT, 0);
+        var critter = new sprites.Critter(model.level.sources[0], sprites.RABBIT, 0);
 
         model.critters.push(critter);
 
@@ -194,8 +194,8 @@ describe('model', function() {
             from: 20
         });
 
-        model.sources.push(new fixtures.Source(1, 2, 1));
-        model.sources.push(new fixtures.Source(3, 2, 3));
+        model.level.sources.push(new fixtures.Source(1, 2, 1));
+        model.level.sources.push(new fixtures.Source(3, 2, 3));
 
         while (rabbit1.isAlive) {
             model.update(gameTime);
@@ -321,7 +321,7 @@ describe('model', function() {
         });
 
         var fox = new sprites.Critter(
-            model.sources[0],
+            model.level.sources[0],
             sprites.FOX,
             0
         );
@@ -352,7 +352,7 @@ describe('model', function() {
         });
 
         var fox = new sprites.Critter(
-            model.sources[0],
+            model.level.sources[0],
             sprites.FOX,
             0
         );
@@ -383,7 +383,7 @@ describe('model', function() {
         });
 
         var rabbit = new sprites.Critter(
-            model.sources[0],
+            model.level.sources[0],
             sprites.RABBIT,
             0
         );

@@ -33,19 +33,19 @@ Bot.prototype.update = function update() {
         this.implementPath(chosenPath);
     }
 
-    setTimeout(this.update.bind(this), 100);
+    setTimeout(this.update.bind(this), 250);
 };
 
 Bot.prototype.start = function startBot(model) {
     this.model = model;
     this.pathFinder = new paths.Finder(this.model, this.playerId);
-    setTimeout(this.update.bind(this), 1000);
+    setTimeout(this.update.bind(this), 250);
 };
 
 function findSourcePaths(model, finder, playerId) {
     var bestPaths = [];
 
-    model.sources.forEach(function(source) {
+    model.level.sources.forEach(function(source) {
         var path = finder.findBestPath({
             x: source.x,
             y: source.y,

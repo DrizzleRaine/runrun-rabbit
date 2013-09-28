@@ -8,7 +8,7 @@ var none = function() {};
 function standardRabbits(model, random) {
     var results = [];
 
-    model.sources.forEach(function(source, index) {
+    model.level.sources.forEach(function(source, index) {
         if (random.nextByte() > 220) {
             results.push({
                 sourceId: index,
@@ -33,7 +33,7 @@ function foxFilter(model) {
 function standardFoxes(model, random) {
     if (random.nextByte() > 127) {
         return [{
-            sourceId: random.nextByte() % model.sources.length,
+            sourceId: random.nextByte() % model.level.sources.length,
             type: sprites.FOX
         }];
     } else {
@@ -58,7 +58,7 @@ function cached(strategy, filter) {
         }
 
         spawns.forEach(function (spawn) {
-            model.critters.push(new sprites.Critter(model.sources[spawn.sourceId], spawn.type, time));
+            model.critters.push(new sprites.Critter(model.level.sources[spawn.sourceId], spawn.type, time));
         });
     };
 }

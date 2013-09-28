@@ -73,7 +73,7 @@ Critter.prototype.update = function(model, gameTime) {
         var centreX = oldCellX > newCellX ? oldCellX : newCellX;
         var centreY = oldCellY > newCellY ? oldCellY : newCellY;
 
-        var sink = gridUtils.getAtCell(model.sinks, centreX, centreY);
+        var sink = gridUtils.getAtCell(model.level.sinks, centreX, centreY);
         if (sink !== null) {
             this.inPlay = false;
             if (sink.player !== null) {
@@ -89,7 +89,7 @@ Critter.prototype.update = function(model, gameTime) {
                     arrow.hits.push(gameTime);
                 }
             } else {
-                var source = gridUtils.getAtCell(model.sources, centreX, centreY);
+                var source = gridUtils.getAtCell(model.level.sources, centreX, centreY);
                 if (source) {
                     newDirection = source.direction;
                 }

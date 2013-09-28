@@ -30,7 +30,7 @@ var isValid = module.exports.isValid = function isValid(direction, model, centre
     var targetX = centreX + direction.x;
     var targetY = centreY + direction.y;
 
-    return (targetX >= 0 && targetY >= 0 && targetX < model.width && targetY < model.height);
+    return (targetX >= 0 && targetY >= 0 && targetX < model.level.width && targetY < model.level.height);
 };
 
 module.exports.opposing = function opposingDirection(a, b) {

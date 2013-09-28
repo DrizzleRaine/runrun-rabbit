@@ -11,17 +11,20 @@ var ARROW_COST = 10;
 var PathFinder = module.exports.Finder = function PathFinder(model, playerId) {
     this.model = model;
     this.playerId = playerId;
-    this.heuristicCache = arrayUtils.initialise(model.totalPlayers, function() {
-        return arrayUtils.initialise(model.width, function() {
-            return arrayUtils.initialise(model.height, function() {
-                return arrayUtils.initialise(4, undefined);
+
+    if (!model.level.heuristicCache) {
+        model.level.heuristicCache = arrayUtils.initialise(model.totalPlayers, function() {
+            return arrayUtils.initialise(model.level.width, function() {
+                return arrayUtils.initialise(model.level.height, function() {
+                    return arrayUtils.initialise(4, undefined);
+                });
             });
         });
-    });
+    }
 };
 
 PathFinder.prototype.isPlayerSink = function (node, playerId) {
-    var sink = gridUtils.getAtCell(this.model.sinks, node.x, node.y);
+    var sink = gridUtils.getAtCell(this.model.level.sinks, node.x, node.y);
     return sink && (sink.player === playerId);
 };
 
@@ -35,9 +38,9 @@ function sign(x) {
 }
 
 PathFinder.prototype.heuristicCost = function (node, playerId) {
-    if (!this.heuristicCache[playerId][node.x][node.y][node.d]) {
+    if (!this.model.level.heuristicCache[playerId][node.x][node.y][node.d]) {
         var cheapest = Infinity;
-        this.model.sinks.forEach(function(sink) {
+        this.model.level.sinks.forEach(function(sink) {
             if (sink.player === playerId) {
                 var dx = sink.x - node.x;
                 var dy = sink.y - node.y;
@@ -55,10 +58,10 @@ PathFinder.prototype.heuristicCost = function (node, playerId) {
                 }
             }
         }.bind(this));
-        this.heuristicCache[playerId][node.x][node.y][node.d] = cheapest;
+        this.model.level.heuristicCache[playerId][node.x][node.y][node.d] = cheapest;
     }
 
-    return this.heuristicCache[playerId][node.x][node.y][node.d];
+    return this.model.level.heuristicCache[playerId][node.x][node.y][node.d];
 };
 
 PathFinder.prototype.reconstructPath = function (end) {
@@ -109,7 +112,7 @@ PathFinder.prototype.findBestPath = function findBestPath(start, playerId) {
 
         var force = arrow.arrow;
         if (!force || (arrow.player === this.playerId)) {
-            force = gridUtils.getAtCell(this.model.sources, current.x, current.y);
+            force = gridUtils.getAtCell(this.model.level.sources, current.x, current.y);
         }
 
         if (force) {
@@ -138,7 +141,7 @@ PathFinder.prototype.processDirection = function(current, open, closed, playerId
             g: current.g + (index === natural ? 0 : ARROW_COST)
         };
 
-        var foundSink = gridUtils.getAtCell(this.model.sinks, neighbour.x, neighbour.y);
+        var foundSink = gridUtils.getAtCell(this.model.level.sinks, neighbour.x, neighbour.y);
         if (foundSink && foundSink.player !== playerId) {
             return;
         }
