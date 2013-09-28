@@ -27,7 +27,7 @@ module.exports = function(grunt) {
             shared: ['shared/**/*.js'],
             client: {
                 options: {
-                    ignores: ['client/lib/**/*.js'],
+                    ignores: ['client/static/**/*.js'],
                     browser: true,
                     globals: {
                         $: false,

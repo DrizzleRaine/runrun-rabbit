@@ -4,6 +4,7 @@
     <title>RunRun Rabbit!</title>
     <link href="./site.css" rel="stylesheet">
     <script src="/socket.io/socket.io.js"></script>
+    <script src="./minified.js"></script>
 </head>
 <body>
     <div id="container" class="container">
@@ -19,11 +20,11 @@
             <h2>Instructions</h2>
             <div>
                 <h3 id="rabbits">Rabbits</h3>
-                <p>Earn points by guiding the purple bunnies safely to your home square.</p>
+                <p>Earn points by guiding the purple bunnies safely to your home.</p>
             </div>
             <div>
                 <h3 id="foxes">Foxes</h3>
-                <p>If one of the orange foxes reaches your home square, they'll eat half of your rabbits!</p>
+                <p>Watch out for foxes! They'll eat your rabbits if they reach your home.</p>
             </div>
             <div>
                 <h3 id="arrows">Arrows</h3>
@@ -31,21 +32,37 @@
                 <p>Place arrows to guide critters around.
                    You can only place up to three arrows at a time, so use them wisely&hellip;</p>
             </div>
+            <br /><br />
+            <a class="btn player-1" href="">Start playing now!</a>
             <h2>Input method</h2>
             <label>
-                <h3><input type="radio" name="input" value="desktop" /> Desktop</h3>
+                <h3><input type="radio" name="input" class="input" value="desktop" /> Desktop</h3>
                 <p>Place arrows by <b>clicking</b> on a square while <b>pressing</b> one of the
                    <span class="nowrap">&larr;/&uarr;/&rarr;/&darr;</span> or <span class="nowrap">W/A/S/D</span> keys.</p>
             </label>
             <label>
-                <h3><input type="radio" name="input" value="laptop" /> Laptop</h3>
+                <h3><input type="radio" name="input" class="input" value="laptop" /> Laptop</h3>
                 <p>Place arrows by <b>pressing</b> one of the <span class="nowrap">&larr;/&uarr;/&rarr;/&darr;</span>
                     or <span class="nowrap">W/A/S/D</span> keys while <b>hovering</b> over a square.</p>
             </label>
             <label>
-                <h3><input type="radio" name="input" value="mobile" disabled /> Tablet/Phone (coming soon)</h3>
+                <h3><input type="radio" name="input" class="input" value="mobile" disabled /> Tablet/Phone (coming soon)</h3>
                 <p>Place arrows by <b>touching</b> a square and <b>swiping</b> left/right/up/down.</p>
             </label>
+            <h2>Accessibility</h2>
+            <label>
+                <h3><input type="radio" name="visuals" class="visuals" value="standard" /> Standard</h3>
+                <p>Players are differentiated by colour only. Make sure you can tell the difference between the four player arrows below&hellip;</p>
+            </label>
+            <label>
+                <h3><input type="radio" name="visuals" class="visuals" value="redGreen" /> Red-green</h3>
+                <p>Red and yellow players are distinguished from green and blue players by shape (designed for protanopia and deuteranopia).</p>
+            </label>
+            <label>
+                <h3><input type="radio" name="visuals" class="visuals" value="blueYellow" /> Blue-yellow</h3>
+                <p>Blue and red players are distinguished from yellow and green players by shape (designed for tritanopia).</p>
+            </label>
+            <div id="four-player-preview"></div>
         </div>
         <script src="./bundle.js"></script>
     </div>

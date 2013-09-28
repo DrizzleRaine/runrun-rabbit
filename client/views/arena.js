@@ -96,6 +96,10 @@ module.exports = function build(parent, model, gameData, placeArrowCallback) {
         });
     }
 
+    function setVisualStyle(visualStyle) {
+        fixtures.setVisualStyle(visualStyle);
+    }
+
     function close() {
         isRunning = false;
         grid.clear();
@@ -104,7 +108,8 @@ module.exports = function build(parent, model, gameData, placeArrowCallback) {
 
     return {
         close: close,
-        inputMethod: setInputMethod,
+        setInputMethod: setInputMethod,
+        setVisualStyle: setVisualStyle,
         gameOver: function(callback) { gameOverCallback = callback; }
     };
 };

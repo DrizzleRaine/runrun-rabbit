@@ -14,7 +14,7 @@ module.exports.RABBIT = {
 module.exports.FOX = {
     speed: 0.0022,
     score: function(currentScore) {
-        return Math.ceil(currentScore / 2);
+        return Math.floor(currentScore * 3 / 2);
     }
 };
 

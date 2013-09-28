@@ -13,6 +13,7 @@ module.exports = (function() {
     var connected = false;
     var container;
     var inputMethod;
+    var visualStyle;
 
     function disconnect() {
         if (connected) {
@@ -33,7 +34,8 @@ module.exports = (function() {
             }
         );
 
-        arena.inputMethod(inputMethod);
+        arena.setInputMethod(inputMethod);
+        arena.setVisualStyle(visualStyle);
 
         arena.gameOver(function() {
             message.setText('Game over!');
@@ -54,11 +56,12 @@ module.exports = (function() {
         }
     }
 
-    var init = function init(multiplayer, selectedInputMethod) {
+    var init = function init(multiplayer, options) {
         container = document.createElement('div');
         container.setAttribute('id', 'game');
         document.body.appendChild(container);
-        inputMethod = selectedInputMethod;
+        inputMethod = options.inputMethod;
+        visualStyle = options.visualStyle;
 
         message = require('./../views/message.js').build(container);
         container.appendChild(message.view);

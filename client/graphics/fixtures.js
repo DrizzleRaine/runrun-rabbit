@@ -3,8 +3,48 @@
 module.exports = function initFixtures(grid) {
     var constants = require('./constants.js');
     var common = require('./common.js')(grid);
+    var visualStyle = 'standard';
 
     var unit = constants.CELL_SIZE;
+
+    function squareArrow(ctx) {
+        ctx.fillRect(-unit / 2, -unit / 2, unit, unit);
+    }
+
+    function circleArrow(ctx) {
+        ctx.drawCircle(0, 0, unit / 2);
+        ctx.fill();
+    }
+
+    function squareSink(ctx) {
+        ctx.beginPath();
+        ctx.moveTo(-unit / 6, -unit / 3);
+        ctx.lineTo(unit / 6, -unit / 3);
+        ctx.arc(unit /6, -unit / 6, unit / 6, Math.PI * 3 / 2, 0);
+        ctx.lineTo(unit / 3, unit / 6);
+        ctx.arc(unit /6, unit / 6, unit / 6, 0, Math.PI / 2);
+        ctx.lineTo(-unit / 6, unit / 3);
+        ctx.arc(-unit /6, unit / 6, unit / 6, Math.PI / 2, Math.PI);
+        ctx.lineTo(-unit / 3, -unit / 6);
+        ctx.arc(-unit /6, -unit / 6, unit / 6, Math.PI, Math.PI * 3 / 2);
+    }
+
+    function circleSink(ctx) {
+        ctx.drawCircle(0, 0, unit/3);
+    }
+
+    var shapes = {
+        playerArrows: {
+            'standard': [squareArrow, squareArrow, squareArrow, squareArrow],
+            'redGreen': [squareArrow, squareArrow, circleArrow, circleArrow],
+            'blueYellow': [squareArrow, circleArrow, squareArrow, circleArrow]
+        },
+        playerSinks: {
+            'standard': [circleSink, circleSink, circleSink, circleSink],
+            'redGreen': [squareSink, squareSink, circleSink, circleSink],
+            'blueYellow': [squareSink, circleSink, squareSink, circleSink]
+        }
+    };
 
     function shadeCell3d(ctx, convex) {
         var light = '#FFFFFF';
@@ -59,7 +99,7 @@ module.exports = function initFixtures(grid) {
         function(ctx) {
             ctx.globalAlpha = gameTime + 500 > arrow.to ? 0.2 : 0.6;
             ctx.fillStyle = constants.COLOURS.PLAYER[player];
-            ctx.fillRect(-unit / 2, -unit / 2, unit, unit);
+            shapes.playerArrows[visualStyle][player](ctx);
         }, 1 - arrow.hits.length * 0.3);
     }
 
@@ -96,7 +136,7 @@ module.exports = function initFixtures(grid) {
     function drawSink(sink) {
         common.renderStatic(sink.x, sink.y, function(ctx) {
             if (sink.player !== null) {
-                ctx.drawCircle(0, 0, unit/3);
+                shapes.playerSinks[visualStyle][sink.player](ctx);
                 ctx.strokeStyle = '#FFFFFF';
                 ctx.lineWidth = 4;
                 ctx.globalAlpha = 0.5;
@@ -110,9 +150,14 @@ module.exports = function initFixtures(grid) {
         });
     }
 
+    function setVisualStyle(value) {
+        visualStyle = value;
+    }
+
     return {
         drawArrow: drawArrow,
         drawSource: drawSource,
-        drawSink: drawSink
+        drawSink: drawSink,
+        setVisualStyle: setVisualStyle
     };
 };

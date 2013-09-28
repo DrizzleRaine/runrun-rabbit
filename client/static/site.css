@@ -31,8 +31,16 @@ h2.message {
 
 #settings h2 {
     background-color: #eeeeee;
-    border-radius: 6px;
     padding: 0.5em;
+}
+
+#settings h2, #settings .btn {
+    border-radius: 6px;
+    font-size: 1.5em;
+}
+
+#settings .btn {
+    width: 100%;
 }
 
 #settings div, #settings label {
@@ -83,10 +91,6 @@ h2.message {
 #menu .btn {
     width: 100%;
     margin-top: 1em;
-}
-
-#settings .btn {
-    width: 100%;
 }
 
 .hidden {

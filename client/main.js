@@ -37,12 +37,12 @@ setupHintMessage('settingsAndInstructions',
 
 document.getElementById('startSinglePlayer').onclick = function() {
     hideMenu();
-    gameController.init(false, settingsController.inputMethod);
+    gameController.init(false, settingsController.options);
 };
 
 document.getElementById('startMultiplayer').onclick = function() {
     hideMenu();
-    gameController.init(true, settingsController.inputMethod);
+    gameController.init(true, settingsController.options);
 };
 
 var openSettings = function() {
@@ -57,11 +57,14 @@ if (newVisitor) {
     openSettings();
 }
 
-document.getElementById('backToMenu').onclick = function(event) {
+function returnToMenu(event) {
     if (settingsOpen) {
         settingsController.hide();
         settingsOpen = false;
         showMenu();
         event.preventDefault();
     }
-};
+}
+
+document.getElementById('backToMenu').onclick = returnToMenu;
+document.getElementById('startPlaying').onclick = returnToMenu;
