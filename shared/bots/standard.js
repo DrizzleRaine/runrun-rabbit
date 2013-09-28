@@ -1,14 +1,17 @@
 'use strict';
 
 var paths = require('./paths.js');
-
 var sprites = require('../sprites.js');
-
 var directionUtils = require('../utils/direction.js');
 
 var Bot = module.exports.Bot = function Bot(playerId) {
     this.playerId = playerId;
 };
+
+// Note: If this is set less than the time taken for a critter to cross a square, then
+// the behaviour of the fox and rabbit path placement may be odd, as arrows are placed
+// based on where the critter is going to be, so have to be left untouched for a while
+var UPDATE_INTERVAL = 500;
 
 var MAX_ARROWS = require('../arrows.js').MAX_ARROWS;
 Bot.prototype.implementPath = function implementPath(chosenPath) {
@@ -33,13 +36,13 @@ Bot.prototype.update = function update() {
         this.implementPath(chosenPath);
     }
 
-    setTimeout(this.update.bind(this), 250);
+    setTimeout(this.update.bind(this), UPDATE_INTERVAL);
 };
 
 Bot.prototype.start = function startBot(model) {
     this.model = model;
     this.pathFinder = new paths.Finder(this.model, this.playerId);
-    setTimeout(this.update.bind(this), 250);
+    setTimeout(this.update.bind(this), UPDATE_INTERVAL);
 };
 
 function findSourcePaths(model, finder, playerId) {
