@@ -12,6 +12,7 @@ module.exports = function build(parent) {
     canvas.setAttribute('height', unit.toString());
     canvas.style.backgroundColor = '#DDDDDD';
     canvas.classList.add('banner');
+    canvas.classList.add('hidden');
 
     var context = canvas.getContext('2d');
 
@@ -19,19 +20,34 @@ module.exports = function build(parent) {
         context.clearRect(0,0, $(canvas).get('width'), unit);
     };
 
-    var grid = {
+    var isRunning = false;
+
+    var show = function() {
+        isRunning = true;
+        window.requestAnimationFrame(animate);
+        canvas.classList.remove('hidden');
+    };
+
+    var hide = function() {
+        isRunning = false;
+        canvas.classList.add('hidden');
+    };
+
+    var banner = {
         view: canvas,
         context: context,
         clear: clear,
-        unit: unit
+        unit: unit,
+        show: show,
+        hide: hide
     };
 
-    var sprites = require('../graphics/sprites.js')(grid);
+    var sprites = require('../graphics/sprites.js')(banner);
 
     var startTime = new Date().getTime();
 
     var rabbit = {
-        x: 0,
+        x: -1,
         y: 0,
         direction: 1,
         type: {
@@ -44,7 +60,7 @@ module.exports = function build(parent) {
     };
 
     var fox = {
-        x: -1,
+        x: -2,
         y: 0,
         direction: 1,
         type: {
@@ -59,6 +75,10 @@ module.exports = function build(parent) {
     var critters = [fox, rabbit];
 
     function animate() {
+        if (!isRunning) {
+            return;
+        }
+
         var currentTime = new Date().getTime();
 
         clear();
@@ -71,10 +91,10 @@ module.exports = function build(parent) {
             sprites.drawCritter(critter, currentTime);
         });
 
-        if ((fox.type.speed * (currentTime - fox.lastUpdate)) > (1 + $(canvas).get('width') / unit)) {
+        if ((fox.type.speed * (currentTime - fox.lastUpdate)) > (width + 2)) {
             rabbit.direction = fox.direction = 4 - rabbit.direction;
-            rabbit.x = width - rabbit.x;
-            fox.x = width - fox.x;
+            rabbit.x = width - 1 - rabbit.x;
+            fox.x = width - 1 - fox.x;
             rabbit.lastUpdate = currentTime;
             fox.lastUpdate = currentTime;
         }
@@ -84,7 +104,5 @@ module.exports = function build(parent) {
 
     parent.appendChild(canvas);
 
-    window.requestAnimationFrame(animate);
-
-    return canvas;
+    return banner;
 };

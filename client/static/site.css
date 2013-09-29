@@ -9,6 +9,10 @@ body{
     user-select: none;
 }
 
+h1 {
+    font-style: italic;
+}
+
 #game, #backToMenu {
     text-align: center;
 }
