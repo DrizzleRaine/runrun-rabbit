@@ -145,6 +145,12 @@ module.exports = function(grunt) {
                 dir : 'build/reports/coverage',
                 print : 'detail'
             }
+        },
+        exec: {
+            deploy: {
+                cmd: 'jitsu deploy',
+                cwd: 'build'
+            }
         }
     });
 
@@ -159,6 +165,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-compress');
     grunt.loadNpmTasks('grunt-mocha-test');
     grunt.loadNpmTasks('grunt-istanbul');
+    grunt.loadNpmTasks('grunt-exec');
 
     grunt.registerTask('setInstrumentedSourceRoot', function() {
         process.env.SOURCE_ROOT = '/build/instrument';
@@ -169,4 +176,5 @@ module.exports = function(grunt) {
     grunt.registerTask('test', ['jshint', 'mochaTest']);
     grunt.registerTask('cover', ['clean', 'instrument', 'setInstrumentedSourceRoot', 'test', 'storeCoverage', 'makeReport']);
     grunt.registerTask('run', ['default', 'concurrent']);
+    grunt.registerTask('deploy', ['release', 'exec:deploy']);
 };
