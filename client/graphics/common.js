@@ -9,8 +9,6 @@
  */
 
 module.exports = function(grid) {
-    var unit = require('./constants.js').CELL_SIZE;
-
     CanvasRenderingContext2D.prototype.drawCircle = function (x, y, radius) {
         this.beginPath();
         this.arc(x, y, radius, 0, Math.PI * 2, false);
@@ -38,13 +36,13 @@ module.exports = function(grid) {
 
     function preRender(drawDetail) {
         var cell = document.createElement('canvas');
-        cell.width = unit;
-        cell.height = unit;
+        cell.width = grid.unit;
+        cell.height = grid.unit;
         var ctx = cell.getContext('2d');
-        ctx.translate(unit / 2, unit / 2);
+        ctx.translate(grid.unit / 2, grid.unit / 2);
         drawDetail(ctx);
         return function preRenderSprite(ctx) {
-            ctx.drawImage(cell, -unit / 2, -unit / 2);
+            ctx.drawImage(cell, -grid.unit / 2, -grid.unit / 2);
         };
     }
 
@@ -54,7 +52,7 @@ module.exports = function(grid) {
 
     function render(x, y, direction, foreground, background, scale) {
         grid.context.save();
-        grid.context.translate((unit * x) + (unit / 2), (unit * y) + (unit / 2));
+        grid.context.translate((grid.unit * x) + (grid.unit / 2), (grid.unit * y) + (grid.unit / 2));
         if (scale) {
             grid.context.scale(scale, scale);
         }

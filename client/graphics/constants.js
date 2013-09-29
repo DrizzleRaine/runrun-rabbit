@@ -1,7 +1,6 @@
 'use strict';
 
 module.exports = {
-    CELL_SIZE: 48,
     COLOURS: {
         BACKGROUND: '#000000',
         CELL: ['#EEEEEE', '#CCCCCC', '#AAAAAA'],

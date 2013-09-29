@@ -5,6 +5,7 @@ var newVisitor = !document.cookie;
 var gameController = require('./controllers/game.js');
 var settingsController = require('./controllers/settings.js');
 var hintMessage = require('./views/message.js').build(document.getElementById('container'));
+var banner = require('./views/banner.js')(document.getElementById('container'));
 
 var settingsOpen = false;
 
@@ -12,12 +13,14 @@ var hideMenu = function hideMenu() {
     document.getElementById('menu').classList.add('hidden');
     hintMessage.view.classList.add('hidden');
     document.getElementById('backToMenu').classList.remove('hidden');
+    banner.classList.add('hidden');
 };
 
 var showMenu = function showMenu() {
     document.getElementById('menu').classList.remove('hidden');
     hintMessage.view.classList.remove('hidden');
     document.getElementById('backToMenu').classList.add('hidden');
+    banner.classList.remove('hidden');
 };
 
 function setupHintMessage(elementId, message) {

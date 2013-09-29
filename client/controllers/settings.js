@@ -157,6 +157,8 @@ module.exports = (function() {
             initialSpawning: spawning.standard()
         });
 
+        models.push(model);
+
         var view = viewFactory(container, model);
 
         var replaceArrows = function () {

@@ -1,10 +1,10 @@
 'use strict';
 
-module.exports = function(model) {
-    var constants = require('./constants.js');
+var CELL_SIZE = 48;
 
-    var width = model.level.width * constants.CELL_SIZE;
-    var height = model.level.height * constants.CELL_SIZE;
+module.exports = function(model) {
+    var width = model.level.width * CELL_SIZE;
+    var height = model.level.height * CELL_SIZE;
 
     var canvas = document.createElement('canvas');
     canvas.setAttribute('width', width.toString());
@@ -21,6 +21,7 @@ module.exports = function(model) {
     return {
         view: canvas,
         context: context,
-        clear: clear
+        clear: clear,
+        unit: CELL_SIZE
     };
 };

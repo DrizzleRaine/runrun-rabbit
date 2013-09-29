@@ -1,6 +1,7 @@
 'use strict';
 
 module.exports.RABBIT = {
+    name: 'rabbit',
     speed: 0.0024,
     score: function(currentScore) {
         if (!this.isAlive) {
@@ -12,6 +13,7 @@ module.exports.RABBIT = {
 };
 
 module.exports.FOX = {
+    name: 'fox',
     speed: 0.0022,
     score: function(currentScore) {
         return Math.floor(currentScore * 3 / 2);

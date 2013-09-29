@@ -20,20 +20,19 @@ function directionFromKey(keyCode) {
 }
 
 var methods = {};
-var constants = require('../graphics/constants.js');
 
 module.exports = methods;
 
-function clearHandlers(arena) {
+function clearHandlers(view) {
     window.oncontextmenu = null;
     window.onkeydown = null;
     window.onkeyup = null;
     window.onresize = null;
-    arena.onmousedown = null;
-    arena.onmousemove = null;
+    view.onmousedown = null;
+    view.onmousemove = null;
 }
 
-function offsetHandler(arena) {
+function offsetHandler(view) {
     var offsetX;
     var offsetY;
 
@@ -43,12 +42,12 @@ function offsetHandler(arena) {
     };
 
     function getRelativeX(event) {
-        offsetX = offsetX || arena.offsetLeft + (arena.offsetWidth - arena.width) / 2;
+        offsetX = offsetX || view.offsetLeft + (view.offsetWidth - view.width) / 2;
         return event.clientX - offsetX + document.body.scrollLeft;
     }
 
     function getRelativeY(event) {
-        offsetY = offsetY || arena.offsetTop + (arena.offsetHeight - arena.height) / 2;
+        offsetY = offsetY || view.offsetTop + (view.offsetHeight - view.height) / 2;
         return event.clientY - offsetY + document.body.scrollTop;
     }
 
@@ -58,9 +57,9 @@ function offsetHandler(arena) {
     };
 }
 
-methods.desktop = function desktop(arena, placeArrowCallback) {
+methods.desktop = function desktop(grid, placeArrowCallback) {
     var activeKey;
-    var handler = offsetHandler(arena);
+    var handler = offsetHandler(grid.view);
 
     window.oncontextmenu = function() { return false; };
 
@@ -77,7 +76,7 @@ methods.desktop = function desktop(arena, placeArrowCallback) {
         }
     };
 
-    arena.onmousedown = function(event) {
+    grid.view.onmousedown = function(event) {
         if (!placeArrowCallback) {
             return;
         }
@@ -89,24 +88,24 @@ methods.desktop = function desktop(arena, placeArrowCallback) {
         }
 
         placeArrowCallback(
-            Math.floor(handler.getRelativeX(event) / constants.CELL_SIZE),
-            Math.floor(handler.getRelativeY(event) / constants.CELL_SIZE),
+            Math.floor(handler.getRelativeX(event) / grid.unit),
+            Math.floor(handler.getRelativeY(event) / grid.unit),
             direction
         );
     };
 
     return {
-        unbind: function() { clearHandlers(arena); }
+        unbind: function() { clearHandlers(grid.view); }
     };
 };
 
-methods.laptop = function desktop(arena, placeArrowCallback) {
+methods.laptop = function desktop(grid, placeArrowCallback) {
     var currentLocation = {};
-    var handler = offsetHandler(arena);
+    var handler = offsetHandler(grid.view);
 
     window.oncontextmenu = function() { return false; };
 
-    arena.onmousemove = function(event) {
+    grid.view.onmousemove = function(event) {
         currentLocation.x = handler.getRelativeX(event);
         currentLocation.y = handler.getRelativeY(event);
     };
@@ -118,10 +117,10 @@ methods.laptop = function desktop(arena, placeArrowCallback) {
     window.onkeyup = function (event) {
         var direction = directionFromKey(event.keyCode);
         if (direction !== null && currentLocation.x > 0 && currentLocation.y > 0 &&
-            currentLocation.x < arena.width && currentLocation.y < arena.height) {
+            currentLocation.x < grid.view.width && currentLocation.y < grid.view.height) {
             placeArrowCallback(
-                Math.floor(currentLocation.x / constants.CELL_SIZE),
-                Math.floor(currentLocation.y / constants.CELL_SIZE),
+                Math.floor(currentLocation.x / grid.unit),
+                Math.floor(currentLocation.y / grid.unit),
                 direction
             );
             event.preventDefault();
@@ -129,6 +128,6 @@ methods.laptop = function desktop(arena, placeArrowCallback) {
     };
 
     return {
-        unbind: function() { clearHandlers(arena); }
+        unbind: function() { clearHandlers(grid.view); }
     };
 };

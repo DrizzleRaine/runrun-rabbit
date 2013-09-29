@@ -23,6 +23,7 @@ canvas.arena {
 
 h2.message {
     text-align: center;
+    min-height: 24px;
 }
 
 #settings {
@@ -75,11 +76,21 @@ h2.message {
 
 .container {
     min-width: 576px;
+    text-align: center;
+}
+
+.banner {
+    display: none;
 }
 
 @media screen and (min-width: 1200px) {
     .container {
         max-width: 1170px;
+    }
+
+    .banner {
+        display: inline-block;
+        border-radius: 16px;
     }
 }
 

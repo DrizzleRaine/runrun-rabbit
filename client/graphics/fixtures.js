@@ -5,32 +5,30 @@ module.exports = function initFixtures(grid) {
     var common = require('./common.js')(grid);
     var visualStyle = 'standard';
 
-    var unit = constants.CELL_SIZE;
-
     function squareArrow(ctx) {
-        ctx.fillRect(-unit / 2, -unit / 2, unit, unit);
+        ctx.fillRect(-grid.unit / 2, -grid.unit / 2, grid.unit, grid.unit);
     }
 
     function circleArrow(ctx) {
-        ctx.drawCircle(0, 0, unit / 2);
+        ctx.drawCircle(0, 0, grid.unit / 2);
         ctx.fill();
     }
 
     function squareSink(ctx) {
         ctx.beginPath();
-        ctx.moveTo(-unit / 6, -unit / 3);
-        ctx.lineTo(unit / 6, -unit / 3);
-        ctx.arc(unit /6, -unit / 6, unit / 6, Math.PI * 3 / 2, 0);
-        ctx.lineTo(unit / 3, unit / 6);
-        ctx.arc(unit /6, unit / 6, unit / 6, 0, Math.PI / 2);
-        ctx.lineTo(-unit / 6, unit / 3);
-        ctx.arc(-unit /6, unit / 6, unit / 6, Math.PI / 2, Math.PI);
-        ctx.lineTo(-unit / 3, -unit / 6);
-        ctx.arc(-unit /6, -unit / 6, unit / 6, Math.PI, Math.PI * 3 / 2);
+        ctx.moveTo(-grid.unit / 6, -grid.unit / 3);
+        ctx.lineTo(grid.unit / 6, -grid.unit / 3);
+        ctx.arc(grid.unit /6, -grid.unit / 6, grid.unit / 6, Math.PI * 3 / 2, 0);
+        ctx.lineTo(grid.unit / 3, grid.unit / 6);
+        ctx.arc(grid.unit /6, grid.unit / 6, grid.unit / 6, 0, Math.PI / 2);
+        ctx.lineTo(-grid.unit / 6, grid.unit / 3);
+        ctx.arc(-grid.unit /6, grid.unit / 6, grid.unit / 6, Math.PI / 2, Math.PI);
+        ctx.lineTo(-grid.unit / 3, -grid.unit / 6);
+        ctx.arc(-grid.unit /6, -grid.unit / 6, grid.unit / 6, Math.PI, Math.PI * 3 / 2);
     }
 
     function circleSink(ctx) {
-        ctx.drawCircle(0, 0, unit/3);
+        ctx.drawCircle(0, 0, grid.unit/3);
     }
 
     var shapes = {
@@ -53,28 +51,28 @@ module.exports = function initFixtures(grid) {
         ctx.globalAlpha = 0.2;
         ctx.fillStyle = convex ? light : shade;
         ctx.beginPath();
-        ctx.moveTo(-unit/2, -unit/2);
-        ctx.lineTo(unit/2, -unit/2);
-        ctx.lineTo(unit/2, unit/2);
-        ctx.lineTo(-unit/2, -unit/2);
+        ctx.moveTo(-grid.unit/2, -grid.unit/2);
+        ctx.lineTo(grid.unit/2, -grid.unit/2);
+        ctx.lineTo(grid.unit/2, grid.unit/2);
+        ctx.lineTo(-grid.unit/2, -grid.unit/2);
         ctx.fill();
         ctx.fillStyle = convex ? shade : light;
         ctx.beginPath();
-        ctx.moveTo(-unit/2, -unit/2);
-        ctx.lineTo(-unit/2, unit/2);
-        ctx.lineTo(unit/2, unit/2);
-        ctx.lineTo(-unit/2, -unit/2);
+        ctx.moveTo(-grid.unit/2, -grid.unit/2);
+        ctx.lineTo(-grid.unit/2, grid.unit/2);
+        ctx.lineTo(grid.unit/2, grid.unit/2);
+        ctx.lineTo(-grid.unit/2, -grid.unit/2);
         ctx.fill();
         ctx.globalAlpha = 0.2;
         ctx.strokeStyle = convex ? light : shade;
         ctx.beginPath();
-        ctx.moveTo(unit/2, -unit/2);
+        ctx.moveTo(grid.unit/2, -grid.unit/2);
         ctx.lineTo(0, 0);
         ctx.stroke();
         ctx.closePath();
         ctx.strokeStyle = convex ? shade : light;
         ctx.beginPath();
-        ctx.moveTo(-unit/2, unit/2);
+        ctx.moveTo(-grid.unit/2, grid.unit/2);
         ctx.lineTo(0, 0);
         ctx.stroke();
         ctx.closePath();
@@ -83,14 +81,14 @@ module.exports = function initFixtures(grid) {
     var arrowForeground = common.preRender(function (ctx) {
         ctx.fillStyle = constants.COLOURS.ARROW;
         ctx.beginPath();
-        ctx.moveTo(0, -unit / 3);
-        ctx.lineTo(unit / 3, 0);
-        ctx.lineTo(unit / 6, 0);
-        ctx.lineTo(unit / 6, unit / 3);
-        ctx.lineTo(-unit / 6, unit / 3);
-        ctx.lineTo(-unit / 6, 0);
-        ctx.lineTo(-unit / 3, 0);
-        ctx.lineTo(0, -unit / 3);
+        ctx.moveTo(0, -grid.unit / 3);
+        ctx.lineTo(grid.unit / 3, 0);
+        ctx.lineTo(grid.unit / 6, 0);
+        ctx.lineTo(grid.unit / 6, grid.unit / 3);
+        ctx.lineTo(-grid.unit / 6, grid.unit / 3);
+        ctx.lineTo(-grid.unit / 6, 0);
+        ctx.lineTo(-grid.unit / 3, 0);
+        ctx.lineTo(0, -grid.unit / 3);
         ctx.fill();
     });
 
@@ -105,19 +103,19 @@ module.exports = function initFixtures(grid) {
 
     var sourceBackground = common.preRender(function(ctx) {
         ctx.fillStyle = constants.COLOURS.NPC.FRIENDLY[0];
-        ctx.fillRect(-unit/2, -unit/2, unit, unit);
+        ctx.fillRect(-grid.unit/2, -grid.unit/2, grid.unit, grid.unit);
         shadeCell3d(ctx, true);
     });
     var sourceForeground = common.preRender(function(ctx) {
         ctx.fillStyle = constants.COLOURS.CELL[2];
-        ctx.moveTo(-unit/3, -unit/2);
-        ctx.lineTo(unit/3, -unit/2);
-        ctx.lineTo(unit/6, -unit/3);
-        ctx.lineTo(-unit/6, -unit/3);
-        ctx.lineTo(-unit/3, -unit/2);
+        ctx.moveTo(-grid.unit/3, -grid.unit/2);
+        ctx.lineTo(grid.unit/3, -grid.unit/2);
+        ctx.lineTo(grid.unit/6, -grid.unit/3);
+        ctx.lineTo(-grid.unit/6, -grid.unit/3);
+        ctx.lineTo(-grid.unit/3, -grid.unit/2);
         ctx.fill();
         ctx.fillStyle = constants.COLOURS.NPC.FRIENDLY[0];
-        ctx.fillRect(-unit/4, -unit/4, unit / 2, unit / 2);
+        ctx.fillRect(-grid.unit/4, -grid.unit/4, grid.unit / 2, grid.unit / 2);
     });
 
     function drawSource(source) {
@@ -126,11 +124,11 @@ module.exports = function initFixtures(grid) {
 
     var renderedSink = common.preRender(function(ctx) {
         ctx.fillStyle = constants.COLOURS.CELL[1];
-        ctx.fillRect(-unit/2, -unit/2, unit, unit);
+        ctx.fillRect(-grid.unit/2, -grid.unit/2, grid.unit, grid.unit);
         shadeCell3d(ctx, false);
         ctx.globalAlpha = 1;
         ctx.fillStyle = constants.COLOURS.BACKGROUND;
-        ctx.fillRect(-unit*5/12,-unit*5/12,unit*5/6,unit*5/6);
+        ctx.fillRect(-grid.unit*5/12,-grid.unit*5/12,grid.unit*5/6,grid.unit*5/6);
     });
 
     function drawSink(sink) {
