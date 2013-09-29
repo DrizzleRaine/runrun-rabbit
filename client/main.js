@@ -3,11 +3,13 @@
 var newVisitor = !document.cookie;
 
 var gameController = require('./controllers/game.js');
-var settingsController = require('./controllers/settings.js');
-var hintMessage = require('./views/message.js').build(document.getElementById('container'));
+var hintMessage = require('./views/message.js').build(document.getElementById('container'), 'menuHint');
 var banner = require('./views/banner.js')(document.getElementById('container'));
 
-var settingsOpen = false;
+var options = {};
+var settings = require('./controllers/settings.js')(options);
+var accessibility = require('./controllers/accessibility.js')(options);
+var optionsControllers = [settings, accessibility];
 
 var hideMenu = function hideMenu() {
     document.getElementById('menu').classList.add('hidden');
@@ -38,35 +40,39 @@ setupHintMessage('startMultiplayer',
 setupHintMessage('settingsAndInstructions',
     'View instructions and configure input options');
 
+setupHintMessage('accessibilityOptions',
+    'Configure display options for accessibility, and audio volumes');
+
 document.getElementById('startSinglePlayer').onclick = function() {
     hideMenu();
-    gameController.init(false, settingsController.options);
+    gameController.init(false, options);
 };
 
 document.getElementById('startMultiplayer').onclick = function() {
     hideMenu();
-    gameController.init(true, settingsController.options);
+    gameController.init(true, options);
 };
 
-var openSettings = function() {
+var openController = function(controller) {
     hideMenu();
-    settingsOpen = true;
-    settingsController.show();
+    controller.show();
 };
 
-document.getElementById('settingsAndInstructions').onclick = openSettings;
+document.getElementById('settingsAndInstructions').onclick = function() { openController(settings); };
+document.getElementById('accessibilityOptions').onclick = function() { openController(accessibility); };
 
 if (newVisitor) {
-    openSettings();
+    openController(settings);
 }
 
 function returnToMenu(event) {
-    if (settingsOpen) {
-        settingsController.hide();
-        settingsOpen = false;
-        showMenu();
-        event.preventDefault();
-    }
+    optionsControllers.forEach(function(controller) {
+        if (controller.open) {
+            controller.hide();
+            showMenu();
+            event.preventDefault();
+        }
+    });
 }
 
 document.getElementById('backToMenu').onclick = returnToMenu;

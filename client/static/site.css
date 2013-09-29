@@ -1,3 +1,5 @@
+@import url("//fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700");
+
 body{
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -23,28 +25,32 @@ canvas.arena {
 
 h2.message {
     text-align: center;
-    min-height: 24px;
 }
 
-#settings {
+h2.menuHint {
+    min-height: 48px;
+    padding: 12px 0;
+}
+
+.settings {
     text-align: center;
 }
 
-#settings h2 {
+.settings h2 {
     background-color: #eeeeee;
     padding: 0.5em;
 }
 
-#settings h2, #settings .btn {
+.settings h2, .settings .btn {
     border-radius: 6px;
     font-size: 1.5em;
 }
 
-#settings .btn {
+.settings .btn {
     width: 100%;
 }
 
-#settings div, #settings label {
+.settings div, .settings label {
     text-align: left;
     max-width: 345px;
     margin: 0 20px;
@@ -52,12 +58,12 @@ h2.message {
     vertical-align: top;
 }
 
-#settings canvas.arena {
+.settings canvas.arena {
     float: right;
     margin-left: 20px;
 }
 
-#settings blockquote {
+.settings blockquote {
     float: right;
     padding: 0 3px;
     margin: 0;
@@ -102,6 +108,7 @@ h2.message {
 #menu .btn {
     width: 100%;
     margin-top: 1em;
+    border-radius: 3px;
 }
 
 .hidden {
@@ -109,7 +116,7 @@ h2.message {
 }
 
 body, .btn, .btn-lg {
-    font-family: "Century Gothic", CenturyGothic, AppleGothic, sans-serif;
+    font-family: "Open Sans", "Century Gothic", CenturyGothic, AppleGothic, sans-serif;
     font-size: 15px;
     color: #333;
 }

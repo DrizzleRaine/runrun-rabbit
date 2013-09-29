@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = (function() {
+module.exports = function(options) {
     var viewFactory = require('./../views/arena.js');
     var modelFactory = require('../../shared/model.js');
     var spawning = require('../../shared/spawning.js');
@@ -33,10 +33,9 @@ module.exports = (function() {
     }
 
     var models = [];
-    var controller = { options: {} };
+    var controller = {};
 
     var DEFAULT_INPUT_METHOD = 'desktop';
-    var DEFAULT_VISUAL_STYLE = 'standard';
 
     function getInputMethod() {
         return $.getCookie('inputMethod');
@@ -46,26 +45,13 @@ module.exports = (function() {
         $.setCookie('inputMethod', value, 9999);
     }
 
-    function getVisualStyle() {
-        return $.getCookie('visualStyle');
-    }
-
-    function setVisualStyle(value) {
-        $.setCookie('visualStyle', value, 9999);
-    }
-
     if (!getInputMethod()) {
         setInputMethod('desktop');
     }
 
-    if (!getVisualStyle()) {
-        setVisualStyle('standard');
-    }
+    options.inputMethod = getInputMethod() || options.inputMethod || DEFAULT_INPUT_METHOD;
 
-    controller.options.inputMethod = getInputMethod() || controller.options.inputMethod || DEFAULT_INPUT_METHOD;
-    controller.options.visualStyle = getVisualStyle() || controller.options.visualStyle || DEFAULT_VISUAL_STYLE;
-
-    function setupGameplayPreviews(models, controller) {
+    function setupGameplayPreviews(models) {
         var rabbitsModel = createModel(
             [ new fixtures.Source(0, 0, 1) ],
             [
@@ -115,7 +101,7 @@ module.exports = (function() {
         var arrowsView = createView(document.getElementById('arrows'), arrowsModel, function placeArrow(newArrow) {
             arrowsModel.addArrow(0, newArrow);
         });
-        arrowsView.setInputMethod(controller.options.inputMethod);
+        arrowsView.setInputMethod(options.inputMethod);
         models.push(arrowsModel);
         return arrowsView;
     }
@@ -125,12 +111,12 @@ module.exports = (function() {
 
         var onInputClick = function () {
             setInputMethod($(this).get('value'));
-            controller.options.inputMethod = $(this).get('value');
-            arrowsView.setInputMethod(controller.options.inputMethod);
+            options.inputMethod = $(this).get('value');
+            arrowsView.setInputMethod(options.inputMethod);
         };
 
         inputs.each(function(input) {
-            if ($(input).get('value') === controller.options.inputMethod) {
+            if ($(input).get('value') === options.inputMethod) {
                 input.checked = true;
             }
             if (!$(input).get('disabled')) {
@@ -139,78 +125,13 @@ module.exports = (function() {
         });
     }
 
-    function setupAccessibilityOptions() {
-        var container = document.getElementById('four-player-preview');
-
-        var model = modelFactory.build({
-            level: {
-                width: 6,
-                height: 6,
-                sources: [ new fixtures.Source(3, 0, 2), new fixtures.Source(5, 3, 3),
-                    new fixtures.Source(2, 5, 0), new fixtures.Source(0, 2, 1) ],
-                sinks: [ new fixtures.Sink(0, 5, 2), new fixtures.Sink(1, 3, 5),
-                    new fixtures.Sink(2, 0, 3), new fixtures.Sink(3, 2, 0)]
-            },
-            totalPlayers: 4,
-            totalTime: Infinity,
-            random: new RNG(),
-            initialSpawning: spawning.standard()
-        });
-
-        models.push(model);
-
-        var view = viewFactory(container, model);
-
-        var replaceArrows = function () {
-            model.addArrow(0, {
-                x: 3,
-                y: 2,
-                direction: 1
-            });
-            model.addArrow(1, {
-                x: 3,
-                y: 3,
-                direction: 2
-            });
-            model.addArrow(2, {
-                x: 2,
-                y: 3,
-                direction: 3
-            });
-            model.addArrow(3, {
-                x: 2,
-                y: 2,
-                direction: 0
-            });
-        };
-
-        replaceArrows();
-
-        setInterval(replaceArrows, ARROW_LIFETIME + 500);
-
-        view.setVisualStyle(controller.options.visualStyle);
-
-        var inputs = $('input.visuals');
-
-        var onInputClick = function () {
-            setVisualStyle($(this).get('value'));
-            controller.options.visualStyle = $(this).get('value');
-            view.setVisualStyle(controller.options.visualStyle);
-        };
-
-        inputs.each(function(input) {
-            if ($(input).get('value') === controller.options.visualStyle) {
-                input.checked = true;
-            }
-            input.onclick = onInputClick;
-        });
-    }
+    controller.open = false;
 
     controller.show = function show() {
-        var arrowsView = setupGameplayPreviews(models, controller);
+        var arrowsView = setupGameplayPreviews(models);
         setupInputOptions(arrowsView);
-        setupAccessibilityOptions();
         document.getElementById('settings').classList.remove('hidden');
+        controller.open = true;
     };
 
     controller.hide = function hide() {
@@ -219,7 +140,8 @@ module.exports = (function() {
         }
 
         document.getElementById('settings').classList.add('hidden');
+        controller.open = false;
     };
 
     return controller;
-}());
+};
