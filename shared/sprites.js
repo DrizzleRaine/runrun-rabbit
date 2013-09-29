@@ -16,7 +16,7 @@ module.exports.FOX = {
     name: 'fox',
     speed: 0.0022,
     score: function(currentScore) {
-        return Math.floor(currentScore * 3 / 2);
+        return Math.floor(currentScore * 2 / 3);
     }
 };
 

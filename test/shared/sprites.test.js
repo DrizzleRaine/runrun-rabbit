@@ -5,15 +5,15 @@ var assert = require('chai').assert;
 var sinon = require('sinon');
 
 describe('sprites', function() {
+    var source = {
+        x: 0,
+        y: 0,
+        direction: 1
+    };
+
     describe('update', function() {
         var type = {
             speed: 0.01
-        };
-
-        var source = {
-            x: 0,
-            y: 0,
-            direction: 1
         };
 
         it('should check for arrows at the correct point in time', function() {
@@ -135,6 +135,55 @@ describe('sprites', function() {
             sprites.performInteractions(critters);
 
             assert.isTrue(critters[0].isAlive);
+        });
+    });
+
+    describe('RABBIT', function() {
+        describe('score', function() {
+            it('should increment if alive', function() {
+                var rabbit = new sprites.Critter(source, sprites.RABBIT, 0);
+
+                var currentScore = 0;
+
+                var result = sprites.RABBIT.score.call(rabbit, currentScore);
+
+                assert.equal(result, 1);
+            });
+
+            it('should not increment if not alive', function() {
+                var rabbit = new sprites.Critter(source, sprites.RABBIT, 0);
+                rabbit.isAlive = false;
+
+                var currentScore = 0;
+
+                var result = rabbit.type.score.call(rabbit, currentScore);
+
+                assert.equal(result, 0);
+            });
+        });
+    });
+
+    describe('FOX', function() {
+        describe('score', function() {
+            it('should reduce score by a third', function() {
+                var fox = new sprites.Critter(source, sprites.FOX, 0);
+
+                var currentScore = 12;
+
+                var result = fox.type.score.call(fox, currentScore);
+
+                assert.equal(result, 8);
+            });
+
+            it('should always reduce score', function() {
+                var fox = new sprites.Critter(source, sprites.FOX, 0);
+
+                var currentScore = 1;
+
+                var result = fox.type.score.call(fox, currentScore);
+
+                assert.equal(result, 0);
+            });
         });
     });
 });
