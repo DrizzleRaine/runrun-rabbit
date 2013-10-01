@@ -52,7 +52,7 @@ describe('model', function() {
             y: 2,
             direction: 0,
             from: gameTime
-        });
+        }, gameTime);
 
         while (critter.x < 2) {
             model.update(gameTime);
@@ -84,7 +84,7 @@ describe('model', function() {
             y: 2,
             direction: 0,
             from: gameTime - 200
-        });
+        }, gameTime);
 
         model.update(gameTime);
 
@@ -98,7 +98,7 @@ describe('model', function() {
             y: 2,
             direction: 3,
             from: 0
-        });
+        }, gameTime);
 
         while (gameTime < 2000) {
             dummyRandom.nextByte.returns(((gameTime / modelFactory.TICK_INTERVAL) % 2 ) * 255);
@@ -115,7 +115,7 @@ describe('model', function() {
             y: 0,
             direction: 2,
             from: 1000
-        });
+        }, gameTime);
 
         // Double the spawn rate
         dummyRandom.nextByte.returns(255);
@@ -140,7 +140,7 @@ describe('model', function() {
             y: 2,
             direction: 3,
             from: 200
-        });
+        }, gameTime - 100);
 
         model.update(gameTime);
 
@@ -178,21 +178,21 @@ describe('model', function() {
             y: 0,
             direction: 2,
             from: 0
-        });
+        }, gameTime);
 
         model.addArrow(0, {
             x: 4,
             y: 0,
             direction: 2,
             from: 10
-        });
+        }, gameTime);
 
         model.addArrow(0, {
             x: 0,
             y: 4,
             direction: 0,
             from: 20
-        });
+        }, gameTime);
 
         model.level.sources.push(new fixtures.Source(1, 2, 1));
         model.level.sources.push(new fixtures.Source(3, 2, 3));
@@ -209,7 +209,7 @@ describe('model', function() {
             y: 4,
             direction: 0,
             from: 100
-        });
+        }, gameTime - 100);
 
         model.update(gameTime);
 
@@ -239,21 +239,21 @@ describe('model', function() {
             y: 0,
             direction: 2,
             from: 0
-        });
+        }, gameTime);
 
         model.addArrow(0, {
             x: 2,
             y: 4,
             direction: 2,
             from: 0
-        });
+        }, gameTime);
 
         model.addArrow(0, {
             x: 2,
             y: 3,
             direction: 2,
             from: 0
-        });
+        }, gameTime);
 
         while (critter1.x + (critter1.type.speed * 100) <= 2) {
             model.update(gameTime);
@@ -265,7 +265,7 @@ describe('model', function() {
             y: 1,
             direction: 2,
             from: gameTime - 100
-        });
+        }, gameTime - 100);
 
         model.update(gameTime);
 
@@ -281,7 +281,7 @@ describe('model', function() {
             y: 1,
             direction: 0,
             from: gameTime - 200
-        });
+        }, gameTime);
 
         model.update(gameTime + 10);
 
@@ -318,7 +318,7 @@ describe('model', function() {
             y: 2,
             direction: 3,
             from: 0
-        });
+        }, gameTime);
 
         var fox = new sprites.Critter(
             model.level.sources[0],
@@ -349,7 +349,7 @@ describe('model', function() {
             y: 2,
             direction: 2,
             from: 0
-        });
+        }, gameTime);
 
         var fox = new sprites.Critter(
             model.level.sources[0],
@@ -380,7 +380,7 @@ describe('model', function() {
             y: 2,
             direction: 3,
             from: 0
-        });
+        }, gameTime);
 
         var rabbit = new sprites.Critter(
             model.level.sources[0],

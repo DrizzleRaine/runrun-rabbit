@@ -20,6 +20,7 @@ Arrow.prototype.isActive = function isArrowActive(gameTime) {
 };
 
 var PlayerArrows = module.exports.PlayerArrows = function PlayerArrows(totalPlayers) {
+    this.totalPlayers = totalPlayers;
     this.data = arrayUtils.initialise(totalPlayers, function() { return []; });
 };
 
@@ -41,43 +42,54 @@ PlayerArrows.prototype.forEach = function forEachArrow(callback) {
 };
 
 PlayerArrows.prototype.getActiveArrow = function getActiveArrow(time, x, y) {
-    var haveMoreArrows = true;
-    for (var i = 1; haveMoreArrows; ++i) {
-        haveMoreArrows = false;
-        for (var p = 0; p < this.data.length; ++p) {
-            if (i <= this.data[p].length) {
-                haveMoreArrows = true;
-                var index = this.data[p].length - i;
-                var arrow = this.data[p][index];
-                if (arrow.x === x && arrow.y === y && arrow.isActive(time)) {
-                    return {
-                        arrow: arrow,
-                        player: p,
-                        index: index
-                    };
-                }
-            }
-        }
-    }
-
-    return {};
+    return getArrowMatchingPredicate(this.data, x, y, function(arrow) {
+        return arrow.isActive(time);
+    });
 };
 
-PlayerArrows.prototype.addArrow = function addArrow(player, arrowData, currentTime) {
-    var existing = this.getActiveArrow(currentTime, arrowData.x, arrowData.y);
-    if (existing.arrow) {
-        if (arrowData.from <= existing.arrow.from) {
-            // Remove the existing arrow that was pre-empted by another player
-            var removedArrow = this.data[existing.player].splice(existing.index, 1)[0];
+function getArrowAfter(data, x, y, fromTime) {
+    return getArrowMatchingPredicate(data, x, y, function(arrow) {
+        return arrow.from > fromTime;
+    });
+}
 
-            // If the arrow we just removed replaced another arrow, re-instate it
-            for (var j = this.data[existing.player].length - 1; j >= 0; --j) {
-                var oldArrow = this.data[existing.player][j];
-                if (oldArrow.to === removedArrow.from) {
-                    delete oldArrow.to;
-                    break;
-                }
+function removePreEmptedArrow(data, preEmpted) {
+    // Remove the existing arrow that was pre-empted by another player
+    var removedArrow = data[preEmpted.player].splice(preEmpted.index, 1)[0];
+
+    // If the arrow we just removed replaced another arrow, re-instate it
+    for (var j = data[preEmpted.player].length - 1; j >= 0; --j) {
+        var oldArrow = data[preEmpted.player][j];
+        if (oldArrow.to === removedArrow.from) {
+            delete oldArrow.to;
+
+            // The arrow we restore may in turn pre-empt another arrow...
+            var undone = getArrowAfter(data, oldArrow.x, oldArrow.y, oldArrow.from);
+
+            if (undone.arrow) {
+                removePreEmptedArrow(data, undone);
             }
+
+            break;
+        }
+    }
+}
+
+PlayerArrows.prototype.addArrow = function addArrow(player, arrowData, currentTime) {
+    // Nudge the from time st. arrows can never be placed by two players at identical times (makes other cases easier)
+    while ((arrowData.from % this.totalPlayers) !== player) {
+        ++arrowData.from;
+    }
+
+    var existing = this.getActiveArrow(arrowData.from, arrowData.x, arrowData.y);
+    if (existing.arrow) {
+        return false;
+    }
+
+    var competing = getArrowAfter(this.data, arrowData.x, arrowData.y, Math.min(currentTime, arrowData.from));
+    if (competing.arrow) {
+        if (arrowData.from < competing.arrow.from) {
+            removePreEmptedArrow(this.data, competing);
         } else {
             return false;
         }
@@ -98,3 +110,26 @@ PlayerArrows.prototype.addArrow = function addArrow(player, arrowData, currentTi
     ownArrows.push(newArrow);
     return newArrow;
 };
+
+function getArrowMatchingPredicate(data, x, y, predicate) {
+    var haveMoreArrows = true;
+    for (var i = 1; haveMoreArrows; ++i) {
+        haveMoreArrows = false;
+        for (var p = 0; p < data.length; ++p) {
+            if (i <= data[p].length) {
+                haveMoreArrows = true;
+                var index = data[p].length - i;
+                var arrow = data[p][index];
+                if (arrow.x === x && arrow.y === y && predicate(arrow)) {
+                    return {
+                        arrow: arrow,
+                        player: p,
+                        index: index
+                    };
+                }
+            }
+        }
+    }
+
+    return {};
+}

@@ -35,14 +35,14 @@ describe('model', function() {
             y: 2,
             direction: 0,
             from: 0
-        });
+        }, 0);
 
         var result = model.addArrow(1, {
             x: 2,
             y: 2,
             direction: 1,
             from: 100
-        });
+        }, 100);
 
         assert.isFalse(result);
         assert.equal(firstArrow, model.getActiveArrow(200, 2, 2).arrow);
@@ -54,17 +54,41 @@ describe('model', function() {
             y: model.level.sinks[0].y,
             direction: 0,
             from: 0
-        });
+        }, 0);
 
         model.addArrow(0, {
             x: model.level.sources[0].x,
             y: model.level.sources[0].y,
             direction: 0,
             from: 0
-        });
+        }, 0);
 
         assert.isUndefined(model.getActiveArrow(0, model.level.sinks[0].x, model.level.sinks[0].y).arrow, 0);
         assert.isUndefined(model.getActiveArrow(0, model.level.sources[0].x, model.level.sources[0].y).arrow, 0);
+    });
+
+    it('should not allow two conflicting arrows to be placed in the future', function() {
+        model.update(gameTime);
+        gameTime += 100;
+        model.update(gameTime);
+        gameTime += 100;
+
+        var firstArrow = model.addArrow(0, {
+            x: 2,
+            y: 2,
+            direction: 0,
+            from: gameTime
+        }, gameTime);
+
+        var result = model.addArrow(1, {
+            x: 2,
+            y: 2,
+            direction: 1,
+            from: gameTime
+        }, gameTime);
+
+        assert.isFalse(result);
+        assert.equal(firstArrow, model.getActiveArrow(200, 2, 2).arrow);
     });
 
     it('should prevent the same player from placing more than three arrows', function() {
@@ -80,7 +104,7 @@ describe('model', function() {
             y: 0,
             direction: 4,
             from: 4
-        });
+        }, 4);
 
         var result = model.getActiveArrow(5, 0, 0);
         assert.isNotNull(result);
@@ -92,28 +116,28 @@ describe('model', function() {
             y: 0,
             direction: 0,
             from: 0
-        });
+        }, 0);
 
         model.addArrow(0, {
             x: 1,
             y: 1,
             direction: 1,
             from: 1
-        });
+        }, 1);
 
         model.addArrow(0, {
             x: 2,
             y: 2,
             direction: 2,
             from: 2
-        });
+        }, 2);
 
         model.addArrow(0, {
             x: 3,
             y: 3,
             direction: 3,
             from: 3
-        });
+        }, 3);
 
         return firstArrow;
     }

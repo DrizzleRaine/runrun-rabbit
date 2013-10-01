@@ -50,7 +50,7 @@ Model.prototype.addArrow = function addArrow(player, arrowData) {
 
     if (gridUtils.getAtCell(this.level.sinks, arrowData.x, arrowData.y) ||
         gridUtils.getAtCell(this.level.sources, arrowData.x, arrowData.y)) {
-        return;
+        return false;
     }
 
     var addedArrow = this.playerArrows.addArrow(player, arrowData, this.lastUpdate);
