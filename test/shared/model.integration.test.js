@@ -38,27 +38,35 @@ describe('model', function() {
         gameTime = 0;
     });
 
-    it('should alter critter direction based on arrows', function() {
+    function addArrow(player, x, y, direction, from, lastUpdate) {
+        return model.addArrow(player, {
+            x: x,
+            y: y,
+            direction: direction,
+            from: from || gameTime
+        }, lastUpdate || gameTime);
+    }
+
+    function spawnCritter(x, y, direction, type, from) {
         var critter = new sprites.Critter({
-            x: 0,
-            y: 2,
-            direction: 1
-        }, sprites.RABBIT, 0);
+            x: x,
+            y: y,
+            direction: direction
+        }, type || sprites.RABBIT, from || gameTime);
 
         model.critters.push(critter);
 
-        var arrow = model.addArrow(0, {
-            x: 2,
-            y: 2,
-            direction: 0,
-            from: gameTime
-        }, gameTime);
+        return critter;
+    }
+
+    it('should alter critter direction based on arrows', function() {
+        var critter = spawnCritter(0, 2, 1);
+        var arrow = addArrow(0, 2, 2, 0);
 
         while (critter.x < 2) {
             model.update(gameTime);
             gameTime += 100;
         }
-
         model.update(gameTime);
 
         assert.equal(critter.direction, arrow.direction,
@@ -66,26 +74,13 @@ describe('model', function() {
     });
 
     it('should compensate for arrows placed in the past', function() {
-        var critter = new sprites.Critter({
-            x: 0,
-            y: 2,
-            direction: 1
-        }, sprites.RABBIT, 0);
-
-        model.critters.push(critter);
+        var critter = spawnCritter(0, 2, 1);
 
         while (critter.x <= 2) {
             model.update(gameTime);
             gameTime += 100;
         }
-
-        var arrow = model.addArrow(0, {
-            x: 2,
-            y: 2,
-            direction: 0,
-            from: gameTime - 200
-        }, gameTime);
-
+        var arrow = addArrow(0, 2, 2, 0, gameTime - 200);
         model.update(gameTime);
 
         assert.equal(critter.direction, arrow.direction,
@@ -93,12 +88,7 @@ describe('model', function() {
     });
 
     it('should preserve critter count when compensating for arrows placed in the past', function() {
-        model.addArrow(0, {
-            x: 3,
-            y: 2,
-            direction: 3,
-            from: 0
-        }, gameTime);
+        addArrow(0, 3, 2, 3);
 
         while (gameTime < 2000) {
             dummyRandom.nextByte.returns(((gameTime / modelFactory.TICK_INTERVAL) % 2 ) * 255);
@@ -110,14 +100,9 @@ describe('model', function() {
 
         var expected = model.critters.length;
 
-        model.addArrow(0, {
-            x: 2,
-            y: 0,
-            direction: 2,
-            from: 1000
-        }, gameTime);
+        addArrow(0, 2, 0, 2, 1000);
 
-        // Double the spawn rate
+        // Double the spawn rate - should have no effect during the time we're replaying
         dummyRandom.nextByte.returns(255);
 
         model.update(gameTime);
@@ -126,21 +111,14 @@ describe('model', function() {
     });
 
     it('should restore critters when compensating for arrows placed in the past', function() {
-        var critter = new sprites.Critter(model.level.sources[0], sprites.RABBIT, 0);
-
-        model.critters.push(critter);
+        var critter = spawnCritter(0, 2, 1);
 
         while (critter.inPlay) {
             model.update(gameTime);
             gameTime += 100;
         }
 
-        model.addArrow(0, {
-            x: 3,
-            y: 2,
-            direction: 3,
-            from: 200
-        }, gameTime - 100);
+        addArrow(0, 3, 2, 3, 200, gameTime - 100);
 
         model.update(gameTime);
 
@@ -148,52 +126,14 @@ describe('model', function() {
     });
 
     it('should compensate for critter interactions due to arrows placed in the past', function() {
-        var rabbit1 = new sprites.Critter({
-            x: 0,
-            y: 0,
-            direction: 1
-        }, sprites.RABBIT, 0);
-
-        var rabbit2 = new sprites.Critter({
-            x: 4,
-            y: 4,
-            direction: 3
-        }, sprites.RABBIT, 0);
-
-        model.critters.push(rabbit1);
-        model.critters.push(rabbit2);
-        model.critters.push(new sprites.Critter({
-            x: 2,
-            y: 2,
-            direction: 1
-        }, sprites.FOX, 0));
-        model.critters.push(new sprites.Critter({
-            x: 2,
-            y: 2,
-            direction: 3
-        }, sprites.FOX, 0));
-
-        model.addArrow(0, {
-            x: 2,
-            y: 0,
-            direction: 2,
-            from: 0
-        }, gameTime);
-
-        model.addArrow(0, {
-            x: 4,
-            y: 0,
-            direction: 2,
-            from: 10
-        }, gameTime);
-
-        model.addArrow(0, {
-            x: 0,
-            y: 4,
-            direction: 0,
-            from: 20
-        }, gameTime);
-
+        var rabbit1 = spawnCritter(0, 0, 1);
+        var rabbit2 = spawnCritter(4, 4, 3);
+        spawnCritter(2, 2, 1, sprites.FOX);
+        spawnCritter(2, 2, 3, sprites.FOX);
+        addArrow(0, 2, 0, 2);
+        addArrow(0, 4, 0, 2, 10);
+        addArrow(0, 0, 4, 0, 10);
+        // (Just using sources to trap the foxes - arrows are no good since foxes will destroy them)
         model.level.sources.push(new fixtures.Source(1, 2, 1));
         model.level.sources.push(new fixtures.Source(3, 2, 3));
 
@@ -201,16 +141,7 @@ describe('model', function() {
             model.update(gameTime);
             gameTime += 100;
         }
-
-        console.log(gameTime);
-
-        model.addArrow(0, {
-            x: 2,
-            y: 4,
-            direction: 0,
-            from: 100
-        }, gameTime - 100);
-
+        addArrow(0, 2, 4, 0, 100, gameTime - 100);
         model.update(gameTime);
 
         assert.isTrue(rabbit1.isAlive);
@@ -218,54 +149,18 @@ describe('model', function() {
     });
 
     it('should compensate arrows removed/replaced due to overriding arrow', function() {
-        var critter0 = new sprites.Critter({
-            x: 0,
-            y: 0,
-            direction: 1
-        }, sprites.RABBIT, 0);
-
-        model.critters.push(critter0);
-
-        var critter1 = new sprites.Critter({
-            x: 0,
-            y: 1,
-            direction: 1
-        }, sprites.RABBIT, 0);
-
-        model.critters.push(critter1);
-
-        model.addArrow(0, {
-            x: 2,
-            y: 0,
-            direction: 2,
-            from: 0
-        }, gameTime);
-
-        model.addArrow(0, {
-            x: 2,
-            y: 4,
-            direction: 2,
-            from: 0
-        }, gameTime);
-
-        model.addArrow(0, {
-            x: 2,
-            y: 3,
-            direction: 2,
-            from: 0
-        }, gameTime);
+        var critter0 = spawnCritter(0, 0, 1);
+        var critter1 = spawnCritter(0, 1, 1);
+        addArrow(0, 2, 0, 2);
+        addArrow(0, 2, 4, 2);
+        addArrow(0, 2, 3, 2);
 
         while (critter1.x + (critter1.type.speed * 100) <= 2) {
             model.update(gameTime);
             gameTime += 100;
         }
 
-        model.addArrow(0, {
-            x: 2,
-            y: 1,
-            direction: 2,
-            from: gameTime - 100
-        }, gameTime - 100);
+        addArrow(0, 2, 1, 2, gameTime - 100, gameTime - 100);
 
         model.update(gameTime);
 
@@ -276,12 +171,7 @@ describe('model', function() {
         assert.equal(critter0.direction, 1);
 
         // Now place an arrow from the other player, that pre-empts the last arrow placed above
-        model.addArrow(1, {
-            x: 2,
-            y: 1,
-            direction: 0,
-            from: gameTime - 200
-        }, gameTime);
+        addArrow(1, 2, 1, 0, gameTime - 200);
 
         model.update(gameTime + 10);
 
@@ -292,20 +182,8 @@ describe('model', function() {
     });
 
     it('should update correctly when updating is delayed', function() {
-        var critter = new sprites.Critter({
-            x: 0,
-            y: 2,
-            direction: 1
-        }, sprites.RABBIT, 0);
-
-        model.critters.push(critter);
-
-        var arrow = model.addArrow(0, {
-            x: 2,
-            y: 2,
-            direction: 0,
-            from: 0
-        });
+        var critter = spawnCritter(0, 2, 1);
+        var arrow = addArrow(0, 2, 2, 0);
         model.update(3 / critter.type.speed);
 
         assert.equal(critter.direction, arrow.direction,
@@ -313,97 +191,47 @@ describe('model', function() {
     });
 
     it('should remove arrows after multiple head-on collisions with foxes', function() {
-        var arrow = model.addArrow(0, {
-            x: 3,
-            y: 2,
-            direction: 3,
-            from: 0
-        }, gameTime);
+        var arrow = addArrow(0, 3, 2, 3);
+        var fox = spawnCritter(0, 2, 1, sprites.FOX);
 
-        var fox = new sprites.Critter(
-            model.level.sources[0],
-            sprites.FOX,
-            0
-        );
-
-        model.critters.push(fox);
-
-        var lastDirection = fox.direction;
-        var directionChanges = 0;
-
-        while (directionChanges < 7 && fox.inPlay) {
-            if (lastDirection !== fox.direction) {
-                ++directionChanges;
-                lastDirection = fox.direction;
-            }
-            model.update(gameTime);
-            gameTime += 100;
-        }
+        arrow.to = Infinity;
+        runForDirectionChanges(fox, 20);
 
         assert.isFalse(arrow.isActive(gameTime));
     });
 
     it('should not remove arrows after multiple side-on collisions with foxes', function() {
-        var arrow = model.addArrow(0, {
-            x: 1,
-            y: 2,
-            direction: 2,
-            from: 0
-        }, gameTime);
+        var arrow = addArrow(0, 1, 2, 2);
+        var fox = spawnCritter(0, 2, 1, sprites.FOX);
 
-        var fox = new sprites.Critter(
-            model.level.sources[0],
-            sprites.FOX,
-            0
-        );
-
-        model.critters.push(fox);
-
-        var lastDirection = fox.direction;
-        var directionChanges = 0;
-
-        while (directionChanges < 14 && fox.inPlay) {
-            if (lastDirection !== fox.direction) {
-                ++directionChanges;
-                lastDirection = fox.direction;
-            }
-            model.update(gameTime);
-            gameTime += 100;
-        }
+        arrow.to = Infinity;
+        runForDirectionChanges(fox, 20);
 
         assert.isTrue(arrow.isActive(gameTime));
     });
 
     it('should not remove arrows after multiple collisions with rabbits', function() {
-        var arrow = model.addArrow(0, {
-            x: 3,
-            y: 2,
-            direction: 3,
-            from: 0
-        }, gameTime);
+        var arrow = addArrow(0, 3, 2, 3);
+        var rabbit = spawnCritter(0, 2, 1);
 
-        var rabbit = new sprites.Critter(
-            model.level.sources[0],
-            sprites.RABBIT,
-            0
-        );
+        arrow.to = Infinity;
+        runForDirectionChanges(rabbit, 20);
 
-        model.critters.push(rabbit);
+        assert.isTrue(arrow.isActive(gameTime));
+    });
 
-        var lastDirection = rabbit.direction;
+    function runForDirectionChanges(critter, numberOfChanges) {
+        var lastDirection = critter.direction;
         var directionChanges = 0;
-
-        while (directionChanges < 7 && rabbit.inPlay) {
-            if (lastDirection !== rabbit.direction) {
+        while (directionChanges < numberOfChanges && critter.inPlay) {
+            if (lastDirection !== critter.direction) {
                 ++directionChanges;
-                lastDirection = rabbit.direction;
+                lastDirection = critter.direction;
             }
             model.update(gameTime);
             gameTime += 100;
         }
-
-        assert.isTrue(arrow.isActive(gameTime));
-    });
+    }
 
     describe('TICK_INTERVAL', function() {
         it('should not allow any sprite to skip over a whole cell', function() {
