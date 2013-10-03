@@ -87,7 +87,7 @@ PlayerArrows.prototype.addArrow = function addArrow(player, arrowData, currentTi
     }
 
     var competing = getArrowAfter(this.data, arrowData.x, arrowData.y, Math.min(currentTime, arrowData.from));
-    if (competing.arrow) {
+    if (competing.arrow && competing.arrow.to > arrowData.from) {
         if (arrowData.from < competing.arrow.from) {
             removePreEmptedArrow(this.data, competing);
         } else {
