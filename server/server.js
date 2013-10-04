@@ -19,7 +19,8 @@ exports.start = function(callback) {
             function (err, data) {
                 if (err) {
                     res.writeHead(500);
-                    return res.end('Error loading ' + url);
+                    res.end('Error loading ' + url);
+                    return;
                 }
 
                 res.writeHead(200);

@@ -1,6 +1,5 @@
 'use strict';
 
-//noinspection JSUnresolvedFunction
 var arrayUtils = require('./utils/array.js');
 var TICK_INTERVAL = require('./model.js').TICK_INTERVAL;
 var ARROW_LIFETIME = module.exports.ARROW_LIFETIME = 10000;
@@ -11,8 +10,12 @@ var Arrow = module.exports.Arrow = function Arrow(x, y, direction, from) {
     this.y = y;
     this.direction = direction;
     this.from = from;
-    this.to = this.from + ARROW_LIFETIME;
     this.hits = [];
+    this.initialiseLifeTime();
+};
+
+Arrow.prototype.initialiseLifeTime = function initialiseLifeTime() {
+    this.to = this.from + ARROW_LIFETIME;
 };
 
 Arrow.prototype.isActive = function isArrowActive(gameTime) {
@@ -61,7 +64,7 @@ function removePreEmptedArrow(data, preEmpted) {
     for (var j = data[preEmpted.player].length - 1; j >= 0; --j) {
         var oldArrow = data[preEmpted.player][j];
         if (oldArrow.to === removedArrow.from) {
-            delete oldArrow.to;
+            oldArrow.initialiseLifeTime();
 
             // The arrow we restore may in turn pre-empt another arrow...
             var undone = getArrowAfter(data, oldArrow.x, oldArrow.y, oldArrow.from);

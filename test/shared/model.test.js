@@ -29,25 +29,6 @@ describe('model', function() {
         gameTime = 0;
     });
 
-    it('should prevent placing arrows on top of other arrows', function() {
-        var firstArrow = model.addArrow(0, {
-            x: 2,
-            y: 2,
-            direction: 0,
-            from: 0
-        }, 0);
-
-        var result = model.addArrow(1, {
-            x: 2,
-            y: 2,
-            direction: 1,
-            from: 100
-        }, 100);
-
-        assert.isFalse(result);
-        assert.equal(firstArrow, model.getActiveArrow(200, 2, 2).arrow);
-    });
-
     it('should prevent placing arrows on top of other fixtures', function() {
         model.addArrow(0, {
             x: model.level.sinks[0].x,
@@ -66,79 +47,4 @@ describe('model', function() {
         assert.isUndefined(model.getActiveArrow(0, model.level.sinks[0].x, model.level.sinks[0].y).arrow, 0);
         assert.isUndefined(model.getActiveArrow(0, model.level.sources[0].x, model.level.sources[0].y).arrow, 0);
     });
-
-    it('should not allow two conflicting arrows to be placed in the future', function() {
-        model.update(gameTime);
-        gameTime += 100;
-        model.update(gameTime);
-        gameTime += 100;
-
-        var firstArrow = model.addArrow(0, {
-            x: 2,
-            y: 2,
-            direction: 0,
-            from: gameTime
-        }, gameTime);
-
-        var result = model.addArrow(1, {
-            x: 2,
-            y: 2,
-            direction: 1,
-            from: gameTime
-        }, gameTime);
-
-        assert.isFalse(result);
-        assert.equal(firstArrow, model.getActiveArrow(200, 2, 2).arrow);
-    });
-
-    it('should prevent the same player from placing more than three arrows', function() {
-        var firstArrow = placeArrows();
-        assert.isFalse(firstArrow.isActive(5));
-    });
-
-    it('should return active arrow when an active arrow is placed over an inactive one', function() {
-        placeArrows();
-
-        model.addArrow(0, {
-            x: 0,
-            y: 0,
-            direction: 4,
-            from: 4
-        }, 4);
-
-        var result = model.getActiveArrow(5, 0, 0);
-        assert.isNotNull(result);
-    });
-
-    function placeArrows() {
-        var firstArrow = model.addArrow(0, {
-            x: 0,
-            y: 0,
-            direction: 0,
-            from: 0
-        }, 0);
-
-        model.addArrow(0, {
-            x: 1,
-            y: 1,
-            direction: 1,
-            from: 1
-        }, 1);
-
-        model.addArrow(0, {
-            x: 2,
-            y: 2,
-            direction: 2,
-            from: 2
-        }, 2);
-
-        model.addArrow(0, {
-            x: 3,
-            y: 3,
-            direction: 3,
-            from: 3
-        }, 3);
-
-        return firstArrow;
-    }
 });

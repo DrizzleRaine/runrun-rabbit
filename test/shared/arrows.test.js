@@ -19,6 +19,42 @@ describe('arrows', function() {
     }
 
     describe('addArrow', function() {
+        it('should prevent placing arrows on top of other arrows', function() {
+            var firstArrow = addArrow(0, 2, 2, 0);
+            var result = addArrow(1, 2, 2, 100);
+
+            assert.isFalse(result);
+            assert.equal(firstArrow, playerArrows.getActiveArrow(200, 2, 2).arrow);
+        });
+
+        it('should not allow two conflicting arrows to be placed in the future', function() {
+            var firstArrow = addArrow(0, 2, 2, 250, 200);
+            var result = addArrow(1, 2, 2, 350, 200);
+
+            assert.isFalse(result);
+            assert.equal(firstArrow, playerArrows.getActiveArrow(400, 2, 2).arrow);
+        });
+
+        it('should prevent the same player from placing more than three arrows', function() {
+            var firstArrow = addArrow(0, 0, 0, 0);
+            addArrow(0, 1, 1, 1);
+            addArrow(0, 2, 2, 2);
+            addArrow(0, 3, 3, 3);
+
+            assert.isFalse(firstArrow.isActive(5));
+        });
+
+        it('should return active arrow when an active arrow is placed over an inactive one', function() {
+            addArrow(0, 0, 0, 0);
+            addArrow(0, 1, 1, 1);
+            addArrow(0, 2, 2, 2);
+            addArrow(0, 3, 3, 3);
+            addArrow(0, 0, 0, 4);
+
+            var result = playerArrows.getActiveArrow(5, 0, 0);
+            assert.isNotNull(result);
+        });
+
         it('should remove arrows pre-empted by re-instated arrows', function() {
             addArrow(0, 0, 0, 0);
             addArrow(0, 1, 1, 10);
@@ -35,7 +71,7 @@ describe('arrows', function() {
             assert.equal(0, playerArrows.data[1].length);
         });
 
-        it('should not allow players to place arrows at identical times', function() {
+        it('should not allow different players to place arrows at identical times', function() {
             var firstArrow = addArrow(0, 1, 2, 100);
             var secondArrow = addArrow(1, 2, 3, 100);
 
@@ -47,20 +83,17 @@ describe('arrows', function() {
             assert.notEqual(thirdArrow.from, fourthArrow.from);
         });
 
-        it('should remove arrows pre-empted by re-instated arrows', function() {
-            addArrow(0, 0, 0, 0);
+        it('should restore lifetime of re-instated arrows', function() {
+            var arrow = addArrow(0, 0, 0, 0);
+            var lifeTime = arrow.to;
             addArrow(0, 1, 1, 10);
             addArrow(0, 2, 2, 20);
-            addArrow(0, 3, 3, 30);
-            var arrow = addArrow(1, 0, 0, 35);
 
-            // Check assumptions
-            assert.isTrue(!!arrow);
-            assert.equal(1, playerArrows.getActiveArrow(40, 0, 0).player);
+            var newArrow = addArrow(0, 3, 3, 30);
+            assert.equal(arrow.to, newArrow.from);
 
             addArrow(2, 3, 3, 25);
-
-            assert.equal(0, playerArrows.data[1].length);
+            assert.equal(arrow.to, lifeTime);
         });
 
         it('should not block arrows due to no longer active arrows between updates', function() {
@@ -70,9 +103,19 @@ describe('arrows', function() {
             addArrow(0, 3, 3, 135, 100);
             var arrow = addArrow(1, 0, 0, 145, 100);
 
-            // Both arrows should exist at their respective times, since they don't overlap (so no pre-emption occured)
+            // Both arrows should exist at their respective times, since they don't overlap (so no pre-emption occurred)
             assert.isTrue(!!arrow);
             assert.equal(0, playerArrows.getActiveArrow(110, 0, 0).player);
+        });
+
+        it('should not block arrows due to existing arrows that have been destroyed by foxes', function() {
+            var arrow = addArrow(0, 0, 0, 100);
+            arrow.hits.push(200);
+            arrow.hits.push(300);
+
+            var newArrow = addArrow(1, 0, 0, 400);
+
+            assert.isTrue(!!newArrow);
         });
     });
 });

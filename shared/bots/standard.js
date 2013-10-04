@@ -42,7 +42,7 @@ Bot.prototype.update = function update() {
 Bot.prototype.start = function startBot(model) {
     this.model = model;
     this.pathFinder = new paths.Finder(this.model, this.playerId);
-    setTimeout(this.update.bind(this), UPDATE_INTERVAL);
+    setTimeout(this.update.bind(this), UPDATE_INTERVAL * this.playerId / model.totalPlayers);
 };
 
 function findSourcePaths(model, finder, playerId) {
