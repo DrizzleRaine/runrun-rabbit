@@ -145,12 +145,6 @@ module.exports = function(grunt) {
                 dir : 'build/reports/coverage',
                 print : 'detail'
             }
-        },
-        exec: {
-            deploy: {
-                cmd: 'jitsu deploy',
-                cwd: 'build'
-            }
         }
     });
 
@@ -172,9 +166,9 @@ module.exports = function(grunt) {
     });
 
     grunt.registerTask('default', ['test', 'clean', 'browserify', 'copy']);
-    grunt.registerTask('release', ['default', 'uglify', 'compress']);
+    grunt.registerTask('production', ['default', 'uglify']);
+    grunt.registerTask('release', ['production', 'compress']);
     grunt.registerTask('test', ['jshint', 'mochaTest']);
     grunt.registerTask('cover', ['clean', 'instrument', 'setInstrumentedSourceRoot', 'test', 'storeCoverage', 'makeReport']);
     grunt.registerTask('run', ['default', 'concurrent']);
-    grunt.registerTask('deploy', ['release', 'exec:deploy']);
 };
