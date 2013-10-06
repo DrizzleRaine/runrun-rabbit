@@ -17,7 +17,8 @@ function configure(io) {
             level: levels[gameData.levelId],
             totalPlayers: gameData.totalPlayers,
             random: new RNG(gameData.seed),
-            totalTime: gameData.totalTime
+            totalTime: gameData.totalTime,
+            logLevel: process.env.LOG_LEVEL
         });
 
         var startGame = function startGame() {
@@ -38,7 +39,8 @@ function configure(io) {
                 levelId: gameData.levelId,
                 totalPlayers: gameData.totalPlayers,
                 seed: gameData.seed,
-                totalTime: gameData.totalTime
+                totalTime: gameData.totalTime,
+                logLevel: process.env.LOG_LEVEL
             });
             socket.on('placeArrow', function(arrow) {
                 if (model.addArrow(index, arrow)) {

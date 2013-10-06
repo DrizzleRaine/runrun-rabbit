@@ -5,6 +5,8 @@ function configure(server) {
     var io = require('socket.io').listen(server);
     var game = require('./game.js')(io);
 
+    io.set('log level', 1);
+
     io.sockets.on('connection', function(socket) {
         var joinedRoom = false;
         for (var room in io.sockets.manager.rooms) {

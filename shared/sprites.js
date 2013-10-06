@@ -1,5 +1,8 @@
 'use strict';
 
+var log = require('loglevel');
+var util = require('util');
+
 module.exports.RABBIT = {
     name: 'rabbit',
     speed: 0.0024,
@@ -23,6 +26,7 @@ module.exports.FOX = {
 var gridUtils = require('./utils/grid.js');
 var directionUtils = require('./utils/direction.js');
 var TICK_INTERVAL = require('./model.js').TICK_INTERVAL;
+var id = 0;
 
 function Critter(source, type, gameTime) {
     this.x = source.x;
@@ -48,6 +52,10 @@ function Critter(source, type, gameTime) {
         direction: source.direction,
         isAlive: this.isAlive
     };
+
+    this.id = ++id;
+
+    log.debug(util.format('%d: Creating critter %d of type %s at %d,%d', gameTime, this.id, this.type.name, this.x, this.y));
 }
 
 Critter.prototype.update = function(model, gameTime) {
@@ -77,9 +85,11 @@ Critter.prototype.update = function(model, gameTime) {
 
         var sink = gridUtils.getAtCell(model.level.sinks, centreX, centreY);
         if (sink !== null) {
+            log.debug(util.format('%d: Critter %d of type %s entering sink at %d,%d', gameTime, this.id, this.type.name, centreX, centreY));
             this.inPlay = false;
             if (sink.player !== null) {
                 model.playerScores.modify(sink.player, this.type.score.bind(this));
+                log.debug(util.format('%d: Scores changes to %s', gameTime, model.playerScores.current.toString()));
             }
         } else {
             var timeToCentre = (Math.abs(this.x - centreX) + Math.abs(this.y - centreY)) / this.type.speed;
@@ -99,6 +109,7 @@ Critter.prototype.update = function(model, gameTime) {
 
             newDirection = directionUtils.getNatural(newDirection, model, centreX, centreY);
             if (newDirection !== this.direction) {
+                log.debug(util.format('%d: Critter %d of type %s changing direction from %d to %d, at %d,%d', gameTime, this.id, this.type.name, this.direction, newDirection, this.x.toFixed(3), this.y.toFixed(3)));
                 this.direction = newDirection;
 
                 var deltaD = Math.abs(deltaT * this.type.speed) - Math.abs(this.x - centreX) - Math.abs(this.y - centreY);
@@ -107,6 +118,10 @@ Critter.prototype.update = function(model, gameTime) {
                 newY = centreY + deltaD * newDirectionVector.y;
             }
         }
+    }
+
+    if (newX < 0 || newY < 0 || newX > model.width - 1 || newY > model.height - 1) {
+        log.warn(util.format('%d: Critter %d out-of-bounds at %d,%d', gameTime, this.id, newX.toFixed(3), newY.toFixed(3)));
     }
 
     this.x = newX;
@@ -151,6 +166,7 @@ module.exports.performInteractions = function(critters) {
             var dx = fox.x - rabbit.x;
             var dy = fox.y - rabbit.y;
             if (dx * dx + dy * dy < 0.05) {
+                log.trace(util.format('Fox at %d,%d killing rabbit at %d,%d', fox.x.toFixed(3), fox.y.toFixed(3), rabbit.x.toFixed(3), rabbit.y.toFixed(3)));
                 rabbit.isAlive = false;
             }
         });

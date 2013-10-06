@@ -2,6 +2,8 @@
 
 var arrayUtils = require('./utils/array.js');
 var TICK_INTERVAL = require('./model.js').TICK_INTERVAL;
+var log = require('loglevel');
+var util = require('util');
 var ARROW_LIFETIME = module.exports.ARROW_LIFETIME = 10000;
 var MAX_ARROWS = module.exports.MAX_ARROWS = 3;
 
@@ -111,6 +113,7 @@ PlayerArrows.prototype.addArrow = function addArrow(player, arrowData, currentTi
 
     var newArrow = new Arrow(arrowData.x, arrowData.y, arrowData.direction, arrowData.from);
     ownArrows.push(newArrow);
+    log.debug(util.format('%d: Adding arrow from player %d at %d,%d', arrowData.from, player, arrowData.x, arrowData.y));
     return newArrow;
 };
 

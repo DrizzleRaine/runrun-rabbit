@@ -7,12 +7,17 @@ var spawning = require('./spawning.js');
 var sprites = require('./sprites.js');
 var arrows = require('./arrows.js');
 var scores = require('./scores.js');
+var log = require('loglevel');
 
 module.exports.build = function build(gameData) {
     return new Model(gameData);
 };
 
 function Model(gameData) {
+    if (gameData.logLevel) {
+        log.setLevel(gameData.logLevel);
+    }
+
     this.playerArrows = new arrows.PlayerArrows(gameData.totalPlayers);
     this.playerScores = new scores.PlayerScores(gameData.totalPlayers);
     this.lastUpdate = 0;
