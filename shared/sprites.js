@@ -120,19 +120,22 @@ Critter.prototype.update = function(model, gameTime) {
         }
     }
 
-    if (newX < 0 || newY < 0 || newX > model.width - 1 || newY > model.height - 1) {
-        log.warn(util.format('%d: Critter %d out-of-bounds at %d,%d', gameTime, this.id, newX.toFixed(3), newY.toFixed(3)));
+    if (this.inPlay) {
+        if (newX < 0 || newY < 0 || newX > model.width - 1 || newY > model.height - 1) {
+            log.warn(util.format('%d: Critter %d out-of-bounds at %d,%d', gameTime, this.id, newX.toFixed(3), newY.toFixed(3)));
+        }
+
+        this.x = newX;
+        this.y = newY;
+        this.history[(gameTime / TICK_INTERVAL) - this.firstTick] = {
+            x: this.x,
+            y: this.y,
+            direction: this.direction,
+            isAlive: this.isAlive
+        };
     }
 
-    this.x = newX;
-    this.y = newY;
     this.lastUpdate = gameTime;
-    this.history[(gameTime / TICK_INTERVAL) - this.firstTick] = {
-        x: this.x,
-        y: this.y,
-        direction: this.direction,
-        isAlive: this.isAlive
-    };
 };
 
 Critter.prototype.restore = function restore(tick) {

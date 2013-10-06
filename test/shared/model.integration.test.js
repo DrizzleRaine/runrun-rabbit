@@ -38,13 +38,13 @@ describe('model', function() {
         gameTime = 0;
     });
 
-    function addArrow(player, x, y, direction, from, lastUpdate) {
+    function addArrow(player, x, y, direction, from) {
         return model.addArrow(player, {
             x: x,
             y: y,
             direction: direction,
             from: from || gameTime
-        }, lastUpdate || gameTime);
+        });
     }
 
     function spawnCritter(x, y, direction, type, from) {
@@ -218,6 +218,22 @@ describe('model', function() {
         runForDirectionChanges(rabbit, 20);
 
         assert.isTrue(arrow.isActive(gameTime));
+    });
+
+    it('should not put critters back in play when restoring state to point that critter died', function() {
+        var rabbit = spawnCritter(0, 2, 1);
+
+        while (rabbit.inPlay) {
+            model.update(gameTime);
+            gameTime += 100;
+        }
+
+        var restoreTime = model.lastUpdate;
+        model.update(gameTime);
+
+        addArrow(0, 1, 1, 1, restoreTime + 50);
+
+        assert.isFalse(rabbit.inPlay);
     });
 
     function runForDirectionChanges(critter, numberOfChanges) {
