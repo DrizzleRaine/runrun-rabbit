@@ -12,7 +12,7 @@ PlayerScores.prototype.save = function saveScores(tick) {
 };
 
 PlayerScores.prototype.restore = function restoreScores(tick) {
-    this.current = this.history[tick];
+    this.current = this.history[tick].concat();
 };
 
 PlayerScores.prototype.modify = function modifyScore(player, modifier) {

@@ -290,4 +290,26 @@ describe('model', function() {
             assert.equal(model.critters[0].firstTick, 1);
         });
     });
+
+    describe('scores', function() {
+        it('should restore consistently to previous time', function() {
+            testLevel.sinks[0].player = 0;
+
+            dummyRandom.nextByte.returns(240);
+
+            while (model.playerScores.current[0] === 0) {
+                model.update(gameTime);
+                gameTime += 100;
+            }
+
+            addArrow(1, 0, 0, 1, gameTime - 150);
+            assert.equal(0, model.playerScores.current[0]);
+
+            model.update(gameTime - 100);
+            model.update(gameTime);
+
+            addArrow(1, 1, 1, 1, gameTime - 150);
+            assert.equal(0, model.playerScores.current[0]);
+        });
+    });
 });
