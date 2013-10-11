@@ -61,7 +61,7 @@ Model.prototype.addArrow = function addArrow(player, arrowData) {
     var addedArrow = this.playerArrows.addArrow(player, arrowData, this.lastUpdate);
 
     if (addedArrow && arrowData.from <= this.lastUpdate) {
-        restoreState(this, Math.floor(arrowData.from / TICK_INTERVAL));
+        restoreState(this, Math.max(0, Math.floor((arrowData.from - 1) / TICK_INTERVAL)));
     }
 
     return addedArrow;

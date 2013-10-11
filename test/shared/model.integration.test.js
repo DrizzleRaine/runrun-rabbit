@@ -236,6 +236,16 @@ describe('model', function() {
         assert.isFalse(rabbit.inPlay);
     });
 
+    it('should replay from earlier time when arrow is placed', function() {
+        model.update(100);
+        model.update(200);
+        model.update(300);
+
+        addArrow(0, 1, 1, 1, 200);
+
+        assert.equal(100, model.lastUpdate);
+    });
+
     function runForDirectionChanges(critter, numberOfChanges) {
         var lastDirection = critter.direction;
         var directionChanges = 0;
