@@ -141,7 +141,7 @@ describe('model', function() {
             model.update(gameTime);
             gameTime += 100;
         }
-        addArrow(0, 2, 4, 0, 100, gameTime - 100);
+        addArrow(0, 2, 4, 0, 100);
         model.update(gameTime);
 
         assert.isTrue(rabbit1.isAlive);
@@ -160,7 +160,7 @@ describe('model', function() {
             gameTime += 100;
         }
 
-        addArrow(0, 2, 1, 2, gameTime - 100, gameTime - 100);
+        addArrow(0, 2, 1, 2, gameTime - 100);
 
         model.update(gameTime);
 
