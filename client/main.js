@@ -1,6 +1,7 @@
 'use strict';
 
-var newVisitor = !document.cookie;
+var newVisitor = !localStorage.visited;
+localStorage.visited = true;
 
 var gameController = require('./controllers/game.js');
 var hintMessage = require('./views/message.js').build(document.getElementById('container'), 'menuHint');

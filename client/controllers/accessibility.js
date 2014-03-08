@@ -14,11 +14,11 @@ module.exports = function(options) {
     var DEFAULT_VISUAL_STYLE = 'standard';
 
     function getVisualStyle() {
-        return $.fn.cookie('visualStyle');
+        return localStorage.visualStyle;
     }
 
     function setVisualStyle(value) {
-        $.fn.cookie('visualStyle', value, {expires: 9999});
+        localStorage.visualStyle = value;
     }
     if (!getVisualStyle()) {
         setVisualStyle('standard');

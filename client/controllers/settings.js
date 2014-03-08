@@ -36,11 +36,11 @@ module.exports = function(options) {
     var DEFAULT_INPUT_METHOD = 'desktop';
 
     function getInputMethod() {
-        return $.fn.cookie('inputMethod');
+        return localStorage.inputMethod;
     }
 
     function setInputMethod(value) {
-        $.fn.cookie('inputMethod', value, { expires: 9999 });
+        localStorage.inputMethod = value;
     }
 
     if (!getInputMethod()) {
