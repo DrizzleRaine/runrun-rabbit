@@ -100,7 +100,7 @@ module.exports = function(grunt) {
             main: {
                 files: [
                     { src: ['release.package.json'], dest: 'build/package.json' },
-                    { src: ['client/static/*'], dest: 'build/client/', expand: true, flatten: true },
+                    { src: ['client/static/**'], dest: 'build/client/', expand: true, flatten: true },
                     { src: ['server/**'], dest: 'build/' },
                     { src: ['shared/**'], dest: 'build/' }
                 ]

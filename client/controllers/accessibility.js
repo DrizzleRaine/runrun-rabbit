@@ -7,8 +7,6 @@ module.exports = function(options) {
     var fixtures = require('../../shared/fixtures.js');
     var RNG = require('../../shared/utils/rng.js').RNG;
     var ARROW_LIFETIME = require('../../shared/arrows.js').ARROW_LIFETIME;
-    var MINI = window.require('minified');
-    var $ = MINI.$;//, $$=MINI.$$, EE=MINI.EE;
 
     var model;
     var controller = { options: {} };
@@ -16,11 +14,11 @@ module.exports = function(options) {
     var DEFAULT_VISUAL_STYLE = 'standard';
 
     function getVisualStyle() {
-        return $.getCookie('visualStyle');
+        return $.fn.cookie('visualStyle');
     }
 
     function setVisualStyle(value) {
-        $.setCookie('visualStyle', value, 9999);
+        $.fn.cookie('visualStyle', value, {expires: 9999});
     }
     if (!getVisualStyle()) {
         setVisualStyle('standard');
@@ -80,13 +78,13 @@ module.exports = function(options) {
         var inputs = $('input.visuals');
 
         var onInputClick = function () {
-            setVisualStyle($(this).get('value'));
-            options.visualStyle = $(this).get('value');
+            setVisualStyle($(this).val());
+            options.visualStyle = $(this).val();
             view.setVisualStyle(options.visualStyle);
         };
 
-        inputs.each(function(input) {
-            if ($(input).get('value') === options.visualStyle) {
+        inputs.each(function(i, input) {
+            if ($(input).val() === options.visualStyle) {
                 input.checked = true;
             }
             input.onclick = onInputClick;

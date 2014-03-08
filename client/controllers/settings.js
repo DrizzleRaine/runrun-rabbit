@@ -7,8 +7,6 @@ module.exports = function(options) {
     var fixtures = require('../../shared/fixtures.js');
     var RNG = require('../../shared/utils/rng.js').RNG;
     var ARROW_LIFETIME = require('../../shared/arrows.js').ARROW_LIFETIME;
-    var MINI = window.require('minified');
-    var $ = MINI.$;//, $$=MINI.$$, EE=MINI.EE;
 
     function createModel(sources, sinks, initialSpawning) {
         return modelFactory.build({
@@ -38,11 +36,11 @@ module.exports = function(options) {
     var DEFAULT_INPUT_METHOD = 'desktop';
 
     function getInputMethod() {
-        return $.getCookie('inputMethod');
+        return $.fn.cookie('inputMethod');
     }
 
     function setInputMethod(value) {
-        $.setCookie('inputMethod', value, 9999);
+        $.fn.cookie('inputMethod', value, { expires: 9999 });
     }
 
     if (!getInputMethod()) {
@@ -110,16 +108,16 @@ module.exports = function(options) {
         var inputs = $('input.input');
 
         var onInputClick = function () {
-            setInputMethod($(this).get('value'));
-            options.inputMethod = $(this).get('value');
+            setInputMethod($(this).val());
+            options.inputMethod = $(this).val();
             arrowsView.setInputMethod(options.inputMethod);
         };
 
-        inputs.each(function(input) {
-            if ($(input).get('value') === options.inputMethod) {
+        inputs.each(function(i, input) {
+            if ($(input).val() === options.inputMethod) {
                 input.checked = true;
             }
-            if (!$(input).get('disabled')) {
+            if (!$(input).attr('disabled')) {
                 input.onclick = onInputClick;
             }
         });

@@ -1,9 +1,6 @@
 'use strict';
 
 module.exports = function build(parent) {
-    var MINI = window.require('minified');
-    var $ = MINI.$;//, $$=MINI.$$, EE=MINI.EE;
-
     var unit = 256;
     var width = 4;
 
@@ -17,7 +14,7 @@ module.exports = function build(parent) {
     var context = canvas.getContext('2d');
 
     var clear = function clear() {
-        context.clearRect(0,0, $(canvas).get('width'), unit);
+        context.clearRect(0,0, $(canvas).attr('width'), unit);
     };
 
     var isRunning = false;
