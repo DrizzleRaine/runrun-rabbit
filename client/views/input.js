@@ -32,7 +32,7 @@ function clearHandlers(view) {
     view.onmousemove = null;
 }
 
-function offsetHandler(view) {
+function offsetHandler(grid) {
     var offsetX;
     var offsetY;
 
@@ -42,24 +42,34 @@ function offsetHandler(view) {
     };
 
     function getRelativeX(event) {
-        offsetX = offsetX || view.offsetLeft + (view.offsetWidth - view.width) / 2;
-        return event.clientX - offsetX + document.body.scrollLeft;
+        offsetX = offsetX || grid.view.offsetLeft + (grid.view.offsetWidth - grid.view.width) / 2;
+        return event.pageX - offsetX;
     }
 
     function getRelativeY(event) {
-        offsetY = offsetY || view.offsetTop + (view.offsetHeight - view.height) / 2;
-        return event.clientY - offsetY + document.body.scrollTop;
+        offsetY = offsetY || grid.view.offsetTop + (grid.view.offsetHeight - grid.view.height) / 2;
+        return event.pageY - offsetY;
+    }
+
+    function normalise(pixels) {
+        return Math.floor(pixels / grid.unit);
+    }
+
+    function isInGrid(x, y) {
+        return x > 0 && y > 0 && x < grid.view.width && y < grid.view.height
     }
 
     return {
         getRelativeX: getRelativeX,
-        getRelativeY: getRelativeY
+        getRelativeY: getRelativeY,
+        normalise: normalise,
+        isInGrid: isInGrid
     };
 }
 
 methods.desktop = function desktop(grid, placeArrowCallback) {
     var activeKey;
-    var handler = offsetHandler(grid.view);
+    var handler = offsetHandler(grid);
 
     window.oncontextmenu = function() { return false; };
 
@@ -88,8 +98,8 @@ methods.desktop = function desktop(grid, placeArrowCallback) {
         }
 
         placeArrowCallback(
-            Math.floor(handler.getRelativeX(event) / grid.unit),
-            Math.floor(handler.getRelativeY(event) / grid.unit),
+            handler.normalise(handler.getRelativeX(event)),
+            handler.normalise(handler.getRelativeY(event)),
             direction
         );
     };
@@ -101,7 +111,7 @@ methods.desktop = function desktop(grid, placeArrowCallback) {
 
 methods.laptop = function desktop(grid, placeArrowCallback) {
     var currentLocation = {};
-    var handler = offsetHandler(grid.view);
+    var handler = offsetHandler(grid);
 
     window.oncontextmenu = function() { return false; };
 
@@ -116,11 +126,10 @@ methods.laptop = function desktop(grid, placeArrowCallback) {
 
     window.onkeyup = function (event) {
         var direction = directionFromKey(event.keyCode);
-        if (direction !== null && currentLocation.x > 0 && currentLocation.y > 0 &&
-            currentLocation.x < grid.view.width && currentLocation.y < grid.view.height) {
+        if (direction !== null && handler.isInGrid(currentLocation.x, currentLocation.y)) {
             placeArrowCallback(
-                Math.floor(currentLocation.x / grid.unit),
-                Math.floor(currentLocation.y / grid.unit),
+                handler.normalise(currentLocation.x),
+                handler.normalise(currentLocation.y),
                 direction
             );
             event.preventDefault();
@@ -129,5 +138,49 @@ methods.laptop = function desktop(grid, placeArrowCallback) {
 
     return {
         unbind: function() { clearHandlers(grid.view); }
+    };
+};
+
+methods.mobile = function desktop(grid, placeArrowCallback) {
+    var start = null;
+    var handler = offsetHandler(grid);
+
+    var directionFromSwipe = function directionFromSwipe(start, end) {
+        var changeX = end.pageX - start.pageX;
+        var changeY = end.pageY - start.pageY;
+
+        return Math.abs(changeX) > Math.abs(changeY)
+            ? (changeX > 0 ? 1 : 3)
+            : (changeY > 0 ? 2 : 0)
+    };
+
+    var onTouchStart = function(event) {
+        start = event.changedTouches[0];
+    };
+
+    var onTouchEnd = function(event) {
+        var end = event.changedTouches[0];
+
+        if (!start) {
+            return;
+        }
+
+        placeArrowCallback(
+            handler.normalise(handler.getRelativeX(start)),
+            handler.normalise(handler.getRelativeY(start)),
+            directionFromSwipe(start, end)
+        );
+
+        start = null;
+    };
+
+    grid.view.addEventListener('touchstart', onTouchStart);
+    grid.view.addEventListener('touchend', onTouchEnd);
+
+    return {
+        unbind: function() {
+            grid.view.removeEventListener('touchstart', onTouchStart);
+            grid.view.removeEventListener('touchend', onTouchEnd);
+        }
     };
 };
