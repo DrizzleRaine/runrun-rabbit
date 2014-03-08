@@ -30,6 +30,7 @@ function clearHandlers(view) {
     window.onresize = null;
     view.onmousedown = null;
     view.onmousemove = null;
+    window.onmouseup = null;
 }
 
 function offsetHandler(grid) {
@@ -55,8 +56,8 @@ function offsetHandler(grid) {
         return Math.floor(pixels / grid.unit);
     }
 
-    function isInGrid(x, y) {
-        return x > 0 && y > 0 && x < grid.view.width && y < grid.view.height
+    function isInGrid(relativeX, relativeY) {
+        return relativeX > 0 && relativeY > 0 && relativeX < grid.view.width && relativeY < grid.view.height;
     }
 
     return {
@@ -109,7 +110,7 @@ methods.desktop = function desktop(grid, placeArrowCallback) {
     };
 };
 
-methods.laptop = function desktop(grid, placeArrowCallback) {
+methods.laptop = function laptop(grid, placeArrowCallback) {
     var currentLocation = {};
     var handler = offsetHandler(grid);
 
@@ -141,46 +142,74 @@ methods.laptop = function desktop(grid, placeArrowCallback) {
     };
 };
 
-methods.mobile = function desktop(grid, placeArrowCallback) {
-    var start = null;
+methods.universal = function universal(grid, placeArrowCallback) {
+    var start;
     var handler = offsetHandler(grid);
 
     var directionFromSwipe = function directionFromSwipe(start, end) {
         var changeX = end.pageX - start.pageX;
         var changeY = end.pageY - start.pageY;
 
-        return Math.abs(changeX) > Math.abs(changeY)
-            ? (changeX > 0 ? 1 : 3)
-            : (changeY > 0 ? 2 : 0)
+        if (changeX === 0 && changeY === 0) {
+            return null;
+        }
+
+        return Math.abs(changeX) > Math.abs(changeY) ?
+            (changeX > 0 ? 1 : 3) :
+            (changeY > 0 ? 2 : 0);
     };
+
+    var onEnd = function(end) {
+        if (!start) {
+            return;
+        }
+
+        var startX = handler.getRelativeX(start);
+        var startY = handler.getRelativeY(start);
+
+        var direction = directionFromSwipe(start, end);
+
+        if (direction !== null && handler.isInGrid(startX, startY)) {
+            placeArrowCallback(
+                handler.normalise(startX),
+                handler.normalise(startY),
+                direction
+            );
+        }
+
+        start = null;
+    };
+
+    grid.view.onmousedown = function(event) {
+        start = event;
+    };
+
+    window.onmouseup = onEnd;
 
     var onTouchStart = function(event) {
         start = event.changedTouches[0];
     };
 
     var onTouchEnd = function(event) {
-        var end = event.changedTouches[0];
+        onEnd(event.changedTouches[0]);
+    };
 
-        if (!start) {
-            return;
+    var onTouchMove = function(event) {
+        if (start) { // Prevent scrolling while placing arrows
+            event.preventDefault();
         }
-
-        placeArrowCallback(
-            handler.normalise(handler.getRelativeX(start)),
-            handler.normalise(handler.getRelativeY(start)),
-            directionFromSwipe(start, end)
-        );
-
-        start = null;
     };
 
     grid.view.addEventListener('touchstart', onTouchStart);
-    grid.view.addEventListener('touchend', onTouchEnd);
+    window.addEventListener('touchend', onTouchEnd);
+    window.addEventListener('touchmove', onTouchMove);
 
     return {
         unbind: function() {
             grid.view.removeEventListener('touchstart', onTouchStart);
-            grid.view.removeEventListener('touchend', onTouchEnd);
+            window.removeEventListener('touchend', onTouchEnd);
+            window.removeEventListener('touchmove', onTouchMove);
+            clearHandlers(grid.view);
         }
     };
 };

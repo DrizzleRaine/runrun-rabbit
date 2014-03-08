@@ -60,7 +60,7 @@ h2.menuHint {
 
 .settings div, .settings label {
     text-align: left;
-    max-width: 345px;
+    width: 345px;
     margin: 0 20px;
     display: inline-block;
     vertical-align: top;

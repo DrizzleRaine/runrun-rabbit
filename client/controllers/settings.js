@@ -33,7 +33,7 @@ module.exports = function(options) {
     var models = [];
     var controller = {};
 
-    var DEFAULT_INPUT_METHOD = 'desktop';
+    var DEFAULT_INPUT_METHOD = 'universal';
 
     function getInputMethod() {
         return localStorage.inputMethod;
@@ -44,7 +44,7 @@ module.exports = function(options) {
     }
 
     if (!getInputMethod()) {
-        setInputMethod('desktop');
+        setInputMethod(DEFAULT_INPUT_METHOD);
     }
 
     options.inputMethod = getInputMethod() || options.inputMethod || DEFAULT_INPUT_METHOD;
