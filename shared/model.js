@@ -14,9 +14,7 @@ module.exports.build = function build(gameData) {
 };
 
 function Model(gameData) {
-    if (gameData.logLevel) {
-        log.setLevel(gameData.logLevel);
-    }
+    log.setLevel(gameData.logLevel || 'warn');
 
     this.playerArrows = new arrows.PlayerArrows(gameData.totalPlayers);
     this.playerScores = new scores.PlayerScores(gameData.totalPlayers);

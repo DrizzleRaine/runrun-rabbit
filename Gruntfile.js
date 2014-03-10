@@ -30,7 +30,6 @@ module.exports = function(grunt) {
                     ignores: ['client/static/**/*.js'],
                     browser: true,
                     globals: {
-                        $: false,
                         io: false,
                         CanvasRenderingContext2D: false
                     }

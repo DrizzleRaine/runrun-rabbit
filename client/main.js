@@ -3,6 +3,11 @@
 var newVisitor = !localStorage.visited;
 localStorage.visited = true;
 
+var rivets = require('rivets');
+rivets.configure({
+    prefix: 'data'
+});
+
 var gameController = require('./controllers/game.js');
 var hintMessage = require('./views/message.js').build(document.getElementById('container'), 'menuHint');
 var banner = require('./views/banner.js')(document.getElementById('container'));
@@ -12,6 +17,9 @@ var options = {};
 var settings = require('./controllers/settings.js')(options);
 var accessibility = require('./controllers/accessibility.js')(options);
 var optionsControllers = [settings, accessibility];
+
+rivets.bind(document.getElementById('settings'), settings);
+rivets.bind(document.getElementById('accessibility'), accessibility);
 
 var hideMenu = function hideMenu() {
     document.getElementById('menu').classList.add('hidden');

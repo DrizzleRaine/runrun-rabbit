@@ -31,23 +31,11 @@ module.exports = function(options) {
     }
 
     var models = [];
-    var controller = {};
+    var controller = { options: options };
 
     var DEFAULT_INPUT_METHOD = 'universal';
 
-    function getInputMethod() {
-        return localStorage.inputMethod;
-    }
-
-    function setInputMethod(value) {
-        localStorage.inputMethod = value;
-    }
-
-    if (!getInputMethod()) {
-        setInputMethod(DEFAULT_INPUT_METHOD);
-    }
-
-    options.inputMethod = getInputMethod() || options.inputMethod || DEFAULT_INPUT_METHOD;
+    options.inputMethod = localStorage.inputMethod || options.inputMethod || DEFAULT_INPUT_METHOD;
 
     function setupGameplayPreviews(models) {
         var rabbitsModel = createModel(
@@ -104,31 +92,35 @@ module.exports = function(options) {
         return arrowsView;
     }
 
-    function setupInputOptions(arrowsView) {
-        var inputs = $('input.input');
-
-        var onInputClick = function () {
-            setInputMethod($(this).val());
-            options.inputMethod = $(this).val();
-            arrowsView.setInputMethod(options.inputMethod);
-        };
-
-        inputs.each(function(i, input) {
-            if ($(input).val() === options.inputMethod) {
-                input.checked = true;
-            }
-            if (!$(input).attr('disabled')) {
-                input.onclick = onInputClick;
-            }
-        });
-    }
+    controller.inputMethods = [
+        {
+            key: 'universal',
+            title: 'Universal (mouse or touchscreen)',
+            description: 'Place arrows by <b>touching/clicking</b> a square and<br /><b>swiping/dragging</b> left/right/up/down.'
+        },
+        {
+            key: 'desktop',
+            title: 'Desktop (mouse and keyboard)',
+            description: 'Place arrows by <b>holding</b> one of the <span class="nowrap">&larr;/&uarr;/&rarr;/&darr;</span> or <span class="nowrap">W/A/S/D</span> keys and <b>clicking</b> on a square.'
+        },
+        {
+            key: 'laptop',
+            title: 'Laptop (touchpad and keyboard)',
+            description: 'Place arrows by <b>hovering</b> over a square and <b>pressing</b> one of the <span class="nowrap">&larr;/&uarr;/&rarr;/&darr;</span> or <span class="nowrap">W/A/S/D</span> keys.'
+        }
+    ];
 
     controller.open = false;
 
+    var arrowsView;
+
+    controller.update = function() {
+        localStorage.inputMethod = options.inputMethod;
+        arrowsView.setInputMethod(options.inputMethod);
+    };
+
     controller.show = function show() {
-        var arrowsView = setupGameplayPreviews(models);
-        setupInputOptions(arrowsView);
-        document.getElementById('settings').classList.remove('hidden');
+        arrowsView = setupGameplayPreviews(models);
         controller.open = true;
     };
 
@@ -136,8 +128,6 @@ module.exports = function(options) {
         while (models.length) {
             models.pop().isRunning = false;
         }
-
-        document.getElementById('settings').classList.add('hidden');
         controller.open = false;
     };
 

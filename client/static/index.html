@@ -4,7 +4,6 @@
     <title>RunRun Rabbit!</title>
     <link href="./site.css" rel="stylesheet">
     <script src="/socket.io/socket.io.js"></script>
-    <script src="./zepto.min.js"></script>
 </head>
 <body>
     <div id="container" class="container">
@@ -17,7 +16,7 @@
             <button id="settingsAndInstructions" class="btn player-0">Instructions and Controls</button>
             <button id="accessibilityOptions" class="btn player-0">Graphics and Sound</button>
         </div>
-        <div id="settings" class="settings hidden">
+        <div id="settings" data-show="open" class="settings">
             <h2>Instructions</h2>
             <div>
                 <h3 id="rabbits">Rabbits</h3>
@@ -34,34 +33,28 @@
                    You can only place up to three arrows at a time, so use them wisely&hellip;</p>
             </div>
             <h2>Controls</h2>
-            <label>
-                <h3><input type="radio" name="input" class="input" value="universal" /> Universal (mouse or touchscreen)</h3>
-                <p>Place arrows by <b>touching/clicking</b> a square and<br /><b>swiping/dragging</b> left/right/up/down.</p>
-            </label>
-            <label>
-                <h3><input type="radio" name="input" class="input" value="desktop" /> Desktop (mouse and keyboard)</h3>
-                <p>Place arrows by <b>holding</b> one of the <span class="nowrap">&larr;/&uarr;/&rarr;/&darr;</span> or <span class="nowrap">W/A/S/D</span> keys and <b>clicking</b> on a square.</p>
-            </label>
-            <label>
-                <h3><input type="radio" name="input" class="input" value="laptop" /> Laptop (touchpad and keyboard)</h3>
-                <p>Place arrows by <b>hovering</b> over a square and <b>pressing</b> one of the <span class="nowrap">&larr;/&uarr;/&rarr;/&darr;</span> or <span class="nowrap">W/A/S/D</span> keys.</p>
+            <label data-each-option="inputMethods">
+                <h3><input type="radio"
+                           name="inputMethod"
+                           data-value="option.key"
+                           data-checked="options.inputMethod"
+                           data-on-click="update" />
+                    { option.title }</h3>
+                <p data-html="option.description"></p>
             </label>
             <br /><br />
             <a class="btn player-1" href="" id="startPlaying">Start playing now!</a>
         </div>
-        <div id="accessibility" class="settings hidden">
+        <div id="accessibility" data-show="open" class="settings">
             <h2>Graphics</h2>
-            <label>
-                <h3><input type="radio" name="visuals" class="visuals" value="standard" /> Standard</h3>
-                <p>Players are differentiated by colour only. Make sure you can tell the difference between the four player arrows below&hellip;</p>
-            </label>
-            <label>
-                <h3><input type="radio" name="visuals" class="visuals" value="redGreen" /> Red-green colourblind</h3>
-                <p>Red and yellow players are distinguished from green and blue players by shape (designed for protanopia and deuteranopia).</p>
-            </label>
-            <label>
-                <h3><input type="radio" name="visuals" class="visuals" value="blueYellow" /> Blue-yellow colourblind</h3>
-                <p>Blue and red players are distinguished from yellow and green players by shape (designed for tritanopia).</p>
+            <label data-each-option="visualStyles">
+                <h3><input type="radio"
+                           name="visualStyle"
+                           data-value="option.key"
+                           data-checked="options.visualStyle"
+                           data-on-click="update" />
+                    { option.title }</h3>
+                <p data-html="option.description"></p>
             </label>
             <div id="four-player-preview"></div>
             <h2>Sound</h2>

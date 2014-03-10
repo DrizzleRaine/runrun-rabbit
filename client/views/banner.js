@@ -14,7 +14,7 @@ module.exports = function build(parent) {
     var context = canvas.getContext('2d');
 
     var clear = function clear() {
-        context.clearRect(0,0, $(canvas).attr('width'), unit);
+        context.clearRect(0,0, unit * width, unit);
     };
 
     var isRunning = false;

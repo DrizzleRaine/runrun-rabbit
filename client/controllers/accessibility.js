@@ -9,24 +9,13 @@ module.exports = function(options) {
     var ARROW_LIFETIME = require('../../shared/arrows.js').ARROW_LIFETIME;
 
     var model;
-    var controller = { options: {} };
+    var controller = { options: options };
 
     var DEFAULT_VISUAL_STYLE = 'standard';
 
-    function getVisualStyle() {
-        return localStorage.visualStyle;
-    }
+    options.visualStyle = localStorage.visualStyle || options.visualStyle || DEFAULT_VISUAL_STYLE;
 
-    function setVisualStyle(value) {
-        localStorage.visualStyle = value;
-    }
-    if (!getVisualStyle()) {
-        setVisualStyle('standard');
-    }
-
-    options.visualStyle = getVisualStyle() || options.visualStyle || DEFAULT_VISUAL_STYLE;
-
-    function setupAccessibilityOptions() {
+    function setupPreview() {
         var container = document.getElementById('four-player-preview');
 
         model = modelFactory.build({
@@ -74,34 +63,43 @@ module.exports = function(options) {
         setInterval(replaceArrows, ARROW_LIFETIME + 500);
 
         view.setVisualStyle(options.visualStyle);
-
-        var inputs = $('input.visuals');
-
-        var onInputClick = function () {
-            setVisualStyle($(this).val());
-            options.visualStyle = $(this).val();
-            view.setVisualStyle(options.visualStyle);
-        };
-
-        inputs.each(function(i, input) {
-            if ($(input).val() === options.visualStyle) {
-                input.checked = true;
-            }
-            input.onclick = onInputClick;
-        });
+        return view;
     }
+
+    controller.visualStyles = [
+        {
+            key: 'standard',
+            title: 'Universal (mouse or touchscreen)',
+            description: 'Players are differentiated by colour only. Make sure you can tell the difference between the four player arrows below&hellip;'
+        },
+        {
+            key: 'redGreen',
+            title: 'Red-green colourblind',
+            description: 'Red and yellow players are distinguished from green and blue players by shape (designed for protanopia and deuteranopia).'
+        },
+        {
+            key: 'blueYellow',
+            title: 'Blue-yellow colourblind',
+            description: 'Blue and red players are distinguished from yellow and green players by shape (designed for tritanopia).'
+        }
+    ];
 
     controller.open = false;
 
+    var preview;
+
+    controller.update = function() {
+        localStorage.visualStyle = options.visualStyle;
+        preview.setVisualStyle(options.visualStyle);
+    };
+
     controller.show = function show() {
-        setupAccessibilityOptions();
-        document.getElementById('accessibility').classList.remove('hidden');
+        preview = setupPreview();
         controller.open = true;
     };
 
     controller.hide = function hide() {
         model.isRunning = false;
-        document.getElementById('accessibility').classList.add('hidden');
         controller.open = false;
     };
 

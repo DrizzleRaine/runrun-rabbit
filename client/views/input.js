@@ -19,6 +19,15 @@ function directionFromKey(keyCode) {
     }
 }
 
+function disableArrowKeys() {
+    // Prevent accidental scrolling or other confusing behaviour (e.g. switching selected radio buttons)
+    window.onkeydown = function (event) {
+        if (directionFromKey(event.keyCode) !== null) {
+            event.preventDefault();
+        }
+    };
+}
+
 var methods = {};
 
 module.exports = methods;
@@ -121,9 +130,7 @@ methods.laptop = function laptop(grid, placeArrowCallback) {
         currentLocation.y = handler.getRelativeY(event);
     };
 
-    window.onkeydown = function(event) {
-        event.preventDefault();
-    };
+    disableArrowKeys();
 
     window.onkeyup = function (event) {
         var direction = directionFromKey(event.keyCode);
@@ -185,6 +192,8 @@ methods.universal = function universal(grid, placeArrowCallback) {
     };
 
     window.onmouseup = onEnd;
+
+    disableArrowKeys();
 
     var onTouchStart = function(event) {
         start = event.changedTouches[0];
