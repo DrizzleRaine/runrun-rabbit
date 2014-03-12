@@ -26,7 +26,7 @@
     "grunt-mocha-test": "0.6.x",
     "grunt-istanbul": "0.2.x",
     "grunt-exec": "~0.4.2",
-    "redis-mock": "~0.2.0"
+    "redis-mock": "~0.2.x"
   },
   "engines": {
     "node": "0.10.x",
