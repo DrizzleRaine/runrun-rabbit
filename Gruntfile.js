@@ -58,7 +58,14 @@ module.exports = function(grunt) {
         browserify: {
             main: {
                 src: ['client/main.js'],
-                dest: 'build/client/bundle.js'
+                dest: 'build/client/bundle.js',
+                options: {
+                    alias: [
+                        'client/views/menu.js:menu',
+                        'client/controllers/game.js:controllers/game',
+                        'rivets:rivets'
+                    ]
+                }
             }
         },
         mochaTest: {

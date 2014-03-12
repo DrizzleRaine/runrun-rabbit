@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RunRun Rabbit!</title>
+    <link href="./site.css" rel="stylesheet">
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <div id="container" class="container">
+        <h2 id="gameMessage" data-text="text" data-show="text" class="message"></h2>
+    </div>
+    <script src="./bundle.js"></script>
+    <script>
+        var messageHolder = { text: '' };
+        var rivets = require('rivets');
+        rivets.configure({ prefix: 'data' });
+        var view = rivets.bind(document.getElementById('gameMessage'), messageHolder);
+        var gameController = require('controllers/game');
+        gameController.init(true, localStorage, messageHolder);
+    </script>
+</body>
+</html>

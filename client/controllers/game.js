@@ -7,13 +7,13 @@ var RNG = require('../../shared/utils/rng.js').RNG;
 
 module.exports = (function() {
     var model;
-    var message;
     var arena;
     var socket;
     var connected = false;
     var container;
     var inputMethod;
     var visualStyle;
+    var message;
 
     function disconnect() {
         if (connected) {
@@ -38,7 +38,7 @@ module.exports = (function() {
         arena.setVisualStyle(visualStyle);
 
         arena.gameOver(function() {
-            message.setText('Game over!');
+            message.text = 'Game over!';
             connected = false;
         });
 
@@ -56,25 +56,23 @@ module.exports = (function() {
         }
     }
 
-    var init = function init(multiplayer, options) {
+    var init = function init(multiplayer, options, messageHolder) {
         container = document.createElement('div');
         container.setAttribute('id', 'game');
         document.body.appendChild(container);
-        inputMethod = options.inputMethod;
-        visualStyle = options.visualStyle;
-
-        message = require('./../views/message.js').build(container);
-        container.appendChild(message.view);
+        inputMethod = options.inputMethod || 'universal';
+        visualStyle = options.visualStyle || 'standard';
+        message = messageHolder;
 
         if (multiplayer) {
             socket = io.connect('/');
             connected = true;
 
-            message.setText('Waiting for other players to join...');
+            message.text = 'Waiting for other players to join...';
 
             socket.on('start', function(gameData) {
                 if (connected) {
-                    message.setText('');
+                    message.text = '';
                     startGame(gameData);
                 }
             });
@@ -90,7 +88,7 @@ module.exports = (function() {
                         }
                         model = null;
                         arena = null;
-                        message.setText('Connection error!');
+                        message.text = 'Connection error!';
                     }
                 }, 500);
             };

@@ -3,7 +3,6 @@
 <head>
     <title>RunRun Rabbit!</title>
     <link href="./site.css" rel="stylesheet">
-    <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
     <div id="container" class="container">
@@ -11,11 +10,9 @@
         <h4 id="backToMenu" data-hide="menu" data-on-click="returnToMenu"><a href="">Return to menu</a></h4>
         <div id="menu" data-show="menu">
             <button data-hint-text="Start a single player game against a computer-controlled opponent"
-                    data-on-click="startGame" value="false"
-                    id="startSinglePlayer" type="button" class="btn player-1">Start Single Player Game</button>
-            <button data-hint-text="Start a multiplayer game against a randomly chosen human opponent"
-                    data-on-click="startGame" value="true"
-                    id="startMultiplayer" type="button" class="btn player-1">Start Multiplayer Game</button>
+                    data-on-click="startSinglePlayerGame" type="button" class="btn player-1">Start Single Player Game</button>
+            <a data-hint-text="Start a multiplayer game against a randomly chosen human opponent" href="multiplayer"
+               class="btn player-1">Start Multiplayer Game</a>
             <br /><br />
             <button data-hint-text="View instructions and configure input options"
                     data-on-click="showController" data-controller="settings"
@@ -46,7 +43,7 @@
                            name="inputMethod"
                            data-value="option.key"
                            data-checked="options.inputMethod"
-                           data-on-click="update" />
+                           data-on-click="settings.update" />
                     { option.title }</h3>
                 <p data-html="option.description"></p>
             </label>
@@ -60,7 +57,7 @@
                            name="visualStyle"
                            data-value="option.key"
                            data-checked="options.visualStyle"
-                           data-on-click="update" />
+                           data-on-click="accessibility.update" />
                     { option.title }</h3>
                 <p data-html="option.description"></p>
             </label>
@@ -69,7 +66,9 @@
             <p>(Coming soon)</p>
         </div>
         <h2 data-text="hintMessage" data-show="menu" class="menuHint message"></h2>
+        <h2 data-text="gameMessage.text" data-show="gameMessage" class="message"></h2>
     </div>
     <script src="./bundle.js"></script>
+    <script type="text/javascript">require('menu')();</script>
 </body>
 </html>
