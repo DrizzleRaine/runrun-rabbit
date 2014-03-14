@@ -1,13 +1,14 @@
 'use strict';
 
 module.exports = function build(parent, model, gameData, placeArrowCallback) {
-    var inputMethods = require('./input.js');
+    var input = require('./input.js');
     var critters = require('../../shared/sprites.js');
 
     var grid = require('../graphics/grid.js')(model);
     var fixtures = require('../graphics/fixtures.js')(grid);
 
     var sprites = require('../graphics/sprites.js')(grid);
+    var cursors = require('../graphics/cursors.js')(grid);
 
     parent.appendChild(grid.view);
     var hud = require('./hud').build(parent, gameData);
@@ -16,6 +17,7 @@ module.exports = function build(parent, model, gameData, placeArrowCallback) {
     var startTime = new Date().getTime();
 
     var gameOverCallback;
+    var playerPosition;
 
     function animate() {
         var gameTime = new Date().getTime() - startTime;
@@ -61,6 +63,10 @@ module.exports = function build(parent, model, gameData, placeArrowCallback) {
             sprites.drawCritter(foxes.shift(), gameTime);
         }
 
+        if (playerPosition) {
+            cursors.drawCursor(model.playerId, playerPosition.x, playerPosition.y);
+        }
+
         hud.update({
             score: model.playerScores.current,
             time: gameTime
@@ -78,9 +84,20 @@ module.exports = function build(parent, model, gameData, placeArrowCallback) {
             currentInputMethod.unbind();
         }
 
-        grid.view.style.cursor = 'url("cursor-' + model.playerId + '.cur"), default';
+        var handler = input.offSetHandler(grid);
 
-        currentInputMethod = inputMethods[inputMethod](grid, function(x, y, direction) {
+        grid.view.style.cursor = 'none';
+        grid.view.addEventListener('mousemove', function(event) {
+            playerPosition = {
+                x: handler.getRelativeX(event),
+                y: handler.getRelativeY(event)
+            };
+        });
+        grid.view.addEventListener('mouseout', function() {
+            playerPosition = null;
+        });
+
+        currentInputMethod = input.methods[inputMethod](grid, function(x, y, direction) {
             if (!placeArrowCallback) {
                 return;
             }

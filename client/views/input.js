@@ -21,28 +21,38 @@ function directionFromKey(keyCode) {
 
 function disableArrowKeys() {
     // Prevent accidental scrolling or other confusing behaviour (e.g. switching selected radio buttons)
-    window.onkeydown = function (event) {
+    var onKeyDown = function (event) {
         if (directionFromKey(event.keyCode) !== null) {
             event.preventDefault();
         }
     };
+
+    window.addEventListener('keydown', onKeyDown);
+
+    return {
+        unbind: function() {
+            window.removeEventListener('keyDown', onKeyDown);
+        }
+    };
 }
 
-var methods = {};
+function disableContextMenu() {
+    var onContextMenu = function(event) {
+        event.preventDefault();
+    };
 
-module.exports = methods;
+    window.addEventListener('contextmenu', onContextMenu);
 
-function clearHandlers(view) {
-    window.oncontextmenu = null;
-    window.onkeydown = null;
-    window.onkeyup = null;
-    window.onresize = null;
-    view.onmousedown = null;
-    view.onmousemove = null;
-    window.onmouseup = null;
+    return {
+        unbind: function() {
+            window.removeEventListener('contextmenu', onContextMenu);
+        }
+    };
 }
 
-function offsetHandler(grid) {
+module.exports.methods = {};
+
+var offsetHandler = module.exports.offSetHandler = function offsetHandler(grid) {
     var offsetX;
     var offsetY;
 
@@ -75,28 +85,26 @@ function offsetHandler(grid) {
         normalise: normalise,
         isInGrid: isInGrid
     };
-}
+};
 
-methods.desktop = function desktop(grid, placeArrowCallback) {
+module.exports.methods.desktop = function desktop(grid, placeArrowCallback) {
     var activeKey;
     var handler = offsetHandler(grid);
 
-    window.oncontextmenu = function() { return false; };
-
-    window.onkeydown = function (event) {
+    var onKeyDown = function (event) {
         if (directionFromKey(event.keyCode) !== null) {
             activeKey = event.keyCode;
             event.preventDefault();
         }
     };
 
-    window.onkeyup = function (event) {
+    var onKeyUp = function (event) {
         if (event.keyCode === activeKey) {
             activeKey = null;
         }
     };
 
-    grid.view.onmousedown = function(event) {
+    var onMouseDown = function(event) {
         if (!placeArrowCallback) {
             return;
         }
@@ -114,25 +122,31 @@ methods.desktop = function desktop(grid, placeArrowCallback) {
         );
     };
 
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('keyup', onKeyUp);
+    grid.view.addEventListener('mousedown', onMouseDown);
+    var contextMenuDisabled = disableContextMenu();
+
     return {
-        unbind: function() { clearHandlers(grid.view); }
+        unbind: function() {
+            window.removeEventListener('keydown', onKeyDown);
+            window.removeEventListener('keyup', onKeyUp);
+            grid.view.removeEventListener('mousedown', onMouseDown);
+            contextMenuDisabled.unbind();
+        }
     };
 };
 
-methods.laptop = function laptop(grid, placeArrowCallback) {
+module.exports.methods.laptop = function laptop(grid, placeArrowCallback) {
     var currentLocation = {};
     var handler = offsetHandler(grid);
 
-    window.oncontextmenu = function() { return false; };
-
-    grid.view.onmousemove = function(event) {
+    var onMouseMove = function(event) {
         currentLocation.x = handler.getRelativeX(event);
         currentLocation.y = handler.getRelativeY(event);
     };
 
-    disableArrowKeys();
-
-    window.onkeyup = function (event) {
+    var onKeyUp = function (event) {
         var direction = directionFromKey(event.keyCode);
         if (direction !== null && handler.isInGrid(currentLocation.x, currentLocation.y)) {
             placeArrowCallback(
@@ -144,12 +158,22 @@ methods.laptop = function laptop(grid, placeArrowCallback) {
         }
     };
 
+    grid.view.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('keyup', onKeyUp);
+    var arrowKeysDisabled = disableArrowKeys();
+    var contextMenuDisabled = disableContextMenu();
+
     return {
-        unbind: function() { clearHandlers(grid.view); }
+        unbind: function() {
+            grid.view.removeEventListener('mousemove', onMouseMove);
+            window.removeEventListener('keyup', onKeyUp);
+            arrowKeysDisabled.unbind();
+            contextMenuDisabled.unbind();
+        }
     };
 };
 
-methods.universal = function universal(grid, placeArrowCallback) {
+module.exports.methods.universal = function universal(grid, placeArrowCallback) {
     var start;
     var handler = offsetHandler(grid);
 
@@ -187,13 +211,9 @@ methods.universal = function universal(grid, placeArrowCallback) {
         start = null;
     };
 
-    grid.view.onmousedown = function(event) {
+    var onMouseDown = function(event) {
         start = event;
     };
-
-    window.onmouseup = onEnd;
-
-    disableArrowKeys();
 
     var onTouchStart = function(event) {
         start = event.changedTouches[0];
@@ -212,13 +232,18 @@ methods.universal = function universal(grid, placeArrowCallback) {
     grid.view.addEventListener('touchstart', onTouchStart);
     window.addEventListener('touchend', onTouchEnd);
     window.addEventListener('touchmove', onTouchMove);
+    grid.view.addEventListener('mousedown', onMouseDown);
+    window.addEventListener('mouseup', onEnd);
+    var arrowKeysDisabled = disableArrowKeys();
 
     return {
         unbind: function() {
             grid.view.removeEventListener('touchstart', onTouchStart);
             window.removeEventListener('touchend', onTouchEnd);
             window.removeEventListener('touchmove', onTouchMove);
-            clearHandlers(grid.view);
+            grid.view.removeEventListener('mousedown', onMouseDown);
+            window.removeEventListener('mouseup', onEnd);
+            arrowKeysDisabled.unbind();
         }
     };
 };
