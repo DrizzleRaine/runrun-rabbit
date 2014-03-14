@@ -62,6 +62,7 @@ module.exports = function() {
             }
         }
     });
+    container.style.display = '';
 
     // Take new visitors straight to the instructions/settings view
     var newVisitor = !localStorage.visited;

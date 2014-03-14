@@ -5,8 +5,8 @@
     <link href="./site.css" rel="stylesheet">
 </head>
 <body>
-    <div id="container" class="container">
-        <h1>RunRun Rabbit!</h1>
+    <h1>RunRun Rabbit!</h1>
+    <div id="container" class="container" style="display: none" data-show="">
         <h4 id="backToMenu" data-hide="menu" data-on-click="returnToMenu"><a href="">Return to menu</a></h4>
         <div id="menu" data-show="menu">
             <button data-hint-text="Start a single player game against a computer-controlled opponent"
@@ -70,5 +70,8 @@
     </div>
     <script src="./bundle.js"></script>
     <script type="text/javascript">require('menu')();</script>
+    <noscript>
+        <h2 class="message">Sorry, you must have JavaScript enabled to play this game.</h2>
+    </noscript>
 </body>
 </html>
