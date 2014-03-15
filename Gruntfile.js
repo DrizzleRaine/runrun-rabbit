@@ -2,7 +2,7 @@
 
 module.exports = function(grunt) {
     grunt.initConfig({
-        clean: [ 'build', 'release' ],
+        clean: [ 'build' ],
         jshint: {
             options: {
                 camelcase: true,
@@ -58,7 +58,7 @@ module.exports = function(grunt) {
         browserify: {
             main: {
                 src: ['client/main.js'],
-                dest: 'build/client/bundle.js',
+                dest: 'build/debug/client/bundle.js',
                 options: {
                     alias: [
                         'client/views/menu.js:menu',
@@ -80,36 +80,48 @@ module.exports = function(grunt) {
         uglify: {
             all: {
                 files: [
-                    { expand: true, cwd: 'build/', src: ['**/*.js'], dest: 'build/' }
+                    { expand: true, cwd: 'build/debug', src: ['**/*.js'], dest: 'build/production' }
+                ]
+            }
+        },
+        cssmin: {
+            minify: {
+                src: 'build/debug/client/site.css',
+                dest: 'build/production/client/site.css'
+            }
+        },
+        copy: {
+            debug: {
+                files: [
+                    { src: ['client/static/**'], dest: 'build/debug/client/', expand: true, flatten: true },
+                    { src: ['server/**'], dest: 'build/debug/' },
+                    { src: ['shared/**'], dest: 'build/debug/' }
+                ]
+            },
+            prod: {
+                files: [
+                    { src: ['release.package.json'], dest: 'build/production/package.json' },
+                    { src: ['build/debug/client/*.html'], dest: 'build/production/client/', expand: true, flatten: true },
+                    { src: ['build/debug/client/*.png'], dest: 'build/production/client/',expand: true, flatten: true }
                 ]
             }
         },
         compress: {
             client: {
                 options: {
-                    archive: 'release/client.zip'
+                    archive: 'build/release/client.zip'
                 },
                 expand: true,
-                cwd: 'build/client',
+                cwd: 'build/production/client',
                 src: ['**/*']
             },
             server: {
                 options: {
-                    archive: 'release/server.zip'
+                    archive: 'build/release/server.zip'
                 },
                 expand: true,
-                cwd: 'build',
+                cwd: 'build/production',
                 src: ['package.json', 'server/**/*', 'shared/**/*']
-            }
-        },
-        copy: {
-            main: {
-                files: [
-                    { src: ['release.package.json'], dest: 'build/package.json' },
-                    { src: ['client/static/**'], dest: 'build/client/', expand: true, flatten: true },
-                    { src: ['server/**'], dest: 'build/' },
-                    { src: ['shared/**'], dest: 'build/' }
-                ]
             }
         },
         watch: {
@@ -122,8 +134,8 @@ module.exports = function(grunt) {
         nodemon: {
             dev: {
                 options: {
-                    file: 'build/server/start.js',
-                    watchedFolders: ['build'],
+                    file: 'build/debug/server/start.js',
+                    watchedFolders: ['build/debug'],
                     delayTime: 1
                 }
             }
@@ -170,6 +182,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-concurrent');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-contrib-compress');
     grunt.loadNpmTasks('grunt-mocha-test');
     grunt.loadNpmTasks('grunt-istanbul');
@@ -179,10 +192,10 @@ module.exports = function(grunt) {
         process.env.SOURCE_ROOT = '/build/instrument';
     });
 
-    grunt.registerTask('default', ['test', 'clean', 'browserify', 'copy']);
-    grunt.registerTask('production', ['default', 'uglify']);
-    grunt.registerTask('release', ['production', 'compress']);
     grunt.registerTask('test', ['jshint', 'mochaTest']);
+    grunt.registerTask('default', ['test', 'clean', 'browserify', 'copy:debug']);
+    grunt.registerTask('production', ['default', 'uglify', 'cssmin', 'copy:prod']);
+    grunt.registerTask('release', ['production', 'compress']);
     grunt.registerTask('cover', ['clean', 'instrument', 'setInstrumentedSourceRoot', 'test', 'storeCoverage', 'makeReport']);
     grunt.registerTask('run', ['default', 'concurrent']);
     grunt.registerTask('deploy', ['production', 'exec:deploy']);
