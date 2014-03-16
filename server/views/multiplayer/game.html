@@ -2,14 +2,15 @@
 <html>
 <head>
     <title>RunRun Rabbit!</title>
-    <link href="./site.css" rel="stylesheet">
-    <script src="/socket.io/socket.io.js"></script>
+    <link href="/site.css" rel="stylesheet">
+    <script src=/socket.io/socket.io.js"></script>
 </head>
 <body>
     <div id="container" class="container">
+        <h1>RunRun Rabbit!</h1>
         <h2 id="gameMessage" data-text="text" data-show="text" class="message"></h2>
     </div>
-    <script src="./bundle.js"></script>
+    <script src="/bundle.js"></script>
     <script>
         var messageHolder = { text: '' };
         var rivets = require('rivets');

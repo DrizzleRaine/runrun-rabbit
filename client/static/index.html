@@ -23,22 +23,22 @@
         </div>
         <div id="settings" data-show="settings.open" class="settings">
             <h2>Instructions</h2>
-            <div>
+            <div class="col">
                 <h3 id="rabbits">Rabbits</h3>
                 <p>Earn points by guiding the purple bunnies safely to your home.</p>
             </div>
-            <div>
+            <div class="col">
                 <h3 id="foxes">Foxes</h3>
                 <p>Watch out for foxes! They'll eat your rabbits if they reach your home.</p>
             </div>
-            <div>
+            <div class="col">
                 <h3 id="arrows">Arrows</h3>
                 <blockquote>Practise here!</blockquote>
                 <p>Place arrows to guide critters around.
                    You can only place up to three arrows at a time, so use them wisely&hellip;</p>
             </div>
             <h2>Controls</h2>
-            <label data-each-option="settings.inputMethods">
+            <label data-each-option="settings.inputMethods" class="col">
                 <h3><input type="radio"
                            name="inputMethod"
                            data-value="option.key"
@@ -48,11 +48,11 @@
                 <p data-html="option.description"></p>
             </label>
             <br /><br />
-            <a class="btn player-1" href="" data-on-click="returnToMenu">Start playing now!</a>
+            <a class="btn btn-lg player-1" href="" data-on-click="returnToMenu">Start playing now!</a>
         </div>
         <div id="accessibility" data-show="accessibility.open" class="settings">
             <h2>Graphics</h2>
-            <label data-each-option="accessibility.visualStyles">
+            <label data-each-option="accessibility.visualStyles" class="col">
                 <h3><input type="radio"
                            name="visualStyle"
                            data-value="option.key"
@@ -61,7 +61,7 @@
                     { option.title }</h3>
                 <p data-html="option.description"></p>
             </label>
-            <div id="four-player-preview"></div>
+            <div id="four-player-preview" class="col"></div>
             <h2>Sound</h2>
             <p>(Coming soon)</p>
         </div>

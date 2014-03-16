@@ -31,8 +31,12 @@ exports.start = function(callback) {
 
     app.use(express.static(path.resolve(__dirname + '/../client')));
 
-    app.use(express.bodyParser());
+    app.use(express.urlencoded());
     app.use(express.cookieParser());
+
+    app.set('view engine', 'html');
+    app.set('views', __dirname + '/views');
+    app.engine('html', require('hogan-express'));
 
     app.map(multiplayerRoute());
     app.map(userRoute());

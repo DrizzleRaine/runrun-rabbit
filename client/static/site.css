@@ -68,16 +68,17 @@ h2.menuHint {
     padding: 0.5em;
 }
 
-.settings h2, .settings .btn {
+.settings h2, .settings .btn-lg {
     border-radius: 6px;
     font-size: 1.5em;
 }
 
-.settings .btn {
+.settings .btn-lg {
     width: 100%;
+    margin-top: 1em;
 }
 
-.settings div, .settings label {
+.settings .col {
     text-align: left;
     width: 345px;
     margin: 0 20px;
@@ -135,7 +136,6 @@ h2.menuHint {
 #menu .btn {
     width: 100%;
     margin-top: 1em;
-    border-radius: 3px;
     font-size: 1.1em;
 }
 
@@ -152,8 +152,6 @@ body, .btn, .btn-lg {
     margin-right: auto;
     margin-left: auto;
 }
-
-
 
 .hud h3, .hud .timer {
     float: left;
@@ -187,6 +185,16 @@ h3.score {
     cursor: pointer;
     border: 0;
     text-decoration: none;
+    border-radius: 3px;
+}
+
+h3 input {
+    font-size: 1em;
+}
+
+h3 input.btn {
+    padding: 0.6em;
+    vertical-align: bottom;
 }
 
 .player-0 {

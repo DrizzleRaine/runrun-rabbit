@@ -2,21 +2,19 @@
 
 var factory = require('../../..' + (process.env.SOURCE_ROOT || '') + '/server/repositories/user.js');
 var redisFactory = require('../../..' + (process.env.SOURCE_ROOT || '') + '/server/repositories/redisFactory.js');
+var mockRedis = require('redis-mock');
 
 var assert = require('chai').assert;
-var sinon = require('sinon');
 
-var mockRedis = require('redis-mock');
 var promise = require('promise');
 
 describe('User repository', function() {
     var userRepository;
-    var redisClient = mockRedis.createClient();
+    var redisClient = redisFactory.createClient();
     var del = promise.denodeify(redisClient.del);
     var hget = promise.denodeify(redisClient.hget);
 
     beforeEach(function() {
-        sinon.stub(redisFactory, 'createClient', mockRedis.createClient);
         userRepository = factory.build();
     });
 
@@ -25,7 +23,6 @@ describe('User repository', function() {
             assert.isNull(err);
             done();
         });
-        redisFactory.createClient.restore();
     });
 
     it('should persist new users with a default TTL', function(done) {

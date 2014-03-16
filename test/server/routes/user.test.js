@@ -6,48 +6,64 @@ var sinon = require('sinon');
 
 var assert = require('chai').assert;
 
-describe('Multiplayer route', function() {
+describe('User route', function() {
     describe('details', function() {
         var request, response, route, userRepo;
 
         beforeEach(function() {
             request = {
-                cookies: {}
+                cookies: {},
+                body: {}
             };
             response = {
-                sendFile: sinon.spy(),
-                redirect: sinon.spy()
+                render: sinon.spy(),
+                redirect: sinon.spy(),
+                cookie: sinon.spy()
             };
             route = routeFactory();
-            userRepo = {
-                fetchUser: sinon.stub,
-                createUser: sinon.spy
-            };
-            sinon.stub(userRepoFactory, 'build', function() {
-                return userRepo;
-            });
-        });
-
-        afterEach(function() {
-            userRepoFactory.build.restore();
+            userRepo = userRepoFactory.build();
         });
 
         describe('GET', function() {
-            it('should display the user details view', function() {
+            it('should display the user details view', function(done) {
                 route['/user']['/details'].get(request, response);
-                assert.isTrue(response.sendFile.calledWith('details.html'));
+
+                var token = setInterval(function() {
+                    if (response.render.called) {
+                        clearInterval(token);
+                        assert.isTrue(response.render.calledWith('user/details'));
+                        done();
+                    }
+                });
             });
         });
 
         describe('POST', function() {
-            it('should create a new user when username is available', function() {
-//                request.params.username = 'User1';
-//                assertTrue(userRepo.createUser.calledWith('User1'));
-//                assert.isTrue(response.sendFile.calledWith('/user/details'));
+            it('should create a new user when username is available', function(done) {
+                request.body.username = 'User1';
+
+                route['/user']['/details'].post(request, response);
+
+                var token = setInterval(function() {
+                    if (response.redirect.called) {
+                        clearInterval(token);
+                        assert.isTrue(response.redirect.calledWith('/user/details'));
+                        assert.isTrue(response.cookie.called);
+
+                        userRepo.fetchUser(response.cookie.firstCall.args[1], function(error, user) {
+                            assert.equal('User1', user.name);
+                            done();
+                        });
+                    }
+                }, 10);
+            });
+
+            it('should return an error when username is not specified', function() {
+                //TODO
             });
 
             it('should return an error when username is not available', function() {
-
+                //TODO
             });
         });
     });

@@ -125,7 +125,12 @@ module.exports = function(grunt) {
             }
         },
         watch: {
-            files: ['client/**/*.js', 'shared/**/*.js', 'server/**/*.js', 'client/**/*.html', 'client/**/*.css'],
+            files: ['client/**/*.js',
+                    'shared/**/*.js',
+                    'server/**/*.js',
+                    'server/**/*.html',
+                    'client/**/*.html',
+                    'client/**/*.css'],
             tasks: ['browserify', 'copy'],
             options: {
                 livereload: true

@@ -1,10 +1,8 @@
 'use strict';
 
-var userRepoFactory = require('../repositories/user.js');
+var userRepo = require('../repositories/user.js').build();
 
 module.exports = function() {
-    var userRepo = userRepoFactory.build();
-
     return {
         '/multiplayer': {
             get: function(req, res) {
@@ -26,7 +24,7 @@ module.exports = function() {
             },
             '/game': {
                 get: function(req, res) {
-                    res.sendFile('game.html', {root: __dirname + '/../views/multiplayer'});
+                    res.render('multiplayer/game');
                 }
             }
         }

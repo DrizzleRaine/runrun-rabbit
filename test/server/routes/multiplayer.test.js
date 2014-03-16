@@ -7,19 +7,12 @@ var redisFactory = require('../../..' + (process.env.SOURCE_ROOT || '') + '/serv
 var sinon = require('sinon');
 var assert = require('chai').assert;
 
-var mockRedis = require('redis-mock');
-
 describe('Multiplayer route', function() {
-    beforeEach(function() {
-        sinon.stub(redisFactory, 'createClient', mockRedis.createClient);
-    });
-
     afterEach(function(done) {
-        mockRedis.createClient().flushdb(function (err) {
+        redisFactory.createClient().flushdb(function (err) {
             assert.isNull(err);
             done();
         });
-        redisFactory.createClient.restore();
     });
 
     describe('root', function() {
@@ -76,7 +69,7 @@ describe('Multiplayer route', function() {
         beforeEach(function() {
             request = {};
             response = {
-                sendFile: sinon.spy()
+                render: sinon.spy()
             };
             route = routeFactory();
         });
@@ -84,7 +77,7 @@ describe('Multiplayer route', function() {
         it('should start a multiplayer game', function() {
             route['/multiplayer']['/game'].get(request, response);
 
-            assert.isTrue(response.sendFile.calledWith('game.html'));
+            assert.isTrue(response.render.calledWith('multiplayer/game'));
         });
     });
 });
