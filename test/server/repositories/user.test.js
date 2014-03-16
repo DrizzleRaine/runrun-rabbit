@@ -1,10 +1,12 @@
 'use strict';
 
 var factory = require('../../..' + (process.env.SOURCE_ROOT || '') + '/server/repositories/user.js');
+var redisFactory = require('../../..' + (process.env.SOURCE_ROOT || '') + '/server/repositories/redisFactory.js');
+
 var assert = require('chai').assert;
+var sinon = require('sinon');
 
 var mockRedis = require('redis-mock');
-
 var promise = require('promise');
 
 describe('User repository', function() {
@@ -14,7 +16,8 @@ describe('User repository', function() {
     var hget = promise.denodeify(redisClient.hget);
 
     beforeEach(function() {
-        userRepository = factory.build(mockRedis.createClient());
+        sinon.stub(redisFactory, 'createClient', mockRedis.createClient);
+        userRepository = factory.build();
     });
 
     afterEach(function(done) {
@@ -22,6 +25,7 @@ describe('User repository', function() {
             assert.isNull(err);
             done();
         });
+        redisFactory.createClient.restore();
     });
 
     it('should persist new users with a default TTL', function(done) {
@@ -86,10 +90,10 @@ describe('User repository', function() {
             .done();
     });
 
-    it('should extend user expiry time', function(done) {
+    it('should extend user expiry time on read', function(done) {
         userRepository.createUser('user1')
             .then(function (userId) {
-                userRepository.extendUser(userId);
+                userRepository.fetchUser(userId);
                 return userId;
             }).then(function (userId) {
                 var ttl = mockRedis.storage[userId].expires;

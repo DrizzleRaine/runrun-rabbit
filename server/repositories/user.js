@@ -3,7 +3,9 @@
 var uuid = require('node-uuid');
 var promise = require('promise');
 
-module.exports.build = function buildUserRepo(redisClient) {
+module.exports.build = function buildUserRepo() {
+    var redisClient = require('./redisFactory.js').createClient();
+
     // Lifetime of user accounts associated only with a cookie (rather than, for example, an OpenID token)
     var UNAUTHENTICATED_USER_EXPIRY = 86400;
 
@@ -46,10 +48,15 @@ module.exports.build = function buildUserRepo(redisClient) {
                 .nodeify(callback);
         },
         fetchUser: function (userId, callback) {
-            return hgetall(userId).nodeify(callback);
-        },
-        extendUser: function(userId, callback) {
-            return expire(userId, UNAUTHENTICATED_USER_EXPIRY).nodeify(callback);
+            return expire(userId, UNAUTHENTICATED_USER_EXPIRY)
+                .then(function (result) {
+                    if (result) {
+                        return hgetall(userId);
+                    } else {
+                        return null;
+                    }
+                })
+                .nodeify(callback);
         }
     };
 
