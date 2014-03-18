@@ -55,6 +55,27 @@ describe('User repository', function() {
             .done();
     });
 
+    it('should return error when no username specified', function(done) {
+        userRepository.createUser(null, function(err) {
+            assert.isNotNull(err);
+            done();
+        });
+    });
+
+    it('should return error when username is too short', function(done) {
+        userRepository.createUser('A', function(err) {
+            assert.isNotNull(err);
+            done();
+        });
+    });
+
+    it('should return error when username is too long', function(done) {
+        userRepository.createUser('ABCDEFGHIJKLYMNOPQRSTUVWXYZ', function(err) {
+            assert.isNotNull(err);
+            done();
+        });
+    });
+
     it('should allow username to be re-used when user has expired', function(done) {
         var username = 'User1';
 

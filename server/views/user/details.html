@@ -13,6 +13,9 @@
             <input id="username" name="username" type="text" value="{{user.name}}">
             <input type="submit" class="btn player-0">
         </h3>
+        {{#error}}
+            <h4 class="error">{{error}}</h4>
+        {{/error}}
     </form>
     {{#user}}
         <a class="btn btn-lg player-1" href="/multiplayer">Start playing now!</a>

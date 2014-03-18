@@ -2,8 +2,8 @@
 
 var routeFactory = require('../../..' + (process.env.SOURCE_ROOT || '') + '/server/routes/user.js');
 var userRepoFactory = require('../../..' + (process.env.SOURCE_ROOT || '') + '/server/repositories/user.js');
+var mockRedis = require('redis-mock');
 var sinon = require('sinon');
-
 var assert = require('chai').assert;
 
 describe('User route', function() {
@@ -22,6 +22,13 @@ describe('User route', function() {
             };
             route = routeFactory();
             userRepo = userRepoFactory.build();
+        });
+
+        afterEach(function(done) {
+            mockRedis.createClient().flushdb(function (err) {
+                assert.isNull(err);
+                done();
+            });
         });
 
         describe('GET', function() {
@@ -58,12 +65,21 @@ describe('User route', function() {
                 }, 10);
             });
 
-            it('should return an error when username is not specified', function() {
-                //TODO
-            });
+            it('should return an error when username is not available', function(done) {
+                userRepo.createUser('User1').then(function() {
+                    console.log('User created');
+                    request.body.username = 'User1';
+                    route['/user']['/details'].post(request, response);
 
-            it('should return an error when username is not available', function() {
-                //TODO
+                    var token = setInterval(function() {
+                        if (response.render.called) {
+                            clearInterval(token);
+                            assert.isTrue(response.render.calledWith('user/details'));
+                            assert.isDefined(response.render.firstCall.args[1].error);
+                            done();
+                        }
+                    }, 10);
+                }).done();
             });
         });
     });

@@ -18,20 +18,16 @@ module.exports = function() {
             '/details': {
                 get: displayDetails,
                 post: function(req, res) {
-                    if (req.body.username) {
-                        userRepo.createUser(req.body.username, function(error, userId) {
-                            if (error) {
-                                res.render('user/details', {
-                                    user: userRepo.fetchUser(req.cookies.playerId),
-                                    error: error
-                                });
-                            }
+                    userRepo.createUser(req.body.username, function(error, userId) {
+                        if (error) {
+                            res.render('user/details', {
+                                error: error
+                            });
+                        } else {
                             res.cookie('playerId', userId);
                             res.redirect('/user/details');
-                        });
-                    } else {
-                        displayDetails(req, res);
-                    }
+                        }
+                    });
                 }
             }
         }

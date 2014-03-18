@@ -16,8 +16,23 @@ module.exports.build = function buildUserRepo() {
     var exists = promise.denodeify(redisClient.exists);
     var expire = promise.denodeify(redisClient.expire);
 
+    function validateUsername(username) {
+        if (!username) {
+            return 'Please specify a username';
+        } else if (username.length < 2) {
+            return 'Please specify a username at least two characters long';
+        } else if (username.length > 20) {
+            return 'Please specify a username no moare than twenty characters long';
+        }
+    }
+
     var userRepo = {
         createUser: function(username, callback) {
+            var error = validateUsername(username);
+            if (error) {
+                return promise.reject(error).nodeify(callback);
+            }
+
             var userId = 'player:' + uuid.v4();
 
             var tryAddUsername = hsetnx('names', username, userId);
@@ -31,7 +46,7 @@ module.exports.build = function buildUserRepo() {
                 .then(exists)
                 .then(function(doesExist) {
                     if (doesExist) {
-                        throw new Error('Username already taken');
+                        return promise.reject('Sorry, that username is already taken');
                     } else {
                         return saveUser;
                     }

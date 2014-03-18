@@ -197,6 +197,10 @@ h3 input.btn {
     vertical-align: bottom;
 }
 
+.error {
+    color: #FF3B26;
+}
+
 .player-0 {
     background-color: #007fff;
 }
