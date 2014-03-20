@@ -153,8 +153,16 @@ body, .btn, .btn-lg {
     margin-left: auto;
 }
 
-.hud h3, .hud .timer {
+.hud h3, .hud .timer, .hud h4 {
     float: left;
+}
+
+.hud h4:nth-child(odd) {
+    float: right;
+}
+
+.hud h4 {
+    font-size: 1.5em;
 }
 
 .hud h3 {

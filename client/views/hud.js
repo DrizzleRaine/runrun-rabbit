@@ -31,6 +31,13 @@ exports.build = function build(parent, gameData) {
         hudDiv.appendChild(scoreField);
     }
 
+    for (p = 0; p < gameData.totalPlayers; ++p) {
+        var nameField = document.createElement('h4');
+        var name = document.createTextNode(gameData.players[p]);
+        nameField.appendChild(name);
+        hudDiv.appendChild(nameField);
+    }
+
     parent.appendChild(hudDiv);
 
     function update(stats) {

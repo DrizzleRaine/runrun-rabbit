@@ -100,7 +100,8 @@ module.exports = (function() {
                 levelId: new Date().getTime() % levels.length,
                 totalPlayers: 2,
                 totalTime: 90000,
-                bots: [ new standard.Bot(1) ]
+                bots: [ new standard.Bot(1) ],
+                players: ['Human', 'Computer']
             });
         }
     };
