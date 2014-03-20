@@ -23,7 +23,8 @@ describe('Multiplayer route', function() {
                 cookies: {}
             };
             response = {
-                redirect: sinon.spy()
+                redirect: sinon.spy(),
+                clearCookie: sinon.spy()
             };
             route = routeFactory();
         });
@@ -34,13 +35,14 @@ describe('Multiplayer route', function() {
             assert.isTrue(response.redirect.calledWith('/user/details'));
         });
 
-        it('should direct expired users to pick a username', function(done) {
+        it('should direct expired users to pick a username and clear existing cookie', function(done) {
             request.cookies.playerId = 'player:134d7b1b-3924-4566-ad4b-a3fb3a91e591';
             route['/multiplayer'].get(request, response);
 
             var token = setInterval(function() {
                 if (response.redirect.called) {
                     assert.isTrue(response.redirect.calledWith('/user/details'));
+                    assert.isTrue(response.clearCookie.calledWith('playerId'));
                     clearInterval(token);
                     done();
                 }

@@ -24,7 +24,7 @@ module.exports = function() {
                                 error: error
                             });
                         } else {
-                            res.cookie('playerId', userId);
+                            res.cookie('playerId', userId, { expires: new Date(9999, 11), httpOnly: true });
                             res.redirect('/user/details');
                         }
                     });

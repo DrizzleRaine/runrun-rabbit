@@ -14,6 +14,7 @@ module.exports = function() {
                             if (user) {
                                 res.redirect('/multiplayer/game');
                             } else {
+                                res.clearCookie('playerId');
                                 res.redirect('/user/details');
                             }
                         })
