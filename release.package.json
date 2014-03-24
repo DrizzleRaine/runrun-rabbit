@@ -1,6 +1,6 @@
 {
   "name": "runrun-rabbit",
-  "subdomain": "runrunrabbit",
+  "main" : "./server/start.js",
   "version": "0.2.10",
   "dependencies": {
     "express": "3.x",
@@ -13,7 +13,6 @@
     "hogan-express": "~0.5.2",
     "cookie": "~0.1.1"
   },
-  "scripts": { "start": "node ./server/start.js" },
   "engines": {
     "node": "0.10.x",
     "npm": "1.2.x"

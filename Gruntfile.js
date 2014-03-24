@@ -93,7 +93,7 @@ module.exports = function(grunt) {
         copy: {
             debug: {
                 files: [
-                    { src: ['client/static/**'], dest: 'build/debug/client/', expand: true, flatten: true },
+                    { src: ['client/static/**'], dest: 'build/debug/client/', expand: true, flatten: true, filter: 'isFile' },
                     { src: ['server/**'], dest: 'build/debug/' },
                     { src: ['shared/**'], dest: 'build/debug/' }
                 ]
@@ -101,8 +101,13 @@ module.exports = function(grunt) {
             prod: {
                 files: [
                     { src: ['release.package.json'], dest: 'build/production/package.json' },
-                    { src: ['build/debug/client/*.html'], dest: 'build/production/client/', expand: true, flatten: true },
-                    { src: ['build/debug/client/*.png'], dest: 'build/production/client/',expand: true, flatten: true }
+                    {
+                        expand: true,
+                        src: ['build/debug/**'],
+                        dest: 'build/production/',
+                        filter: function(src) { return grunt.file.isFile(src) && src.indexOf('.js') !== src.length - 3; },
+                        rename: function(dest, src) { return src.replace('debug', 'production'); }
+                    }
                 ]
             }
         },
@@ -121,7 +126,7 @@ module.exports = function(grunt) {
                 },
                 expand: true,
                 cwd: 'build/production',
-                src: ['package.json', 'server/**/*', 'shared/**/*']
+                src: ['package.json', 'server/**/*', 'shared/**/*', 'client/**/*']
             }
         },
         watch: {
