@@ -66,9 +66,11 @@ module.exports = function() {
 
     // Take new visitors straight to the instructions/settings view
     var newVisitor = !localStorage.visited;
+    console.log(newVisitor);
     localStorage.visited = true;
     if (newVisitor) {
-        model.hideMenu();
+        console.log(newVisitor);
+        hideMenu();
         model.settings.show();
     }
 };
