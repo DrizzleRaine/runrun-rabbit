@@ -10,16 +10,16 @@
     <form method="post">
         <h3>
             <label for="username">Please choose a username:</label>
-            <input id="username" name="username" type="text" value="{{user.name}}">
-            <input type="submit" class="btn player-0">
+            <input id="username" name="username" type="text" value="{{username}}" maxlength="20">
+            <input type="submit" class="btn player-0" value="OK">
         </h3>
         {{#error}}
             <h4 class="error">{{error}}</h4>
         {{/error}}
     </form>
-    {{#user}}
+    {{#persisted}}
         <a class="btn btn-lg player-1" href="/multiplayer">Start playing now!</a>
-    {{/user}}
+    {{/persisted}}
 </div>
 </body>
 </html>

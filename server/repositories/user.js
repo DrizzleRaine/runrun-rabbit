@@ -22,7 +22,7 @@ module.exports.build = function buildUserRepo() {
         } else if (username.length < 2) {
             return 'Please specify a username at least two characters long';
         } else if (username.length > 20) {
-            return 'Please specify a username no moare than twenty characters long';
+            return 'Please specify a username no more than twenty characters long';
         }
     }
 

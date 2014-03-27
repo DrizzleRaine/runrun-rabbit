@@ -66,4 +66,24 @@ RC4.prototype.nextByte = function() {
     return this.s[(this.s[this.i] + this.s[this.j]) % 256];
 };
 
+/**
+ * @returns {number} Uniform random number between 0 and 1.
+ */
+RC4.prototype.uniform = function() {
+    var BYTES = 7; // 56 bits to make a 53-bit double
+    var output = 0;
+    for (var i = 0; i < BYTES; i++) {
+        output *= 256;
+        output += this.nextByte();
+    }
+    return output / (Math.pow(2, BYTES * 8) - 1);
+};
+
+/**
+ * Produce a random integer within [n, m).
+ */
+RC4.prototype.inRange = function(n, m) {
+    return n + Math.floor(this.uniform() * (m - n));
+};
+
 module.exports.RNG = RC4;

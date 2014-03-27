@@ -39,6 +39,47 @@ describe('User route', function() {
                     if (response.render.called) {
                         clearInterval(token);
                         assert.isTrue(response.render.calledWith('user/details'));
+                        assert.isFalse(response.render.lastCall.args[1].persisted);
+                        done();
+                    }
+                });
+            });
+
+            it('should indicate when the current user is persisted', function(done) {
+                userRepo.createUser('TestUser')
+                    .then(function(userId) {
+                        request.cookies.playerId = userId;
+                        route['/user']['/details'].get(request, response);
+
+                        var token = setInterval(function() {
+                            if (response.render.called) {
+                                clearInterval(token);
+                                assert.isTrue(response.render.calledWith('user/details'));
+                                assert.isTrue(response.render.lastCall.args[1].persisted);
+                                done();
+                            }
+                        });
+                    }).done();
+            });
+
+            it('should display a unique default username for new users', function(done) {
+                var response2 = { render: sinon.spy() };
+
+                route['/user']['/details'].get(request, response);
+                route['/user']['/details'].get(request, response2);
+
+                var token = setInterval(function() {
+                    if (response.render.called && response2.render.called) {
+                        clearInterval(token);
+
+                        var username1 = response.render.lastCall.args[1].username;
+                        var username2 = response2.render.lastCall.args[1].username;
+
+                        assert.isString(username1);
+                        assert.isString(username2);
+
+                        assert.notEqual(username1, username2);
+
                         done();
                     }
                 });
