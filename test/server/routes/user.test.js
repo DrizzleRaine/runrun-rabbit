@@ -2,7 +2,7 @@
 
 var routeFactory = require('../../..' + (process.env.SOURCE_ROOT || '') + '/server/routes/user.js');
 var userRepoFactory = require('../../..' + (process.env.SOURCE_ROOT || '') + '/server/repositories/user.js');
-var mockRedis = require('redis-mock');
+var mockRedis = require('node-redis-mock');
 var sinon = require('sinon');
 var assert = require('chai').assert;
 
@@ -12,13 +12,13 @@ describe('User route', function() {
 
         beforeEach(function() {
             request = {
-                cookies: {},
-                body: {}
+                session: {},
+                body: {},
+                flash: sinon.stub()
             };
             response = {
                 render: sinon.spy(),
-                redirect: sinon.spy(),
-                cookie: sinon.spy()
+                redirect: sinon.spy()
             };
             route = routeFactory();
             userRepo = userRepoFactory.build();
@@ -45,10 +45,26 @@ describe('User route', function() {
                 });
             });
 
+            it('should display any preceding errors', function(done) {
+                var errorMessage = 'Login failed';
+                request.flash.withArgs('error').returns(errorMessage);
+
+                route['/user']['/details'].get(request, response);
+
+                var token = setInterval(function() {
+                    if (response.render.called) {
+                        clearInterval(token);
+                        assert.isTrue(response.render.calledWith('user/details'));
+                        assert.equal(response.render.lastCall.args[1].error, errorMessage);
+                        done();
+                    }
+                });
+            });
+
             it('should indicate when the current user is persisted', function(done) {
                 userRepo.createUser('TestUser')
-                    .then(function(userId) {
-                        request.cookies.playerId = userId;
+                    .then(function(result) {
+                        request.session.playerId = result.playerId;
                         route['/user']['/details'].get(request, response);
 
                         var token = setInterval(function() {
@@ -96,9 +112,9 @@ describe('User route', function() {
                     if (response.redirect.called) {
                         clearInterval(token);
                         assert.isTrue(response.redirect.calledWith('/user/details'));
-                        assert.isTrue(response.cookie.called);
+                        assert.isDefined(request.session.playerId);
 
-                        userRepo.fetchUser(response.cookie.firstCall.args[1], function(error, user) {
+                        userRepo.fetchUser(request.session.playerId, function(error, user) {
                             assert.equal('User1', user.name);
                             done();
                         });
@@ -108,7 +124,6 @@ describe('User route', function() {
 
             it('should return an error when username is not available', function(done) {
                 userRepo.createUser('User1').then(function() {
-                    console.log('User created');
                     request.body.username = 'User1';
                     route['/user']['/details'].post(request, response);
 

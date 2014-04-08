@@ -1,5 +1,5 @@
+*.bat
 *.log
 node_modules
 .idea
 build
-release

@@ -20,11 +20,10 @@ describe('Multiplayer route', function() {
 
         beforeEach(function() {
             request = {
-                cookies: {}
+                session: {}
             };
             response = {
-                redirect: sinon.spy(),
-                clearCookie: sinon.spy()
+                redirect: sinon.spy()
             };
             route = routeFactory();
         });
@@ -36,13 +35,13 @@ describe('Multiplayer route', function() {
         });
 
         it('should direct expired users to pick a username and clear existing cookie', function(done) {
-            request.cookies.playerId = 'player:134d7b1b-3924-4566-ad4b-a3fb3a91e591';
+            request.session.playerId = 'player:134d7b1b-3924-4566-ad4b-a3fb3a91e591';
             route['/multiplayer'].get(request, response);
 
             var token = setInterval(function() {
                 if (response.redirect.called) {
                     assert.isTrue(response.redirect.calledWith('/user/details'));
-                    assert.isTrue(response.clearCookie.calledWith('playerId'));
+                    assert.isUndefined(request.session.playerId);
                     clearInterval(token);
                     done();
                 }
@@ -51,8 +50,8 @@ describe('Multiplayer route', function() {
 
         it('should direct existing users to a multiplayer game and extend expiry time', function(done) {
             userRepo.build().createUser('User1')
-                .then(function(userId) {
-                    request.cookies.playerId = userId;
+                .then(function(result) {
+                    request.session.playerId = result.playerId;
                     route['/multiplayer'].get(request, response);
                     var token = setInterval(function() {
                         if (response.redirect.called) {

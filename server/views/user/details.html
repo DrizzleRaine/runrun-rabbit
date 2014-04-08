@@ -20,6 +20,12 @@
     {{#persisted}}
         <a class="btn btn-lg player-1" href="/multiplayer">Start playing now!</a>
     {{/persisted}}
+    <script>
+        // Workaround for https://github.com/jaredhanson/passport-facebook/issues/12#issuecomment-5913711
+        if (window.location.hash && window.location.hash === "#_=_" && window.history && window.history.replaceState) {
+            window.history.replaceState("", document.title, window.location.pathname);
+        }
+    </script>
 </div>
 </body>
 </html>

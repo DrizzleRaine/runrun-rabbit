@@ -6,7 +6,7 @@ module.exports = function() {
     return {
         '/multiplayer': {
             get: function(req, res) {
-                var playerId = req.cookies.playerId;
+                var playerId = req.session.playerId;
 
                 if (playerId) {
                     userRepo.fetchUser(playerId)
@@ -14,7 +14,7 @@ module.exports = function() {
                             if (user) {
                                 res.redirect('/multiplayer/game');
                             } else {
-                                res.clearCookie('playerId');
+                                delete req.session.playerId;
                                 res.redirect('/user/details');
                             }
                         })

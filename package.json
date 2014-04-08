@@ -9,10 +9,13 @@
     "promise": "~4.0.0",
     "rivets": "~0.6.6",
     "redis": "~0.10.1",
-    "redis-mock": "~0.2.x",
+    "node-redis-mock": "~0.2.x",
     "hogan-express": "~0.5.2",
     "cookie": "~0.1.1",
-    "bases": "~0.2.0"
+    "bases": "~0.2.0",
+    "passport" : "~0.2.0",
+    "passport-facebook" : "~1.0.3",
+    "connect-flash" : "~0.1.1"
   },
   "devDependencies": {
     "grunt": "~0.4.4",

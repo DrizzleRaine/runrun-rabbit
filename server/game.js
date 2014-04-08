@@ -3,10 +3,12 @@
 var modelFactory = require('../shared/model.js');
 var levels = require('../shared/levels.js');
 var crypto = require('crypto');
-var cookie = require('cookie');
+var express = require('express');
 var RNG = require('../shared/utils/rng.js').RNG;
 var userRepo = require('./repositories/user.js').build();
 var promise = require('promise');
+
+var cookieParser = promise.denodeify(express.cookieParser(process.env.SESSION_COOKIE_SECRET));
 
 function configure(io) {
     function start(room) {
@@ -38,8 +40,12 @@ function configure(io) {
 
         var playerNames = [];
         io.sockets.clients(room).forEach(function (socket, index) {
+            // See https://github.com/senchalabs/connect/issues/588
             playerNames[index] =
-                userRepo.fetchUser(cookie.parse(socket.handshake.headers.cookie).playerId)
+                cookieParser(socket.handshake, {})
+                    .then(function() {
+                        return userRepo.fetchUser(socket.handshake.signedCookies[process.env.SESSION_COOKIE_KEY].playerId);
+                    })
                     .then(function(player) { return player ? player.name : null; });
         });
 
