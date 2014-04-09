@@ -15,12 +15,42 @@ module.exports.build = function buildUserRepo() {
     var exists = promise.denodeify(redisClient.exists);
     var expire = promise.denodeify(redisClient.expire);
     var persist = promise.denodeify(redisClient.persist);
+    var hdel = promise.denodeify(redisClient.hdel);
     var hsetnx = promise.denodeify(redisClient.hsetnx);
     var hset = promise.denodeify(redisClient.hset);
     var hget = promise.denodeify(redisClient.hget);
     var hgetall = promise.denodeify(redisClient.hgetall);
     var sadd = promise.denodeify(redisClient.sadd);
     var srandmember = promise.denodeify(redisClient.srandmember);
+
+    var saveUser = function(userId, username) {
+        return hset(userId, 'name', username)
+            .then(expire(userId, 1800))
+            .then(function() {
+                return { playerId: userId };
+            });
+    };
+    var tryStealUsername = function(userId, username) {
+        return hget('names', username)
+            .then(exists)
+            .then(function(doesExist) {
+                if (doesExist) {
+                    return { error: 'Sorry, that username is already taken' };
+                } else {
+                    return saveUser(userId, username);
+                }
+            });
+    };
+    var trySetUsername = function(userId, username) {
+        return hsetnx('names', username, userId)
+            .then(function(success) {
+                if (success) {
+                    return saveUser(userId, username);
+                } else {
+                    return tryStealUsername(userId, username);
+                }
+            });
+    };
 
     var userRepo = {
         createUser: function(username, callback) {
@@ -30,33 +60,7 @@ module.exports.build = function buildUserRepo() {
             }
 
             var userId = 'player:' + uuid.v4();
-
-            var tryAddUsername = hsetnx('names', username, userId);
-            var saveUser = hset(userId, 'name', username)
-                .then(expire(userId, 1800))
-                .then(function() {
-                    return { playerId: userId };
-                });
-            var tryStealUsername =
-                hget('names', username)
-                .then(exists)
-                .then(function(doesExist) {
-                    if (doesExist) {
-                        return { error: 'Sorry, that username is already taken' };
-                    } else {
-                        return saveUser;
-                    }
-                });
-
-            return tryAddUsername
-                .then(function(success) {
-                    if (success) {
-                        return saveUser;
-                    } else {
-                        return tryStealUsername;
-                    }
-                })
-                .nodeify(callback);
+            return trySetUsername(userId, username).nodeify(callback);
         },
         fetchUser: function (userId, callback) {
             return srandmember('player:' + userId + ':providers')
@@ -76,8 +80,32 @@ module.exports.build = function buildUserRepo() {
                 })
                 .nodeify(callback);
         },
+        updateUsername: function(userId, username, callback) {
+            var previousName = null;
+
+            return hget(userId, 'name')
+                .then(function(prev) {
+                    previousName = prev;
+
+                    if (previousName !== username) {
+                        return trySetUsername(userId, username)
+                        .then(function(result) {
+                            if (previousName) {
+                                return hdel('names', previousName)
+                                    .then(function() {
+                                        return result;
+                                    });
+                            } else {
+                                return result;
+                            }
+                        });
+                    } else {
+                        return { playerId: userId };
+                    }
+                })
+                .nodeify(callback);
+        },
         registerAccount: function(userId, provider, providerId, callback) {
-            // TODO: provider and providerId are untrusted strings
             var key = 'provider:' + provider + ':' + providerId;
             return setnx(key, userId)
                 .then(function(result) {
@@ -92,7 +120,6 @@ module.exports.build = function buildUserRepo() {
                 }).nodeify(callback);
         },
         getUserForAccount: function(provider, providerId, callback) {
-            // TODO: provider and providerId are untrusted strings
             return _get('provider:' + provider + ':' + providerId).nodeify(callback);
         }
     };

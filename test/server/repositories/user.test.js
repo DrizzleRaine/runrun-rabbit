@@ -125,6 +125,85 @@ describe('User repository', function() {
             .done();
     });
 
+    describe('renaming', function() {
+        it('should allow users to change their name', function(done) {
+            var playerId = null;
+            userRepository.createUser('OriginalName')
+                .then(function(result) {
+                    playerId = result.playerId;
+                    return userRepository.updateUsername(result.playerId, 'NewUsername');
+                })
+                .then(function(result) {
+                    assert.isUndefined(result.error);
+                    return userRepository.fetchUser(playerId);
+                })
+                .then(function(user) {
+                    assert.equal(user.name, 'NewUsername');
+                    done();
+                })
+                .done();
+        });
+
+        it('should not allow users to change their name when the new name is unavailable', function(done) {
+            var playerId = null;
+
+            userRepository.createUser('OriginalName')
+                .then(function(result) {
+                    playerId = result.playerId;
+                })
+                .then(function() {
+                    return userRepository.createUser('NewUsername');
+                })
+                .then(function() {
+                    return userRepository.updateUsername(playerId, 'NewUsername');
+                })
+                .then(function(result) {
+                    assert.isString(result.error);
+                    return userRepository.fetchUser(playerId);
+                })
+                .then(function(user) {
+                    assert.equal(user.name, 'OriginalName');
+                    done();
+                })
+                .done();
+        });
+
+        it('should allow a name to be taken by a new account once it is no longer in use', function(done) {
+            userRepository.createUser('OriginalName')
+                .then(function(result) {
+                    return userRepository.updateUsername(result.playerId, 'NewUsername');
+                })
+                .then(function() {
+                    return userRepository.createUser('OriginalName');
+                })
+                .then(function(result) {
+                    assert.isUndefined(result.error);
+                    assert.ok(result.playerId);
+                    done();
+                })
+                .done();
+        });
+
+        it('should not return an error when attempting to update a user to their existing name', function(done) {
+            var playerId = null;
+            userRepository.createUser('OriginalName')
+                .then(function(result) {
+                    playerId = result.playerId;
+                    return userRepository.updateUsername(result.playerId, 'OriginalName');
+                })
+                .then(function(result) {
+                    assert.isUndefined(result.error);
+                    assert.equal(result.playerId, playerId);
+                    return userRepository.fetchUser(playerId);
+                })
+                .then(function(user) {
+                    assert.equal(user.name, 'OriginalName');
+                    done();
+                })
+                .done();
+        });
+    });
+
     describe('registration', function() {
         it('should allow users to register with an external account', function(done) {
             var playerId;

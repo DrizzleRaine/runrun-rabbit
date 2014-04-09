@@ -17,6 +17,7 @@ module.exports = function() {
                 res.render('user/details', {
                     username: username,
                     persisted: !!user,
+                    success: req.flash('success'),
                     error: req.flash('error')
                 });
             })
@@ -28,8 +29,8 @@ module.exports = function() {
             '/details': {
                 get: displayDetails,
                 post: function(req, res) {
-                    userRepo.createUser(req.body.username)
-                        .then(function(result) {
+                    var handleResult = function(successMessage) {
+                        return function(result) {
                             if (result.error) {
                                 res.render('user/details', {
                                     username: req.body.username,
@@ -38,10 +39,21 @@ module.exports = function() {
                                 });
                             } else {
                                 req.session.playerId = result.playerId;
+                                req.flash('success', successMessage);
                                 res.redirect('/user/details');
                             }
-                        })
-                        .done();
+                        };
+                    };
+
+                    if (req.session.playerId) {
+                        userRepo.updateUsername(req.session.playerId, req.body.username)
+                            .then(handleResult('Username updated!'))
+                            .done();
+                    } else {
+                        userRepo.createUser(req.body.username)
+                            .then(handleResult('Username created!'))
+                            .done();
+                    }
                 }
             }
         }

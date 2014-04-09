@@ -205,6 +205,10 @@ h3 input.btn {
     vertical-align: bottom;
 }
 
+.success {
+    color: #3fb618;
+}
+
 .error {
     color: #FF3B26;
 }

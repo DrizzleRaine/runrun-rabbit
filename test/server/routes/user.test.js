@@ -42,7 +42,7 @@ describe('User route', function() {
                         assert.isFalse(response.render.lastCall.args[1].persisted);
                         done();
                     }
-                });
+                }, 10);
             });
 
             it('should display any preceding errors', function(done) {
@@ -58,7 +58,7 @@ describe('User route', function() {
                         assert.equal(response.render.lastCall.args[1].error, errorMessage);
                         done();
                     }
-                });
+                }, 10);
             });
 
             it('should indicate when the current user is persisted', function(done) {
@@ -74,7 +74,7 @@ describe('User route', function() {
                                 assert.isTrue(response.render.lastCall.args[1].persisted);
                                 done();
                             }
-                        });
+                        }, 10);
                     }).done();
             });
 
@@ -98,44 +98,69 @@ describe('User route', function() {
 
                         done();
                     }
-                });
+                }, 10);
             });
         });
 
         describe('POST', function() {
-            it('should create a new user when username is available', function(done) {
-                request.body.username = 'User1';
-
-                route['/user']['/details'].post(request, response);
-
-                var token = setInterval(function() {
-                    if (response.redirect.called) {
-                        clearInterval(token);
-                        assert.isTrue(response.redirect.calledWith('/user/details'));
-                        assert.isDefined(request.session.playerId);
-
-                        userRepo.fetchUser(request.session.playerId, function(error, user) {
-                            assert.equal('User1', user.name);
-                            done();
-                        });
-                    }
-                }, 10);
-            });
-
-            it('should return an error when username is not available', function(done) {
-                userRepo.createUser('User1').then(function() {
+            describe('new user', function() {
+                it('should create a new user when username is available', function(done) {
                     request.body.username = 'User1';
+
                     route['/user']['/details'].post(request, response);
 
                     var token = setInterval(function() {
-                        if (response.render.called) {
+                        if (response.redirect.called) {
                             clearInterval(token);
-                            assert.isTrue(response.render.calledWith('user/details'));
-                            assert.isDefined(response.render.firstCall.args[1].error);
-                            done();
+                            assert.isTrue(response.redirect.calledWith('/user/details'));
+                            assert.isDefined(request.session.playerId);
+
+                            userRepo.fetchUser(request.session.playerId, function(error, user) {
+                                assert.equal('User1', user.name);
+                                done();
+                            });
                         }
                     }, 10);
-                }).done();
+                });
+
+                it('should return an error when username is not available', function(done) {
+                    userRepo.createUser('User1').then(function() {
+                        request.body.username = 'User1';
+                        route['/user']['/details'].post(request, response);
+
+                        var token = setInterval(function() {
+                            if (response.render.called) {
+                                clearInterval(token);
+                                assert.isTrue(response.render.calledWith('user/details'));
+                                assert.isDefined(response.render.firstCall.args[1].error);
+                                done();
+                            }
+                        }, 10);
+                    }).done();
+                });
+            });
+
+            describe('logged in user', function() {
+                it('should update the name of the current user', function(done) {
+                    userRepo.createUser('OriginalName')
+                        .then(function(result) {
+                            request.session.playerId = result.playerId;
+                            request.body.username = 'NewName';
+                            route['/user']['/details'].post(request, response);
+
+                            var token = setInterval(function() {
+                                if (response.redirect.called) {
+                                    clearInterval(token);
+                                    userRepo.fetchUser(result.playerId)
+                                        .then(function(user) {
+                                            assert.equal(user.name, 'NewName');
+                                            done();
+                                        })
+                                        .done();
+                                }
+                            }, 10);
+                        }).done();
+                });
             });
         });
     });
