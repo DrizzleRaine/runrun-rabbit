@@ -13,8 +13,10 @@
     "hogan-express": "~0.5.2",
     "cookie": "~0.1.1",
     "bases": "~0.2.0",
-    "passport" : "~0.2.0",
-    "passport-facebook" : "~1.0.3",
+    "passport": "~0.2.0",
+    "passport-facebook": "~1.0.3",
+    "passport-twitter": "~1.0.2",
+    "passport-google-oauth": "~0.1.5",
     "connect-flash" : "~0.1.1"
   },
   "devDependencies": {

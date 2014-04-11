@@ -8,7 +8,7 @@ var userRoute = require('./routes/user.js');
 var passport = require('passport');
 var flash = require('connect-flash');
 
-require('./config/passport/index.js')(passport);
+require('./config/passport.js')(passport);
 
 var TEST_PORT = 5000;
 
@@ -50,14 +50,21 @@ exports.start = function(callback) {
     app.set('views', __dirname + '/views');
     app.engine('html', require('hogan-express'));
 
+    var passportOptions = {
+        successRedirect: '/user/details',
+        failureRedirect: '/user/details',
+        failureFlash: true,
+        session: false // Not using passport for session management
+    };
+
     app.get('/auth/facebook', passport.authenticate('facebook'));
-    app.get('/auth/facebook/callback',
-        passport.authenticate('facebook', {
-            successRedirect: '/user/details',
-            failureRedirect: '/user/details',
-            failureFlash: true,
-            session: false // Not using passport for session management
-        }));
+    app.get('/auth/facebook/callback', passport.authenticate('facebook', passportOptions));
+
+    app.get('/auth/twitter', passport.authenticate('twitter'));
+    app.get('/auth/twitter/callback',passport.authenticate('twitter', passportOptions));
+
+    app.get('/auth/google', passport.authenticate('google', { scope: ['openid'] }));
+    app.get('/auth/google/callback',passport.authenticate('google', passportOptions));
 
     app.map(multiplayerRoute());
     app.map(userRoute());

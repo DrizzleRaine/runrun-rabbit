@@ -1,12 +1,13 @@
 'use strict';
 
-var callback = require('../../../..' + (process.env.SOURCE_ROOT || '') + '/server/config/passport/facebook.js');
+var config = require('../../..' + (process.env.SOURCE_ROOT || '') + '/server/config/passport.js');
 var assert = require('chai').assert;
-var userRepoFactory = require('../../../..' + (process.env.SOURCE_ROOT || '') + '/server/repositories/user.js');
+var userRepoFactory = require('../../..' + (process.env.SOURCE_ROOT || '') + '/server/repositories/user.js');
 var mockRedis = require('node-redis-mock');
 
-describe('facebook authentication callback', function() {
+describe('provider authentication callback', function() {
     var request, userRepo;
+    var callback = config.providerCallback('facebook');
 
     beforeEach(function() {
         request = {
@@ -23,9 +24,9 @@ describe('facebook authentication callback', function() {
     });
 
     describe('user not logged in', function() {
-        describe('new facebook account', function() {
+        describe('new provider account', function() {
 
-            it('should create new user using the facebook username', function(done) {
+            it('should create new user using the provider username', function(done) {
                 var profile = { username: 'facebook.user', displayName: 'Facebook User' };
 
                 callback(request, null, null, profile, function(error, authorised) {
@@ -42,7 +43,7 @@ describe('facebook authentication callback', function() {
                 });
             });
 
-            it('should register the facebook account with the newly created user', function(done) {
+            it('should register the provider account with the newly created user', function(done) {
                 var profile = { id: '12345678', username: 'facebook.user', displayName: 'Facebook User' };
 
                 callback(request, null, null, profile, function(error, authorised) {
@@ -96,7 +97,7 @@ describe('facebook authentication callback', function() {
 
         });
 
-        describe('registered facebook account', function() {
+        describe('registered provider account', function() {
             it('should log in as the registered user', function(done) {
                 var playerId = null;
                 userRepo.createUser('User1')
@@ -119,7 +120,7 @@ describe('facebook authentication callback', function() {
     });
 
     describe('User logged in', function() {
-        it('should add new facebook account to current user', function(done) {
+        it('should add new provider account to current user', function(done) {
             userRepo.createUser('User1')
                 .then(function(result) {
                     request.session.playerId = result.playerId;
@@ -135,7 +136,7 @@ describe('facebook authentication callback', function() {
                 });
         });
 
-        it('should return an error if facebook account is already mapped to a user', function(done) {
+        it('should return an error if provider account is already mapped to a user', function(done) {
             var playerId1 = null;
             var playerId2 = null;
 

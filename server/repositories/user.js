@@ -106,7 +106,7 @@ module.exports.build = function buildUserRepo() {
                 .nodeify(callback);
         },
         registerAccount: function(userId, provider, providerId, callback) {
-            var key = 'provider:' + provider + ':' + providerId;
+            var key = 'providerCallback:' + provider + ':' + providerId;
             return setnx(key, userId)
                 .then(function(result) {
                     if (result) {
@@ -120,7 +120,7 @@ module.exports.build = function buildUserRepo() {
                 }).nodeify(callback);
         },
         getUserForAccount: function(provider, providerId, callback) {
-            return _get('provider:' + provider + ':' + providerId).nodeify(callback);
+            return _get('providerCallback:' + provider + ':' + providerId).nodeify(callback);
         }
     };
 
