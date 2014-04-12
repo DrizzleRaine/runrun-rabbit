@@ -21,7 +21,7 @@ module.exports.build = function buildUserRepo() {
     var hget = promise.denodeify(redisClient.hget);
     var hgetall = promise.denodeify(redisClient.hgetall);
     var sadd = promise.denodeify(redisClient.sadd);
-    var srandmember = promise.denodeify(redisClient.srandmember);
+    var smembers = promise.denodeify(redisClient.smembers);
 
     var saveUser = function(userId, username) {
         return hset(userId, 'name', username)
@@ -63,10 +63,15 @@ module.exports.build = function buildUserRepo() {
             return trySetUsername(userId, username).nodeify(callback);
         },
         fetchUser: function (userId, callback) {
-            return srandmember('player:' + userId + ':providers')
-                .then(function(registeredPlayer) {
-                    if (registeredPlayer) {
-                        return hgetall(userId);
+            // TODO: We should actually use smembers and return the provider IDs with the user
+            return smembers('player:' + userId + ':providers')
+                .then(function(providers) {
+                    if (providers && providers.length) {
+                        return hgetall(userId)
+                            .then(function(user) {
+                                user.providers = providers;
+                                return user;
+                            });
                     } else {
                         return expire(userId, UNAUTHENTICATED_USER_EXPIRY)
                             .then(function (result) {

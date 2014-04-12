@@ -17,6 +17,7 @@ module.exports = function() {
                 res.render('user/details', {
                     username: username,
                     persisted: !!user,
+                    details: user,
                     success: req.flash('success'),
                     error: req.flash('error')
                 });

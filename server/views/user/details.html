@@ -5,28 +5,53 @@
     <link href="/site.css" rel="stylesheet">
 </head>
 <body>
+<h1><a href="/">RunRun Rabbit!</a></h1>
 <div id="container" class="container settings">
-    <h1>RunRun Rabbit!</h1>
     {{#success}}
         <h4 class="success">{{success}}</h4>
     {{/success}}
+    {{#error}}
+        <h4 class="error">{{error}}</h4>
+    {{/error}}
     <form method="post">
         <h3>
-            <label for="username">Please choose a username:</label>
+            {{^persisted}}
+                <label for="username">New users, please choose a username&hellip;</label>
+            {{/persisted}}
+            {{#persisted}}
+                <label for="username">You are logged in as:</label>
+            {{/persisted}}
             <input id="username" name="username" type="text" value="{{username}}" maxlength="20">
-            <input type="submit" class="btn player-0" value="OK">
+            {{^persisted}}
+                <input type="submit" class="btn player-0" value="OK">
+            {{/persisted}}
+            {{#persisted}}
+                <input type="submit" class="btn player-0" value="Update">
+            {{/persisted}}
         </h3>
-        {{#error}}
-            <h4 class="error">{{error}}</h4>
-        {{/error}}
     </form>
     {{#persisted}}
         <a class="btn btn-lg player-1" href="/multiplayer">Start playing now!</a>
+        <br />
+        <br />
     {{/persisted}}
-    <hr />
-    <a class="btn social facebook" href="/auth/facebook">Sign in with Facebook</a>
-    <a class="btn social twitter" href="/auth/twitter">Sign in with Twitter</a>
-    <a class="btn social google" href="/auth/google">Sign in with Google</a>
+    {{^details.providers}}
+        <h3>&hellip;or&nbsp;
+            <a class="btn social facebook" href="/auth/facebook">Sign in with Facebook</a>
+            <a class="btn social twitter" href="/auth/twitter">Sign in with Twitter</a>
+            <a class="btn social google" href="/auth/google">Sign in with Google</a>
+        </h3>
+        <br />
+        <div class="col">
+            Sign in is not required, but will allow you to:
+            <ul>
+                <li>Reserve your username indefinitely</li>
+                <li>Use the same name across all of your devices</li>
+                <li class="inactive">Choose a custom avatar (coming soon!)</li>
+                <li class="inactive">Appear in high score tables (coming soon!)</li>
+            </ul>
+        </div>
+    {{/details.providers}}
     <script>
         // Workaround for https://github.com/jaredhanson/passport-facebook/issues/12#issuecomment-5913711
         if (window.location.hash && window.location.hash === "#_=_" && window.history && window.history.replaceState) {

@@ -285,5 +285,27 @@ describe('User repository', function() {
                 })
                 .done();
         });
+
+        it('should return a list of registered account providers along with the user', function(done) {
+            var playerId;
+
+            userRepository.createUser('user1')
+                .then(function(result) {
+                    playerId = result.playerId;
+                    return userRepository.registerAccount(playerId, 'facebook', '12345678');
+                })
+                .then(function() {
+                    return userRepository.registerAccount(playerId, 'twitter', '987654321');
+                })
+                .then(function() {
+                    return userRepository.fetchUser(playerId);
+                })
+                .then(function(user) {
+                    assert.isArray(user.providers);
+                    assert.equal(user.providers.length, 2);
+                    done();
+                })
+                .done();
+        });
     });
 });
