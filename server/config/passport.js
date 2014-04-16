@@ -55,30 +55,40 @@ var providerCallback = module.exports.providerCallback = function() {
                 .done(null, callback);
         };
 
+        var loginOrCreateNewUser = function(playerId) {
+            if (playerId) {
+                req.session.playerId = playerId;
+                callback(null, true);
+            } else {
+                tryCreateUser(profile.username, function() {
+                    tryCreateUser(profile.displayName, function() {
+                        tryCreateUser(username.generate(), callback);
+                    });
+                });
+            }
+        };
+
         if (req.session.playerId) {
-            userRepo.registerAccount(req.session.playerId, 'facebook', profile.id)
-                .then(function(result) {
-                    if (result) {
-                        callback(null, true);
+            userRepo.fetchUser(req.session.playerId)
+                .then(function(user) {
+                    if (user) {
+                        return userRepo.registerAccount(req.session.playerId, 'facebook', profile.id)
+                            .then(function(result) {
+                                if (result) {
+                                    callback(null, true);
+                                } else {
+                                    callback(null, false, 'This facebook account is already associated with another user');
+                                }
+                            });
                     } else {
-                        callback(null, false, 'This facebook account is already associated with another user');
+                        return userRepo.getUserForAccount('facebook', profile.id)
+                            .then(loginOrCreateNewUser);
                     }
                 })
                 .done(null, callback);
         } else {
             userRepo.getUserForAccount('facebook', profile.id)
-                .then(function(playerId) {
-                    if (playerId) {
-                        req.session.playerId = playerId;
-                        callback(null, true);
-                    } else {
-                        tryCreateUser(profile.username, function() {
-                            tryCreateUser(profile.displayName, function() {
-                                tryCreateUser(username.generate(), callback);
-                            });
-                        });
-                    }
-                })
+                .then(loginOrCreateNewUser)
                 .done(null, callback);
         }
     };

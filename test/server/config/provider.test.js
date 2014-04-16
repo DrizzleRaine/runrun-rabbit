@@ -4,6 +4,7 @@ var config = require('../../..' + (process.env.SOURCE_ROOT || '') + '/server/con
 var assert = require('chai').assert;
 var userRepoFactory = require('../../..' + (process.env.SOURCE_ROOT || '') + '/server/repositories/user.js');
 var mockRedis = require('node-redis-mock');
+var uuid = require('node-uuid');
 
 describe('provider authentication callback', function() {
     var request, userRepo;
@@ -134,6 +135,24 @@ describe('provider authentication callback', function() {
                         });
                     });
                 });
+        });
+
+        it('should create new user if the current user has already expired', function(done) {
+            var profile = { id: '12345678', username: 'user.name', displayName: 'User Name' };
+            var expiredId = 'player:' + uuid.v4();
+            request.session.playerId = expiredId;
+
+            callback(request, null, null, profile, function (error, authorised) {
+                assert.isNull(error);
+                assert.isTrue(authorised);
+                assert.isDefined(request.session.playerId);
+                assert.notEqual(request.session.playerId, expiredId);
+
+                userRepo.getUserForAccount('facebook', '12345678', function(error, playerId) {
+                    assert.equal(playerId, request.session.playerId);
+                    done();
+                });
+            });
         });
 
         it('should return an error if provider account is already mapped to a user', function(done) {

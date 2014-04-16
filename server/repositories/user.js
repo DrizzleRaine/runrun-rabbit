@@ -63,7 +63,6 @@ module.exports.build = function buildUserRepo() {
             return trySetUsername(userId, username).nodeify(callback);
         },
         fetchUser: function (userId, callback) {
-            // TODO: We should actually use smembers and return the provider IDs with the user
             return smembers('player:' + userId + ':providers')
                 .then(function(providers) {
                     if (providers && providers.length) {
