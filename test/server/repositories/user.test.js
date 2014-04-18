@@ -4,9 +4,12 @@ var factory = require('../../..' + (process.env.SOURCE_ROOT || '') + '/server/re
 var redisFactory = require('../../..' + (process.env.SOURCE_ROOT || '') + '/server/repositories/redisFactory.js');
 var mockRedis = require('node-redis-mock');
 
+var username = require('../../..' + (process.env.SOURCE_ROOT || '') + '/server/services/username.js');
+
 var assert = require('chai').assert;
 
 var promise = require('promise');
+var sinon = require('sinon');
 
 describe('User repository', function() {
     var userRepository;
@@ -16,9 +19,11 @@ describe('User repository', function() {
 
     beforeEach(function() {
         userRepository = factory.build();
+        sinon.stub(username, 'validate');
     });
 
     afterEach(function(done) {
+        username.validate.restore();
         redisClient.flushdb(function (err) {
             assert.isNull(err);
             done();
@@ -56,23 +61,12 @@ describe('User repository', function() {
             .done();
     });
 
-    it('should return error when no username specified', function(done) {
+    it('should return error when the username is invalid', function(done) {
+        var error = 'Username not valid';
+        username.validate.returns(error);
+
         userRepository.createUser(null, function(err, result) {
-            assert.isNotNull(result.error);
-            done();
-        });
-    });
-
-    it('should return error when username is too short', function(done) {
-        userRepository.createUser('A', function(err, result) {
-            assert.isNotNull(result.error);
-            done();
-        });
-    });
-
-    it('should return error when username is too long', function(done) {
-        userRepository.createUser('ABCDEFGHIJKLYMNOPQRSTUVWXYZ', function(err, result) {
-            assert.isNotNull(result.error);
+            assert.equal(result.error, error);
             done();
         });
     });
@@ -198,6 +192,65 @@ describe('User repository', function() {
                 })
                 .then(function(user) {
                     assert.equal(user.name, 'OriginalName');
+                    done();
+                })
+                .done();
+        });
+
+        it('should return error when no username specified', function(done) {
+            var error = 'Username not valid';
+            username.validate.returns(error);
+
+            userRepository.createUser('TestUser')
+                .then(function(result) {
+                    userRepository.updateUsername(result.playerId, null, function(err, result) {
+                        assert.equal(result.error, error);
+                        done();
+                    });
+                });
+        });
+    });
+
+    describe('updateProfile', function() {
+        it('should save the profile against the user', function(done) {
+            var playerId = null;
+            var profile = {
+                gravatar: 'testuser@example.com'
+            };
+            userRepository.createUser('Test User')
+                .then(function(result) {
+                    playerId = result.playerId;
+                    return userRepository.updateProfile(playerId, profile);
+                })
+                .then(function() {
+                    return userRepository.fetchUser(playerId);
+                })
+                .then(function(user) {
+                    assert.equal(user.gravatar, profile.gravatar);
+                    done();
+                })
+                .done();
+        });
+
+        it('should only save whitelisted properties', function(done) {
+            var playerId = null;
+            var profile = {
+                gravatar: 'testuser@example.com',
+                name: 'New username',
+                role: 'Admin'
+            };
+            userRepository.createUser('Test User')
+                .then(function(result) {
+                    playerId = result.playerId;
+                    return userRepository.updateProfile(playerId, profile);
+                })
+                .then(function() {
+                    return userRepository.fetchUser(playerId);
+                })
+                .then(function(user) {
+                    assert.equal(user.gravatar, profile.gravatar);
+                    assert.equal(user.name, 'Test User');
+                    assert.isUndefined(user.role);
                     done();
                 })
                 .done();

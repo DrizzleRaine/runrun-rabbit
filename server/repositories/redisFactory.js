@@ -13,16 +13,7 @@ module.exports.createClient = function() {
         // Local server or test runner
         var mockRedis = require('node-redis-mock');
         var client = mockRedis.createClient();
-        // node-redis-mock doesn't implement SRANDMEMBER or PERSIST yet...
-        client.srandmember = function(key, callback) {
-            client.smembers(key, function(error, members) {
-                if (members) {
-                    callback(null, members[0]);
-                } else {
-                    callback(null, null);
-                }
-            });
-        };
+        // node-redis-mock doesn't implement PERSIST yet...
         client.persist = function(key, callback) {
             if (key in mockRedis.storage) {
                 delete mockRedis.storage[key].expires;

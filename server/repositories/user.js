@@ -15,11 +15,12 @@ module.exports.build = function buildUserRepo() {
     var exists = promise.denodeify(redisClient.exists);
     var expire = promise.denodeify(redisClient.expire);
     var persist = promise.denodeify(redisClient.persist);
-    var hdel = promise.denodeify(redisClient.hdel);
-    var hsetnx = promise.denodeify(redisClient.hsetnx);
-    var hset = promise.denodeify(redisClient.hset);
     var hget = promise.denodeify(redisClient.hget);
     var hgetall = promise.denodeify(redisClient.hgetall);
+    var hset = promise.denodeify(redisClient.hset);
+    var hmset = promise.denodeify(redisClient.hmset);
+    var hsetnx = promise.denodeify(redisClient.hsetnx);
+    var hdel = promise.denodeify(redisClient.hdel);
     var sadd = promise.denodeify(redisClient.sadd);
     var smembers = promise.denodeify(redisClient.smembers);
 
@@ -85,6 +86,11 @@ module.exports.build = function buildUserRepo() {
                 .nodeify(callback);
         },
         updateUsername: function(userId, username, callback) {
+            var error = usernameService.validate(username);
+            if (error) {
+                return promise.from({ error: error }).nodeify(callback);
+            }
+
             var previousName = null;
 
             return hget(userId, 'name')
@@ -108,6 +114,18 @@ module.exports.build = function buildUserRepo() {
                     }
                 })
                 .nodeify(callback);
+        },
+        updateProfile: function(userId, profile, callback) {
+            var whitelist = ['gravatar'];
+            var filteredProfile = {};
+
+            for (var prop in profile) {
+                if (whitelist.indexOf(prop) !== -1) {
+                    filteredProfile[prop] = profile[prop];
+                }
+            }
+
+            return hmset(userId, filteredProfile).nodeify(callback);
         },
         registerAccount: function(userId, provider, providerId, callback) {
             var key = 'providerCallback:' + provider + ':' + providerId;
