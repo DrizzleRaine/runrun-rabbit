@@ -7,7 +7,6 @@ var mockRedis = require('node-redis-mock');
 var username = require('../../..' + (process.env.SOURCE_ROOT || '') + '/server/services/username.js');
 
 var assert = require('chai').assert;
-
 var promise = require('promise');
 var sinon = require('sinon');
 
@@ -285,7 +284,7 @@ describe('User repository', function() {
                     return userRepository.registerAccount(result.playerId, 'facebook', '12345678');
                 })
                 .then(function() {
-                    assert.isUndefined(mockRedis.storage[playerId].expires);
+                    assert.equal(mockRedis.storage[playerId].expires, -1);
                     done();
                 })
                 .done();
@@ -303,7 +302,7 @@ describe('User repository', function() {
                     return userRepository.fetchUser(playerId);
                 })
                 .then(function() {
-                    assert.isUndefined(mockRedis.storage[playerId].expires);
+                    assert.equal(mockRedis.storage[playerId].expires, -1);
                     done();
                 })
                 .done();

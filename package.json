@@ -9,7 +9,7 @@
     "promise": "~4.0.0",
     "rivets": "~0.6.6",
     "redis": "~0.10.1",
-    "node-redis-mock": "~0.2.x",
+    "node-redis-mock": "~0.2.14",
     "hogan-express": "~0.5.2",
     "cookie": "~0.1.1",
     "bases": "~0.2.0",
