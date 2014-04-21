@@ -191,7 +191,7 @@ h3.score {
 .btn {
     color: #fff;
     display: inline-block;
-    padding: 0.6em 0;
+    padding: 9px 0;
     margin-bottom: 0;
     font-weight: bold;
     text-align: center;
@@ -203,15 +203,19 @@ h3.score {
 
 h3 input, dd input {
     font-size: 1em;
+    margin: 0;
 }
 
-h3 input.btn {
+h3 input[type=text], dd input[type=text] {
+    margin: 0;
+    border: 1px solid #dddddd;
+    border-radius: 3px;
+    padding: 5px;
     vertical-align: bottom;
 }
 
 input.btn {
-    padding: 0.6em;
-    vertical-align: bottom;
+    padding: 9px;
 }
 
 .success {
@@ -314,8 +318,21 @@ span.nowrap {
 
 .profile img {
     float: right;
+    border-radius: 6px;
 }
 
 .profile h3 {
     text-align: left;
+}
+
+@media screen and (max-width: 840px) {
+    .profile dt {
+        text-align: left;
+        margin-left: 1em;
+    }
+
+    .profile dd {
+        clear: left;
+        margin-left: 2em;
+    }
 }
