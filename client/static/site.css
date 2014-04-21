@@ -201,11 +201,15 @@ h3.score {
     border-radius: 3px;
 }
 
-h3 input {
+h3 input, dd input {
     font-size: 1em;
 }
 
 h3 input.btn {
+    vertical-align: bottom;
+}
+
+input.btn {
     padding: 0.6em;
     vertical-align: bottom;
 }
@@ -278,8 +282,40 @@ h3 input.btn {
     padding-left: 2.4em;
     padding-right: 0.8em;
     background-size: 1.2em 1.2em;
+    line-height: 1em;
 }
 
 span.nowrap {
     white-space: nowrap;
+}
+
+.profile dt, .profile dd {
+    font-size: 1.3em;
+    float: left;
+    display: block;
+    line-height: 2em;
+    padding-right: 1em;
+}
+
+.profile dt {
+    width: 14em;
+    clear: left;
+    text-align: right;
+}
+
+.profile dt:after {
+    content: ':';
+}
+
+.profile dd {
+    text-align: left;
+    margin: 0;
+}
+
+.profile img {
+    float: right;
+}
+
+.profile h3 {
+    text-align: left;
 }

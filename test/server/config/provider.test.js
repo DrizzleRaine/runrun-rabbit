@@ -8,7 +8,7 @@ var uuid = require('node-uuid');
 
 describe('provider authentication callback', function() {
     var request, userRepo;
-    var callback = config.providerCallback('facebook');
+    var callback = config.providerCallback('providerKey');
 
     beforeEach(function() {
         request = {
@@ -52,7 +52,7 @@ describe('provider authentication callback', function() {
                     assert.isTrue(authorised);
                     assert.isDefined(request.session.playerId);
 
-                    userRepo.getUserForAccount('facebook', profile.id)
+                    userRepo.getUserForAccount('providerKey', profile.id)
                         .then(function (playerId) {
                             assert.equal(playerId, request.session.playerId);
                             done();
@@ -104,7 +104,7 @@ describe('provider authentication callback', function() {
                 userRepo.createUser('User1')
                     .then(function(result) {
                         playerId = result.playerId;
-                        return userRepo.registerAccount(result.playerId, 'facebook', '12345678');
+                        return userRepo.registerAccount(result.playerId, 'providerKey', '12345678');
                     })
                     .then(function() {
                         var profile = { id: '12345678', username: 'user.name' };
@@ -129,7 +129,7 @@ describe('provider authentication callback', function() {
                     callback(request, null, null, profile, function (error, authorised) {
                         assert.isNull(error);
                         assert.isTrue(authorised);
-                        userRepo.getUserForAccount('facebook', '12345678', function(error, playerId) {
+                        userRepo.getUserForAccount('providerKey', '12345678', function(error, playerId) {
                             assert.equal(result.playerId, playerId);
                             done();
                         });
@@ -148,7 +148,7 @@ describe('provider authentication callback', function() {
                 assert.isDefined(request.session.playerId);
                 assert.notEqual(request.session.playerId, expiredId);
 
-                userRepo.getUserForAccount('facebook', '12345678', function(error, playerId) {
+                userRepo.getUserForAccount('providerKey', '12345678', function(error, playerId) {
                     assert.equal(playerId, request.session.playerId);
                     done();
                 });
@@ -170,7 +170,7 @@ describe('provider authentication callback', function() {
                     playerId2 = result.playerId;
                 })
                 .then(function() {
-                    return userRepo.registerAccount(playerId1, 'facebook', '12345678');
+                    return userRepo.registerAccount(playerId1, 'providerKey', '12345678');
                 })
                 .then(function() {
                     request.session.playerId = playerId2;

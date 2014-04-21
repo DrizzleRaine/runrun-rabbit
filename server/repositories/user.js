@@ -21,8 +21,6 @@ module.exports.build = function buildUserRepo() {
     var hmset = promise.denodeify(redisClient.hmset);
     var hsetnx = promise.denodeify(redisClient.hsetnx);
     var hdel = promise.denodeify(redisClient.hdel);
-    var sadd = promise.denodeify(redisClient.sadd);
-    var smembers = promise.denodeify(redisClient.smembers);
 
     var saveUser = function(userId, username) {
         return hset(userId, 'name', username)
@@ -64,9 +62,9 @@ module.exports.build = function buildUserRepo() {
             return trySetUsername(userId, username).nodeify(callback);
         },
         fetchUser: function (userId, callback) {
-            return smembers('player:' + userId + ':providers')
+            return hgetall('player:' + userId + ':providers')
                 .then(function(providers) {
-                    if (providers && providers.length) {
+                    if (providers) {
                         return hgetall(userId)
                             .then(function(user) {
                                 user.providers = providers;
@@ -127,14 +125,14 @@ module.exports.build = function buildUserRepo() {
 
             return hmset(userId, filteredProfile).nodeify(callback);
         },
-        registerAccount: function(userId, provider, providerId, callback) {
-            var key = 'providerCallback:' + provider + ':' + providerId;
+        registerAccount: function(userId, provider, providerId, providerUsername, callback) {
+            var key = 'external:' + provider + ':' + providerId;
             return setnx(key, userId)
                 .then(function(result) {
                     if (result) {
                         return persist(userId)
                             .then(function() {
-                                return sadd('player:' + userId + ':providers', key);
+                                return hset('player:' + userId + ':providers', provider, providerUsername);
                             });
                     } else {
                         return false;
@@ -142,7 +140,7 @@ module.exports.build = function buildUserRepo() {
                 }).nodeify(callback);
         },
         getUserForAccount: function(provider, providerId, callback) {
-            return _get('providerCallback:' + provider + ':' + providerId).nodeify(callback);
+            return _get('external:' + provider + ':' + providerId).nodeify(callback);
         }
     };
 

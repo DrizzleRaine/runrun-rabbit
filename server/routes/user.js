@@ -2,6 +2,7 @@
 
 var userRepo = require('../repositories/user.js').build();
 var usernameService = require('../services/username.js');
+var viewModel = require('../views/user/model.js');
 
 module.exports = function() {
     var displayDetails = function(req, res) {
@@ -17,7 +18,7 @@ module.exports = function() {
                 res.render('user/details', {
                     username: username,
                     persisted: !!user,
-                    details: user,
+                    details: viewModel.create(user),
                     success: req.flash('success'),
                     error: req.flash('error')
                 });
@@ -29,6 +30,16 @@ module.exports = function() {
         '/user': {
             '/details': {
                 get: displayDetails,
+                post: function(req, res) {
+                    userRepo.updateProfile(req.session.playerId, req.body)
+                        .then(function() {
+                            req.flash('success', 'Details updated!');
+                            res.redirect('/user/details');
+                        })
+                        .done();
+                }
+            },
+            '/name': {
                 post: function(req, res) {
                     var handleResult = function(successMessage) {
                         return function(result) {

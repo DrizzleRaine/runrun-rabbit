@@ -36,7 +36,7 @@ module.exports = function(passport) {
     }
 };
 
-var providerCallback = module.exports.providerCallback = function() {
+var providerCallback = module.exports.providerCallback = function(provider) {
     return function(req, accessToken, refreshToken, profile, callback) {
         var tryCreateUser = function(attemptedName, onValidationError) {
             userRepo.createUser(attemptedName)
@@ -45,7 +45,7 @@ var providerCallback = module.exports.providerCallback = function() {
                         onValidationError(result.error);
                     } else {
                         req.session.playerId = result.playerId;
-                        userRepo.registerAccount(result.playerId, 'facebook', profile.id)
+                        userRepo.registerAccount(result.playerId, provider, profile.id, profile.username || profile.displayName || profile.id)
                             .then(function() {
                                 callback(null, true);
                             })
@@ -72,7 +72,7 @@ var providerCallback = module.exports.providerCallback = function() {
             userRepo.fetchUser(req.session.playerId)
                 .then(function(user) {
                     if (user) {
-                        return userRepo.registerAccount(req.session.playerId, 'facebook', profile.id)
+                        return userRepo.registerAccount(req.session.playerId, provider, profile.id, profile.username || profile.displayName || profile.id)
                             .then(function(result) {
                                 if (result) {
                                     callback(null, true);
@@ -81,13 +81,13 @@ var providerCallback = module.exports.providerCallback = function() {
                                 }
                             });
                     } else {
-                        return userRepo.getUserForAccount('facebook', profile.id)
+                        return userRepo.getUserForAccount(provider, profile.id)
                             .then(loginOrCreateNewUser);
                     }
                 })
                 .done(null, callback);
         } else {
-            userRepo.getUserForAccount('facebook', profile.id)
+            userRepo.getUserForAccount(provider, profile.id)
                 .then(loginOrCreateNewUser)
                 .done(null, callback);
         }

@@ -344,17 +344,17 @@ describe('User repository', function() {
             userRepository.createUser('user1')
                 .then(function(result) {
                     playerId = result.playerId;
-                    return userRepository.registerAccount(playerId, 'facebook', '12345678');
+                    return userRepository.registerAccount(playerId, 'facebook', '12345678', 'facebook.username');
                 })
                 .then(function() {
-                    return userRepository.registerAccount(playerId, 'twitter', '987654321');
+                    return userRepository.registerAccount(playerId, 'twitter', '987654321', 'tweeter');
                 })
                 .then(function() {
                     return userRepository.fetchUser(playerId);
                 })
                 .then(function(user) {
-                    assert.isArray(user.providers);
-                    assert.equal(user.providers.length, 2);
+                    assert.equal(user.providers.facebook, 'facebook.username');
+                    assert.equal(user.providers.twitter, 'tweeter');
                     done();
                 })
                 .done();

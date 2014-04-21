@@ -7,30 +7,30 @@ var sinon = require('sinon');
 var assert = require('chai').assert;
 
 describe('User route', function() {
+    var request, response, route, userRepo;
+
+    beforeEach(function() {
+        request = {
+            session: {},
+            body: {},
+            flash: sinon.stub()
+        };
+        response = {
+            render: sinon.spy(),
+            redirect: sinon.spy()
+        };
+        route = routeFactory();
+        userRepo = userRepoFactory.build();
+    });
+
+    afterEach(function(done) {
+        mockRedis.createClient().flushdb(function (err) {
+            assert.isNull(err);
+            done();
+        });
+    });
+
     describe('details', function() {
-        var request, response, route, userRepo;
-
-        beforeEach(function() {
-            request = {
-                session: {},
-                body: {},
-                flash: sinon.stub()
-            };
-            response = {
-                render: sinon.spy(),
-                redirect: sinon.spy()
-            };
-            route = routeFactory();
-            userRepo = userRepoFactory.build();
-        });
-
-        afterEach(function(done) {
-            mockRedis.createClient().flushdb(function (err) {
-                assert.isNull(err);
-                done();
-            });
-        });
-
         describe('GET', function() {
             it('should display the user details view', function(done) {
                 route['/user']['/details'].get(request, response);
@@ -103,64 +103,88 @@ describe('User route', function() {
         });
 
         describe('POST', function() {
-            describe('new user', function() {
-                it('should create a new user when username is available', function(done) {
-                    request.body.username = 'User1';
-
-                    route['/user']['/details'].post(request, response);
-
-                    var token = setInterval(function() {
-                        if (response.redirect.called) {
-                            clearInterval(token);
-                            assert.isTrue(response.redirect.calledWith('/user/details'));
-                            assert.isDefined(request.session.playerId);
-
-                            userRepo.fetchUser(request.session.playerId, function(error, user) {
-                                assert.equal('User1', user.name);
-                                done();
-                            });
-                        }
-                    }, 10);
-                });
-
-                it('should return an error when username is not available', function(done) {
-                    userRepo.createUser('User1').then(function() {
-                        request.body.username = 'User1';
+            it('should persist additional details', function(done) {
+                userRepo.createUser('TestUser')
+                    .then(function(result) {
+                        request.session.playerId = result.playerId;
+                        request.body.gravatar = 'test@example.com';
                         route['/user']['/details'].post(request, response);
 
                         var token = setInterval(function() {
-                            if (response.render.called) {
+                            if (response.redirect.called) {
                                 clearInterval(token);
-                                assert.isTrue(response.render.calledWith('user/details'));
-                                assert.isDefined(response.render.firstCall.args[1].error);
-                                done();
+                                userRepo.fetchUser(result.playerId)
+                                    .then(function(user) {
+                                        assert.equal(user.gravatar, 'test@example.com');
+                                        done();
+                                    })
+                                    .done();
+                            }
+                        }, 10);
+                    })
+                    .done();
+            });
+        });
+    });
+
+    describe('POST /name', function() {
+        describe('new user', function() {
+            it('should create a new user when username is available', function(done) {
+                request.body.username = 'User1';
+
+                route['/user']['/name'].post(request, response);
+
+                var token = setInterval(function() {
+                    if (response.redirect.called) {
+                        clearInterval(token);
+                        assert.isTrue(response.redirect.calledWith('/user/details'));
+                        assert.isDefined(request.session.playerId);
+
+                        userRepo.fetchUser(request.session.playerId, function(error, user) {
+                            assert.equal('User1', user.name);
+                            done();
+                        });
+                    }
+                }, 10);
+            });
+
+            it('should return an error when username is not available', function(done) {
+                userRepo.createUser('User1').then(function() {
+                    request.body.username = 'User1';
+                    route['/user']['/name'].post(request, response);
+
+                    var token = setInterval(function() {
+                        if (response.render.called) {
+                            clearInterval(token);
+                            assert.isTrue(response.render.calledWith('user/details'));
+                            assert.isDefined(response.render.firstCall.args[1].error);
+                            done();
+                        }
+                    }, 10);
+                }).done();
+            });
+        });
+
+        describe('logged in user', function() {
+            it('should update the name of the current user', function(done) {
+                userRepo.createUser('OriginalName')
+                    .then(function(result) {
+                        request.session.playerId = result.playerId;
+                        request.body.username = 'NewName';
+                        route['/user']['/name'].post(request, response);
+
+                        var token = setInterval(function() {
+                            if (response.redirect.called) {
+                                clearInterval(token);
+                                userRepo.fetchUser(result.playerId)
+                                    .then(function(user) {
+                                        assert.equal(user.name, 'NewName');
+                                        done();
+                                    })
+                                    .done();
                             }
                         }, 10);
                     }).done();
-                });
-            });
-
-            describe('logged in user', function() {
-                it('should update the name of the current user', function(done) {
-                    userRepo.createUser('OriginalName')
-                        .then(function(result) {
-                            request.session.playerId = result.playerId;
-                            request.body.username = 'NewName';
-                            route['/user']['/details'].post(request, response);
-
-                            var token = setInterval(function() {
-                                if (response.redirect.called) {
-                                    clearInterval(token);
-                                    userRepo.fetchUser(result.playerId)
-                                        .then(function(user) {
-                                            assert.equal(user.name, 'NewName');
-                                            done();
-                                        })
-                                        .done();
-                                }
-                            }, 10);
-                        }).done();
-                });
             });
         });
     });

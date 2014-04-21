@@ -13,15 +13,15 @@
     {{#error}}
         <h4 class="error">{{error}}</h4>
     {{/error}}
-    <form method="post">
+    <form method="post" action="/user/name">
         <h3>
             {{^persisted}}
                 <label for="username">New users, please choose a username&hellip;</label>
             {{/persisted}}
             {{#persisted}}
-                <label for="username">You are logged in as:</label>
+                <label for="username">You are logged in as</label>
             {{/persisted}}
-            <input id="username" name="username" type="text" value="{{username}}" maxlength="20">
+                <input id="username" name="username" type="text" value="{{username}}" maxlength="20">
             {{^persisted}}
                 <input type="submit" class="btn player-0" value="OK">
             {{/persisted}}
@@ -35,6 +35,42 @@
         <br />
         <br />
     {{/persisted}}
+    {{#details.providers}}
+        <h2>Profile</h2>
+        <div class="profile">
+            <img src="{{#details.avatar}}200{{/details.avatar}}" />
+            <dl>
+                <dt><label for="gravatar">Gravatar email address</label></dt>
+                <dd>
+                    <form method="post">
+                        <input type="text" name="gravatar" id="gravatar" value="{{details.gravatar}}">
+                        <input type="submit" class="btn player-0" value="Update">
+                    </form>
+                </dd>
+                <dt>Facebook Account</dt>
+                <dd>
+                    {{details.providers.facebook}}
+                    {{^details.providers.facebook}}
+                        <a class="btn social facebook" href="/auth/facebook">Sign in with Facebook</a>
+                    {{/details.providers.facebook}}
+                </dd>
+                <dt>Twitter Account</dt>
+                <dd>
+                    {{details.providers.twitter}}
+                    {{^details.providers.twitter}}
+                        <a class="btn social twitter" href="/auth/twitter">Sign in with Twitter</a>
+                    {{/details.providers.twitter}}
+                </dd>
+                <dt>Google Account</dt>
+                <dd>
+                    {{details.providers.google}}
+                    {{^details.providers.google}}
+                        <a class="btn social google" href="/auth/google">Sign in with Google</a>
+                    {{/details.providers.google}}
+                </dd>
+            </dl>
+        </div>
+    {{/details.providers}}
     {{^details.providers}}
         <h3>&hellip;or&nbsp;
             <a class="btn social facebook" href="/auth/facebook">Sign in with Facebook</a>
@@ -47,7 +83,7 @@
             <ul>
                 <li>Reserve your username indefinitely</li>
                 <li>Use the same name across all of your devices</li>
-                <li class="inactive">Choose a custom avatar (coming soon!)</li>
+                <li>Choose a custom avatar</li>
                 <li class="inactive">Appear in high score tables (coming soon!)</li>
             </ul>
         </div>
