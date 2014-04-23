@@ -188,4 +188,34 @@ describe('User route', function() {
             });
         });
     });
+
+    describe('POST /remove-account', function() {
+        it('should remove the external account from the user', function(done) {
+            var playerId;
+            userRepo.createUser('TestUser')
+                .then(function(result) {
+                    playerId = result.playerId;
+                    return userRepo.registerAccount(playerId, 'facebook', '12345678', 'test.user');
+                })
+                .then(function() {
+                    request.session.playerId = playerId;
+                    request.body.provider = 'facebook';
+
+                    route['/user']['/remove-account'].post(request, response);
+
+                    var token = setInterval(function() {
+                        if (response.redirect.called) {
+                            clearInterval(token);
+                            userRepo.fetchUser(playerId)
+                                .then(function(user) {
+                                    assert.isUndefined(user.providers);
+                                    done();
+                                })
+                                .done();
+                        }
+                    }, 10);
+                })
+                .done();
+        });
+    });
 });

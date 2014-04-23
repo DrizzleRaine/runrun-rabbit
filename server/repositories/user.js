@@ -12,6 +12,7 @@ module.exports.build = function buildUserRepo() {
 
     var _get = promise.denodeify(redisClient.get);
     var setnx = promise.denodeify(redisClient.setnx);
+    var del = promise.denodeify(redisClient.del);
     var exists = promise.denodeify(redisClient.exists);
     var expire = promise.denodeify(redisClient.expire);
     var persist = promise.denodeify(redisClient.persist);
@@ -131,13 +132,26 @@ module.exports.build = function buildUserRepo() {
                 .then(function(result) {
                     if (result) {
                         return persist(userId)
+                            .then(hset('player:' + userId + ':providers', provider, providerUsername))
+                            .then(hset('player:' + userId + ':providerIds', provider, providerId))
                             .then(function() {
-                                return hset('player:' + userId + ':providers', provider, providerUsername);
+                                return true;
                             });
                     } else {
                         return false;
                     }
                 }).nodeify(callback);
+        },
+        unregisterAccount: function(userId, provider, callback) {
+            return hget('player:' + userId + ':providerIds', provider)
+                .then(function(providerId) {
+                    if (providerId) {
+                        return del('external:' + provider + ':' + providerId)
+                            .then(hdel('player:' + userId + ':providers', provider))
+                            .then(hdel('player:' + userId + ':providerIds', provider));
+                    }
+                })
+                .nodeify(callback);
         },
         getUserForAccount: function(provider, providerId, callback) {
             return _get('external:' + provider + ':' + providerId).nodeify(callback);

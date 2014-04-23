@@ -39,6 +39,16 @@ module.exports = function() {
                         .done();
                 }
             },
+            '/remove-account': {
+                post: function(req, res) {
+                    userRepo.unregisterAccount(req.session.playerId, req.body.provider)
+                        .then(function() {
+                            req.flash('success', 'Account removed!');
+                            res.redirect('/user/details');
+                        })
+                        .done();
+                }
+            },
             '/name': {
                 post: function(req, res) {
                     var handleResult = function(successMessage) {

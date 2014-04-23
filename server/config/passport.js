@@ -77,7 +77,7 @@ var providerCallback = module.exports.providerCallback = function(provider) {
                                 if (result) {
                                     callback(null, true);
                                 } else {
-                                    callback(null, false, 'This facebook account is already associated with another user');
+                                    callback(null, false, 'This ' + provider + ' account is already associated with another user');
                                 }
                             });
                     } else {

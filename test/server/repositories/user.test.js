@@ -359,5 +359,30 @@ describe('User repository', function() {
                 })
                 .done();
         });
+
+        it('should allow users to unregister an external account', function(done) {
+            var playerId;
+
+            userRepository.createUser('user1')
+                .then(function(result) {
+                    playerId = result.playerId;
+                    return userRepository.registerAccount(playerId, 'facebook', '12345678', 'facebook.username');
+                })
+                .then(function() {
+                    return userRepository.registerAccount(playerId, 'twitter', '987654321', 'tweeter');
+                })
+                .then(function() {
+                    return userRepository.unregisterAccount(playerId, 'facebook');
+                })
+                .then(function() {
+                    return userRepository.fetchUser(playerId);
+                })
+                .then(function(user) {
+                    assert.isUndefined(user.providers.facebook);
+                    assert.equal(user.providers.twitter, 'tweeter');
+                    done();
+                })
+                .done();
+        });
     });
 });

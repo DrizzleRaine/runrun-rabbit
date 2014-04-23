@@ -49,21 +49,39 @@
                 </dd>
                 <dt>Facebook Account</dt>
                 <dd>
-                    {{details.providers.facebook}}
+                    {{#details.providers.facebook}}
+                        <form method="post" action="/user/remove-account">
+                            {{details.providers.facebook}}
+                            <input type="hidden" name="provider" value="facebook">
+                            <input type="submit" class="btn player-2" value="x" title="Remove">
+                        </form>
+                    {{/details.providers.facebook}}
                     {{^details.providers.facebook}}
                         <a class="btn social facebook" href="/auth/facebook">Sign in with Facebook</a>
                     {{/details.providers.facebook}}
                 </dd>
                 <dt>Twitter Account</dt>
                 <dd>
-                    {{details.providers.twitter}}
+                    {{#details.providers.twitter}}
+                        <form method="post" action="/user/remove-account">
+                            {{details.providers.twitter}}
+                            <input type="hidden" name="provider" value="twitter">
+                            <input type="submit" class="btn player-2" value="x" title="Remove">
+                        </form>
+                    {{/details.providers.twitter}}
                     {{^details.providers.twitter}}
                         <a class="btn social twitter" href="/auth/twitter">Sign in with Twitter</a>
                     {{/details.providers.twitter}}
                 </dd>
                 <dt>Google Account</dt>
                 <dd>
-                    {{details.providers.google}}
+                    {{#details.providers.google}}
+                        <form method="post" action="/user/remove-account">
+                            {{details.providers.google}}
+                            <input type="hidden" name="provider" value="google">
+                            <input type="submit" class="btn player-2" value="x" title="Remove">
+                        </form>
+                    {{/details.providers.google}}
                     {{^details.providers.google}}
                         <a class="btn social google" href="/auth/google">Sign in with Google</a>
                     {{/details.providers.google}}
