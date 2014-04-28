@@ -38,18 +38,17 @@ function configure(io) {
 
         var clientsStarted = 0;
 
-        var playerNames = [];
+        var players = [];
         io.sockets.clients(room).forEach(function (socket, index) {
             // See https://github.com/senchalabs/connect/issues/588
-            playerNames[index] =
+            players[index] =
                 cookieParser(socket.handshake, {})
                     .then(function() {
                         return userRepo.fetchUser(socket.handshake.signedCookies[process.env.SESSION_COOKIE_KEY].playerId);
-                    })
-                    .then(function(player) { return player ? player.name : null; });
+                    });
         });
 
-        promise.all(playerNames).then(function(players) {
+        promise.all(players).then(function(loadedPlayers) {
             io.sockets.clients(room).forEach(function (socket, index) {
                 socket.emit('start', {
                     playerId: index,
@@ -58,7 +57,7 @@ function configure(io) {
                     seed: gameData.seed,
                     totalTime: gameData.totalTime,
                     logLevel: process.env.LOG_LEVEL,
-                    players: players
+                    players: loadedPlayers
                 });
                 socket.on('placeArrow', function(arrow) {
                     if (model.addArrow(index, arrow)) {

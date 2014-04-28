@@ -41,7 +41,12 @@ h3 {
     text-align: center;
 }
 
-#game canvas, .hud {
+#game {
+    width: 900px;
+    margin: auto;
+}
+
+#game canvas {
     display: block;
     margin: 0 auto;
 }
@@ -106,13 +111,6 @@ h2.menuHint {
     font-weight: bold;
 }
 
-.hud {
-    text-align: center;
-    padding-top: 2em;
-    width: 576px;
-    cursor: default;
-}
-
 .container {
     min-width: 576px;
     text-align: center;
@@ -158,34 +156,41 @@ body, .btn, .btn-lg {
     margin-left: auto;
 }
 
-.hud h3, .hud .timer, .hud h4 {
-    float: left;
-}
-
-.hud h4:nth-child(odd) {
+#game .player {
     float: right;
+    clear: right;
+    border-radius: 24px;
+    color: white;
+    margin: 10px 0;
 }
 
-.hud h4 {
+#game .player:nth-child(odd) {
+    float: left;
+    clear: left;
+}
+
+#game .player img {
+    border-radius: 6px;
+}
+
+#game .player h4 {
     font-size: 1.5em;
+    width: 144px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
-.hud h3 {
-    font-size: 48px;
+#game .player .score {
+    font-size: 36px;
     text-align: center;
     width: 144px;
-    height: 96px;
-    padding-top: 48px;
     margin: 0;
+    padding-bottom: 12px;
 }
 
-.hud .timer {
-    margin: 0 72px;
-}
-
-h3.score {
-    color: #fff;
-    border-radius: 24px;
+#game .timer {
+    margin-top: 24px;
 }
 
 .btn {
