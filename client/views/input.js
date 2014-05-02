@@ -62,13 +62,22 @@ var offsetHandler = module.exports.offSetHandler = function offsetHandler(grid) 
     };
 
     function getRelativeX(event) {
-        offsetX = offsetX || grid.view.offsetLeft + (grid.view.offsetWidth - grid.view.width) / 2;
+        offsetX = offsetX || getOffset('Left', grid.view);
         return event.pageX - offsetX;
     }
 
     function getRelativeY(event) {
-        offsetY = offsetY || grid.view.offsetTop + (grid.view.offsetHeight - grid.view.height) / 2;
+        offsetY = offsetY || getOffset('Top', grid.view);
         return event.pageY - offsetY;
+    }
+
+    function getOffset(side, elem) {
+        var offset = 0;
+        while (elem.offsetParent) {
+            offset += elem['offset' + side];
+            elem = elem.offsetParent;
+        }
+        return offset;
     }
 
     function normalise(pixels) {

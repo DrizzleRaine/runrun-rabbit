@@ -101,7 +101,7 @@ module.exports = (function() {
                 totalPlayers: 2,
                 totalTime: 90000,
                 bots: [ new standard.Bot(1) ],
-                players: [{name: 'Human'}, {name: 'Computer'}]
+                players: [{name: 'Player'}, {name: 'Computer'}]
             });
         }
     };

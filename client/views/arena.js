@@ -10,8 +10,8 @@ module.exports = function build(parent, model, gameData, placeArrowCallback) {
     var sprites = require('../graphics/sprites.js')(grid);
     var cursors = require('../graphics/cursors.js')(grid);
 
-    parent.appendChild(grid.view);
     var hud = require('./hud').build(parent, gameData);
+    parent.appendChild(grid.view);
 
     var isRunning = true;
     var startTime = new Date().getTime();

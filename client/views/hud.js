@@ -12,6 +12,7 @@ exports.build = function build(parent, gameData) {
     var grid = parent.firstChild;
 
     var scores = [];
+    var playerDivs = [];
     for (var p = 0; p < gameData.totalPlayers; ++p) {
         var playerDiv = document.createElement('div');
         playerDiv.classList.add('player');
@@ -25,8 +26,8 @@ exports.build = function build(parent, gameData) {
         avatarImage.setAttribute('src',
             gravatar.url(gameData.players[p].gravatar || '', { d: 'mm', s: 128 }));
 
-        playerDiv.appendChild(nameField);
         playerDiv.appendChild(avatarImage);
+        playerDiv.appendChild(nameField);
 
         var scoreField = document.createElement('h3');
         scoreField.classList.add('score');
@@ -36,15 +37,30 @@ exports.build = function build(parent, gameData) {
         scoreField.appendChild(score);
         playerDiv.appendChild(scoreField);
 
-        parent.insertBefore(playerDiv, grid);
+        parent.appendChild(playerDiv, grid);
+        playerDivs.push({
+            player: p,
+            div: playerDiv
+        });
     }
 
     var graphics = require('../graphics/hud.js');
-    var timer = new graphics.Timer(gameData.totalTime);
+    var timer = new graphics.Timer(144, gameData.totalTime);
     parent.appendChild(timer.view);
 
     function update(stats) {
-        for (var p = 0; p < gameData.totalPlayers; ++p) {
+        playerDivs.sort(function(a, b) {
+            return stats.score[b.player] - stats.score[a.player];
+        });
+
+        var step = (parent.offsetHeight - playerDivs[0].div.offsetHeight) / (playerDivs.length - 1);
+
+        for (var p = 0; p < playerDivs.length; ++p) {
+            playerDivs[p].div.style.zIndex = 10 - p;
+            playerDivs[p].div.style.top = (p * step) + 'px';
+        }
+
+        for (p = 0; p < gameData.totalPlayers; ++p) {
             scores[p].textContent = stats.score[p].toString();
         }
         timer.update(gameData.totalTime - stats.time);
