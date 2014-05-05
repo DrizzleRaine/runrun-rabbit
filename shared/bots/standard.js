@@ -63,16 +63,16 @@ function findSourcePaths(model, finder, playerId) {
     return bestPaths.sort(comparePaths);
 }
 
-function findFoxPaths(model, finder, playerId) {
+function findFoxPaths(model, finder, ownPlayerId) {
     var bestPaths = [];
 
-    var targetPlayerId = (playerId + 1) % model.totalPlayers;
+    var targetPlayerId = (ownPlayerId + 1) % model.totalPlayers;
 
     if (model.totalPlayers > 2) {
         var targetPlayerScore = 0;
 
         model.playerScores.current.forEach(function (score, playerId) {
-            if (playerId !== playerId && score > targetPlayerScore) {
+            if (playerId !== ownPlayerId && score > targetPlayerScore) {
                 targetPlayerScore = score;
                 targetPlayerId = playerId;
             }
