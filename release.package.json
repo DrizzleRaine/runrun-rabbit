@@ -1,6 +1,6 @@
 {
   "name": "runrun-rabbit",
-  "main" : "./server/start.js",
+  "main": "./server/start.js",
   "version": "0.2.10",
   "dependencies": {
     "express": "3.x",
@@ -8,6 +8,7 @@
     "loglevel": "~0.4.0",
     "node-uuid": "1.4.x",
     "promise": "~4.0.0",
+    "rivets": "~0.6.6",
     "redis": "~0.10.1",
     "node-redis-mock": "~0.2.14",
     "hogan-express": "~0.5.2",
@@ -17,7 +18,7 @@
     "passport-facebook": "~1.0.3",
     "passport-twitter": "~1.0.2",
     "passport-google-oauth": "~0.1.5",
-    "connect-flash" : "~0.1.1",
+    "connect-flash": "~0.1.1",
     "gravatar": "~1.0.6"
   },
   "engines": {
