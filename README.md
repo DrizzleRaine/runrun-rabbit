@@ -27,3 +27,19 @@ Run:
 ```
 node start
 ```
+
+Deployment
+----------
+
+### By archive (e.g. modulus)
+```
+grunt release:zip
+```
+Then upload build/release/server.zip
+
+### By git (e.g. heroku)
+```
+grunt release:git
+cd release
+git push heroku master
+```

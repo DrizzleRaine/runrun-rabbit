@@ -2,7 +2,11 @@
 
 module.exports = function(grunt) {
     grunt.initConfig({
-        clean: [ 'build' ],
+        clean: {
+            build: ['build'],
+            release: ['release/**/*', '!release/.git'],
+            force: true
+        },
         jshint: {
             options: {
                 camelcase: true,
@@ -109,6 +113,17 @@ module.exports = function(grunt) {
                         rename: function(dest, src) { return src.replace('debug', 'production'); }
                     }
                 ]
+            },
+            release: {
+                files: [
+                    { src: 'Procfile', dest: 'release/' },
+                    {
+                        expand: true,
+                        cwd: 'build/production/',
+                        src: ['**'],
+                        dest: 'release/'
+                    }
+                ]
             }
         },
         compress: {
@@ -203,10 +218,10 @@ module.exports = function(grunt) {
     });
 
     grunt.registerTask('test', ['jshint', 'mochaTest']);
-    grunt.registerTask('default', ['test', 'clean', 'browserify', 'copy:debug']);
+    grunt.registerTask('default', ['test', 'clean:build', 'browserify', 'copy:debug']);
     grunt.registerTask('production', ['default', 'uglify', 'cssmin', 'copy:prod']);
-    grunt.registerTask('release', ['production', 'compress']);
-    grunt.registerTask('cover', ['clean', 'instrument', 'setInstrumentedSourceRoot', 'test', 'storeCoverage', 'makeReport']);
+    grunt.registerTask('cover', ['clean:build', 'instrument', 'setInstrumentedSourceRoot', 'test', 'storeCoverage', 'makeReport']);
     grunt.registerTask('run', ['default', 'concurrent']);
-    grunt.registerTask('deploy', ['production', 'exec:deploy']);
+    grunt.registerTask('release:zip', ['production', 'compress']);
+    grunt.registerTask('release:git', ['clean:release', 'production', 'copy:release']);
 };
