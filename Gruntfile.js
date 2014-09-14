@@ -105,6 +105,7 @@ module.exports = function(grunt) {
             prod: {
                 files: [
                     { src: ['release.package.json'], dest: 'build/production/package.json' },
+                    { src: ['npm-shrinkwrap.json'], dest: 'build/production/npm-shrinkwrap.json' },
                     {
                         expand: true,
                         src: ['build/debug/**'],

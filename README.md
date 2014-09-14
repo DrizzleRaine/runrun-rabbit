@@ -25,11 +25,17 @@ grunt
 
 Run:
 ```
-node start
+grunt run
 ```
 
-Deployment
+Releasing
 ----------
+
+First shrinkwrap npm packages
+```
+npm shrinkwrap
+```
+(Run ```npm prune``` if there are any extraneous packages)
 
 ### By archive (e.g. modulus)
 ```
