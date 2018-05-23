@@ -6,22 +6,25 @@ var directionUtils = require('../utils/direction.js');
 
 var Bot = module.exports.Bot = function Bot(playerId) {
     this.playerId = playerId;
+    this.arrows = [];
 };
 
-// Note: If this is set less than the time taken for a critter to cross a square, then
-// the behaviour of the fox and rabbit path placement may be odd, as arrows are placed
-// based on where the critter is going to be, so have to be left untouched for a while
-var UPDATE_INTERVAL = 500;
+// Adjusting this affects the difficulty
+//  - 500 is almost self-defeating
+//  - 250 feels like a good human player
+//  - 50 is inhumanly good
+var UPDATE_INTERVAL = 250;
 
 var MAX_ARROWS = require('../arrows.js').MAX_ARROWS;
-Bot.prototype.implementPath = function implementPath(chosenPath) {
-    chosenPath.arrows.forEach(function (arrow) {
-        this.model.addArrow(this.playerId, arrow);
-    }.bind(this));
-};
 
 Bot.prototype.update = function update() {
     if (!this.model.isRunning) {
+        return;
+    }
+
+    if (this.arrows.length) {
+        this.model.addArrow(this.playerId, this.arrows.shift());
+        setTimeout(this.update.bind(this), UPDATE_INTERVAL);
         return;
     }
 
@@ -29,11 +32,11 @@ Bot.prototype.update = function update() {
         findFoxPaths(this.model, this.pathFinder, this.playerId)
             .concat(findSourcePaths(this.model, this.pathFinder, this.playerId));
 
-    var totalArrows = 0;
     var chosenPath;
-    while (totalArrows < MAX_ARROWS && (chosenPath = bestPaths.shift())) {
-        totalArrows += chosenPath.arrows.length;
-        this.implementPath(chosenPath);
+    while (this.arrows.length < MAX_ARROWS - 1 && (chosenPath = bestPaths.shift())) {
+        chosenPath.arrows.forEach(function (arrow) {
+            this.arrows.push(arrow);
+        }.bind(this));
     }
 
     setTimeout(this.update.bind(this), UPDATE_INTERVAL);
