@@ -4,3 +4,8 @@ node_modules
 .idea
 build
 release
+bin
+bld
+.vs
+*.user
+*.pfx

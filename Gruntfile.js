@@ -70,6 +70,17 @@ module.exports = function(grunt) {
                         'rivets:rivets'
                     ]
                 }
+            },
+            uwp: {
+                src: ['client/main.js'],
+                dest: 'build/uwp/bundle.js',
+                options: {
+                    alias: [
+                        'client/views/menu.js:menu',
+                        'client/controllers/game.js:controllers/game',
+                        'rivets:rivets'
+                    ]
+                }
             }
         },
         mochaTest: {
@@ -124,6 +135,11 @@ module.exports = function(grunt) {
                         src: ['**'],
                         dest: 'release/'
                     }
+                ]
+            },
+            uwp: {
+                files: [
+                    { src: ['client/static/**'], dest: 'build/uwp/', expand: true, flatten: true, filter: 'isFile' }
                 ]
             }
         },
@@ -220,6 +236,7 @@ module.exports = function(grunt) {
 
     grunt.registerTask('test', ['jshint', 'mochaTest']);
     grunt.registerTask('default', ['test', 'clean:build', 'browserify', 'copy:debug']);
+    grunt.registerTask('uwp', ['test', 'clean:build', 'browserify:uwp', 'copy:uwp']);
     grunt.registerTask('production', ['default', 'uglify', 'cssmin', 'copy:prod']);
     grunt.registerTask('cover', ['clean:build', 'instrument', 'setInstrumentedSourceRoot', 'test', 'storeCoverage', 'makeReport']);
     grunt.registerTask('run', ['default', 'concurrent']);
