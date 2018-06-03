@@ -33,10 +33,11 @@ Bot.prototype.update = function update() {
             .concat(findSourcePaths(this.model, this.pathFinder, this.playerId));
 
     var chosenPath;
+    var chooseArrow = function (arrow) {
+        this.arrows.push(arrow);
+    }.bind(this);
     while (this.arrows.length < MAX_ARROWS - 1 && (chosenPath = bestPaths.shift())) {
-        chosenPath.arrows.forEach(function (arrow) {
-            this.arrows.push(arrow);
-        }.bind(this));
+        chosenPath.arrows.forEach(chooseArrow);
     }
 
     setTimeout(this.update.bind(this), UPDATE_INTERVAL);
