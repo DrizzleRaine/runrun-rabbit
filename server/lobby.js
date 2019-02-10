@@ -1,5 +1,7 @@
 'use strict';
 
+var PLAYERS_PER_ROOM = 2;
+
 function configure(server) {
     var crypto = require('crypto');
     var io = require('socket.io').listen(server);
@@ -9,20 +11,23 @@ function configure(server) {
 
     io.sockets.on('connection', function(socket) {
         var joinedRoom = false;
-        for (var room in io.sockets.manager.rooms) {
-            if (room.length > 0 && io.sockets.manager.rooms.hasOwnProperty(room)) {
-                room = room.substr(1);
-                if (io.sockets.clients(room).length === 1) {
-                    socket.join(room);
+        for (var roomId in io.sockets.adapter.rooms) {
+            if (io.sockets.adapter.rooms.hasOwnProperty(roomId) && roomId.startsWith('game:')) {
+                var existingPlayersInRoom = Object.keys(io.sockets.adapter.rooms[roomId].sockets).length;
+                if (existingPlayersInRoom < PLAYERS_PER_ROOM) {
+                    socket.join(roomId);
                     joinedRoom = true;
-                    game.start(room);
+                    if (existingPlayersInRoom + 1 === PLAYERS_PER_ROOM) {
+                        game.start(roomId);
+                    }
                     break;
                 }
             }
         }
         if (!joinedRoom) {
             crypto.pseudoRandomBytes(16, function(err, buf) {
-                socket.join(buf.toString());
+                var newRoom = 'game:' + buf.toString('base64');
+                socket.join(newRoom);
             });
         }
     });

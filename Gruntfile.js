@@ -16,7 +16,7 @@ module.exports = function(grunt) {
                 immed: true,
                 indent: 4,
                 newcap: true,
-                noarg:true,
+                noarg: true,
                 noempty: true,
                 nonew: true,
                 quotmark: true,
@@ -65,8 +65,8 @@ module.exports = function(grunt) {
                 dest: 'build/debug/client/bundle.js',
                 options: {
                     alias: [
-                        'client/views/menu.js:menu',
-                        'client/controllers/game.js:controllers/game',
+                        './client/views/menu.js:menu',
+                        './client/controllers/game.js:controllers/game',
                         'rivets:rivets'
                     ]
                 }

@@ -7,6 +7,7 @@ var multiplayerRoute = require('./routes/multiplayer.js');
 var userRoute = require('./routes/user.js');
 var passport = require('passport');
 var flash = require('connect-flash');
+var cookieSession = require('cookie-session');
 
 require('./config/passport.js')(passport);
 
@@ -36,10 +37,9 @@ exports.start = function(callback) {
     app.use(express.static(path.resolve(__dirname + '/../client')));
 
     app.use(express.urlencoded());
-    app.use(express.cookieParser());
-    app.use(express.cookieSession({
-        key: process.env.SESSION_COOKIE_KEY,
-        secret: process.env.SESSION_COOKIE_SECRET,
+    app.use(cookieSession({
+        name: process.env.SESSION_COOKIE_KEY,
+        keys: [process.env.SESSION_COOKIE_SECRET],
         cookie: { maxAge: 14 * 24 * 60 * 60 * 1000 }
     }));
     app.use(flash());
