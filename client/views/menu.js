@@ -3,7 +3,7 @@
 module.exports = function() {
     var container = document.getElementById('container');
     var gameController = require('../controllers/game.js');
-    var banner = require('./banner.js')(container);
+    var banner = require('../../ui/components/banner.js')(container);
     banner.show();
 
     // Setup model

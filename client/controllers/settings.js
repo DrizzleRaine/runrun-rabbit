@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = function(options) {
-    var viewFactory = require('./../views/arena.js');
+    var viewFactory = require('../../ui/components/arena.js');
     var modelFactory = require('../../shared/model.js');
     var spawning = require('../../shared/spawning.js');
     var fixtures = require('../../shared/fixtures.js');

@@ -26,7 +26,7 @@ module.exports = (function() {
         gameData.level = levels[gameData.levelId];
         gameData.random = new RNG(gameData.seed);
         model = modelFactory.build(gameData);
-        arena = require('./../views/arena.js')(container, model, gameData,
+        arena = require('../../ui/components/arena.js')(container, model, gameData,
             function placeArrow(newArrow) {
                 if (model.addArrow(gameData.playerId, newArrow) && socket) {
                     socket.emit('placeArrow', newArrow);
