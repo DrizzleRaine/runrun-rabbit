@@ -159,8 +159,8 @@ module.exports = function(grunt) {
         },
         nodemon: {
             dev: {
+                script: 'build/debug/server/start.js',
                 options: {
-                    file: 'build/debug/server/start.js',
                     watchedFolders: ['build/debug'],
                     delayTime: 1
                 }
